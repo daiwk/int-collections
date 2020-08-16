@@ -2171,6 +2171,10 @@ TreeNode findAncestor(TreeNode root, TreeNode node1, TreeNode node2) {
 
 # 回溯法
 
+[https://greyireland.gitbook.io/algorithm-pattern/suan-fa-si-wei/backtrack](https://greyireland.gitbook.io/algorithm-pattern/suan-fa-si-wei/backtrack)
+
+回溯法（backtrack）常用于遍历列表所有子集，是DFS深度搜索一种，一般用于**全排列**，穷尽所有可能，遍历的过程实际上是一个决策树的遍历过程。**时间复杂度一般O(N!)**，它**不像动态规划存在重叠子问题**可以优化，回溯算法就是**纯暴力穷举**，复杂度一般都很高。
+
 ## 子集问题(leetcode78)
 
 [https://leetcode-cn.com/problems/subsets/solution/zi-ji-by-leetcode/](https://leetcode-cn.com/problems/subsets/solution/zi-ji-by-leetcode/)
@@ -2200,9 +2204,9 @@ leetcode78: [https://leetcode-cn.com/problems/subsets/](https://leetcode-cn.com/
 
 首先，它们的解空间非常大：
 
-+ 全排列：$N!$。
-+ 组合：$N!$。
-+ 子集：$2^N$，每个元素都可能存在或者不存在。
++ 全排列：$$N!$$。
++ 组合：$$N!$$。
++ 子集：$$2^N$$，每个元素都可能存在或者不存在。
 
 在它们的指数级解法中，要确保生成的**结果完整**且**无冗余**，有三种常用的方法：
 
@@ -2375,7 +2379,7 @@ public:
 
 $$totalprofit=\sum_i{height(peak_i)-height(valley_i)}$$
 
-例如，在上述情况下，如果我们跳过$peak_i$和$valley_j$。试图通过考虑差异较大的点以获取更多的利润，获得的净利润总是会小与包含它们而获得的静利润，因为 C 总是小于 A+B。
+例如，在上述情况下，如果我们跳过$$peak_i$$和$$valley_j$$。试图通过考虑差异较大的点以获取更多的利润，获得的净利润总是会小与包含它们而获得的静利润，因为 C 总是小于 A+B。
 
 时间复杂度：O(n)。遍历一次。
 
