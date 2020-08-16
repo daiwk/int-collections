@@ -2171,6 +2171,52 @@ TreeNode findAncestor(TreeNode root, TreeNode node1, TreeNode node2) {
 
 # 回溯法
 
+## 子集问题(leetcode78)
+
+[https://leetcode-cn.com/problems/subsets/solution/zi-ji-by-leetcode/](https://leetcode-cn.com/problems/subsets/solution/zi-ji-by-leetcode/)
+
+leetcode78: [https://leetcode-cn.com/problems/subsets/](https://leetcode-cn.com/problems/subsets/)
+
+给定一组不含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。
+
+说明：解集不能包含重复的子集。
+
+```
+输入: nums = [1,2,3]
+输出:
+[
+  [3],
+  [1],
+  [2],
+  [1,2,3],
+  [1,3],
+  [2,3],
+  [1,2],
+  []
+]
+```
+
+观察全排列/组合/子集问题，它们比较相似，且可以使用一些通用策略解决。
+
+首先，它们的解空间非常大：
+
++ 全排列：$N!$。
++ 组合：$N!$。
++ 子集：$2^N$，每个元素都可能存在或者不存在。
+
+在它们的指数级解法中，要确保生成的**结果完整**且**无冗余**，有三种常用的方法：
+
++ 递归
++ 回溯
++ 基于**二进制位掩码**和对应位掩码之间的映射字典生成排列/组合/子集
+
+相比前两种方法，第三种方法将每种情况都简化为二进制数，易于实现和验证。此外，第三种方法具有最优的时间复杂度，可以生成按照字典顺序的输出结果。
+
+### 子集问题递归解法
+
+![](assets/recursion.png)
+
+
 ## 矩阵中的路径(offerNo12)--notdone
 
 ## 机器人的运动范围(offerNo13)--notdone
