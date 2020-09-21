@@ -1188,7 +1188,7 @@ nums2 = [3, 4]
 
 **解答：**
 
-方法1：
+方法1(复杂度O(m+n))：
 
 先归并两个数组，再取中点，归并的复杂度是O(m+n)，参考第88题[https://leetcode-cn.com/problems/merge-sorted-array/description/](https://leetcode-cn.com/problems/merge-sorted-array/description/)
 
@@ -1234,9 +1234,10 @@ public:
 };
 ```
 
-方法2：递归
+方法2：二分查找
 
-参考[https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/)
+[https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
+
 
 ## 合并两个有序数组
 
