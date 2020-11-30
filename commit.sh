@@ -5,7 +5,7 @@ grep offerNo ./int.md | awk -F'No' '{print $2}'| sort -n > progress.res.txt
 git add ./src/*/*.cpp
 git add ./assets
 git add progress.res.txt
-git add int.md
+git add *.md
 git add run.sh
 git add commit.sh
 
