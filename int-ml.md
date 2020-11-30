@@ -404,7 +404,7 @@ $$
 
 对于**第2条**，可以用反证法，如下图，蓝色是$$g(x)=0$$，橙色是$$f(x)$$的等值线(图里假设$$f(x)=x^2+y^2$$)，交点的$$\nabla f(x^*)$$的梯度和$$g(x)$$的切面不垂直，那么，可以找到更小的等值线，使夹角更接近90度，也就是说，这个点不是真正的最优点$$x^*$$。
 
-![等式约束-非相切](./assets/lagrange-equal-1.png){ max-height=50 }
+![等式约束-非相切](./assets/lagrange-equal-1.png)
 
 所以，在最优点$$x^*$$处，梯度$$\nabla g(x)$$和$$\nabla f(x)$$的方向必然**相同或相反**，也就是存在$$\lambda \neq 0$$，使得：
 
@@ -428,7 +428,7 @@ $$g(x)=0$$
 
 考虑不等式约束$$g(x)\le 0$$，最优点或者在边界$$g(x)=0$$上，或者在区域$$g(x)<0$$中。
 
-![(a)是等式约束，(b)是不等式约束](./assets/lagrange-equal-not-equal.png){ max-height=50 }
+![(a)是等式约束，(b)是不等式约束](./assets/lagrange-equal-not-equal.png)
 
 + 对于$$g(x)<0$$
 
