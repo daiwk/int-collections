@@ -39,20 +39,20 @@ a的ascii码：97
 如果两个线程同时首次调用instance方法且**同时检测到p是NULL值**，则两个线程会**同时构造一个实例给p**，因此是线程不安全的！！但如果放在进程级的初始化是不是也行。。。
 
 ```c++
-class singleton
+class SingletonLazy
 {
 protected:
-    singleton(){}
+    SingletonLazy(){}
 private:
-    static singleton* p;
+    static SingletonLazy* p;
 public:
-    static singleton* instance();
+    static SingletonLazy* instance();
 };
-singleton* singleton::p = NULL;
-singleton* singleton::instance()
+SingletonLazy* SingletonLazy::p = NULL;
+SingletonLazy* SingletonLazy::instance()
 {
     if (p == NULL)
-        p = new singleton();
+        p = new SingletonLazy();
     return p;
 }
 ```
@@ -70,29 +70,29 @@ singleton* singleton::instance()
 ### 加锁的经典版本懒汉实现
 
 ```c++
-class singleton
+class SingletonLazyLock
 {
 protected:
-    singleton()
+    SingletonLazyLock()
     {
-        pthread_mutex_init(&mutex);
+        pthread_mutex_init(&mutex, NULL);
     }
 private:
-    static singleton* p;
+    static SingletonLazyLock* p;
 public:
     static pthread_mutex_t mutex;
-    static singleton* initance();
+    static SingletonLazyLock* instance();
 };
 
-pthread_mutex_t singleton::mutex;
-singleton* singleton::p = NULL;
-singleton* singleton::initance()
+pthread_mutex_t SingletonLazyLock::mutex;
+SingletonLazyLock* SingletonLazyLock::p = NULL;
+SingletonLazyLock* SingletonLazyLock::instance()
 {
     if (p == NULL)
     {
         pthread_mutex_lock(&mutex);
         if (p == NULL)
-            p = new singleton();
+            p = new SingletonLazyLock();
         pthread_mutex_unlock(&mutex);
     }
     return p;
@@ -110,25 +110,25 @@ singleton* singleton::initance()
     + **返回其静态实例的地址**
 
 ```c++
-class singleton
+class SingletonLazyLockNoPtr
 {
 protected:
-    singleton()
+    SingletonLazyLockNoPtr()
     {
-        pthread_mutex_init(&mutex);
+        pthread_mutex_init(&mutex_noptr, NULL);
     }
 public:
-    static pthread_mutex_t mutex;
-    static singleton* initance();
+    static pthread_mutex_t mutex_noptr;
+    static SingletonLazyLockNoPtr* instance();
     int a;
 };
 
-pthread_mutex_t singleton::mutex;
-singleton* singleton::initance()
+pthread_mutex_t SingletonLazyLockNoPtr::mutex_noptr;
+SingletonLazyLockNoPtr* SingletonLazyLockNoPtr::instance()
 {
-    pthread_mutex_lock(&mutex);
-    static singleton obj;
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_lock(&mutex_noptr);
+    static SingletonLazyLockNoPtr obj;
+    pthread_mutex_unlock(&mutex_noptr);
     return &obj;
 }
 ```
@@ -141,18 +141,18 @@ singleton* singleton::initance()
 + 全局范围内**new一个对象给p**
 
 ```c++
-class singleton
+class SingletonHungry
 {
 protected:
-    singleton()
+    SingletonHungry()
     {}
 private:
-    static singleton* p;
+    static SingletonHungry* p;
 public:
-    static singleton* initance();
+    static SingletonHungry* instance();
 };
-singleton* singleton::p = new singleton();
-singleton* singleton::initance()
+SingletonHungry* SingletonHungry::p = new SingletonHungry();
+SingletonHungry* SingletonHungry::instance()
 {
     return p;
 }
