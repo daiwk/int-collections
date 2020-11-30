@@ -34,8 +34,9 @@ a的ascii码：97
 + 由一个**public**的类方法 **(instance函数)**返回单例类唯一的**static实例指针**
 + 全局范围内给p赋**初始值NULL**
 + insance函数里判断指针p是否为NULL，如果是就new一个，反之直接return p
++ 构造函数是空的
 
-如果两个线程同时首次调用instance方法且**同时检测到p是NULL值**，则两个线程会**同时构造一个实例给p**，因此是线程不安全的！！
+如果两个线程同时首次调用instance方法且**同时检测到p是NULL值**，则两个线程会**同时构造一个实例给p**，因此是线程不安全的！！但如果放在进程级的初始化是不是也行。。。
 
 ```c++
 class singleton
@@ -150,7 +151,7 @@ private:
 public:
     static singleton* initance();
 };
-singleton* singleton::p = new singleton;
+singleton* singleton::p = new singleton();
 singleton* singleton::initance()
 {
     return p;
