@@ -843,27 +843,24 @@ private:
 注意，中间那个while循环，每进行一次交换，就有一个数字在正确的位置上，而最外面的那个判断，如果位置正确就不会while，所以其实复杂度是O(n)
 
 ```c++
-bool dup(int numbers[], int length, int* dup) {
-    if(numbers == nullptr || length <= 0) {
+bool duplicate(int numbers[], int length, int* duplication) {
+    if (numbers == nullptr || length <= 0) {
         return false;
     }
-    for(int i = 0; i < length; ++i) {
-        if(numbers[i] < 0 || numbers[i] > length - 1) { // 边界检查
+    for (int i = 0; i < length; ++i) {
+        if (numbers[i] < 0 || numbers[i] > length - 1) {
             return false;
         }
     }
-
-    for(int i = 0; i < length; ++i) {
-        while (numbers[i] != i) {
+    for (int i = 0; i < length; ++i) {
+        while (numbers[i] != i) { //当前数不在他的位置上,那就把这个数放到他应该去的numbers[numbers[i]]上
             if (numbers[i] == numbers[numbers[i]]) {
-                *dup = numbers[i];
+                *duplication = numbers[i];
                 return true;
             }
-
-            //交换numbers[i]和numbers[numbers[i]]
             int tmp = numbers[i];
-            numbers[i] = numbers[temp];
-            numbers[temp] = temp;
+            numbers[i] = numbers[numbers[i]];
+            numbers[tmp] = tmp;
         }
     }
     return false;
