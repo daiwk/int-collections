@@ -2117,7 +2117,7 @@ public:
 };
 ```
 
-## 二叉树的最大深度--maybedone(offerNo55)
+## 二叉树的最大深度(offerNo55)
 
 给定一个二叉树，找出其最大深度。
 
@@ -2251,7 +2251,6 @@ TreeNode findAncestor(TreeNode root, TreeNode node1, TreeNode node2) {
 
 ## 二叉搜索树的第k大节点(offerNo54)--notdone
 
-## 二叉树的深度(offerNo55)--notdone
 
 # 递归法
 
