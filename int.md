@@ -835,9 +835,10 @@ private:
 * 先从头往后走，到第i个位置，
     * 开始一个while循环，判断该位置的数字numbers[i]是不是和它的下标i相等（是否在正确的位置上）
         * 相等的话，跳出while, ++i
-        * 不相等，那么比较这个数字a=numbers[i]和以这个数字为下标的数b=numbers[numbers[i]]
-            * 相等，找到了！
-            * 不等，交换两个数，**继续前面的while，也就是比较换完后的b和numbers[b]**！！！
+        * 不相等，那么比较这个数字a=numbers[i]和以这个数字为下标的数b=numbers[numbers[i]](while完了后，只交换一次)
+            * 相等，找到了！直接return
+            * 不等，交换两个数，
+            * ++i, 继续while
 
 注意，中间那个while循环，每进行一次交换，就有一个数字在正确的位置上，而最外面的那个判断，如果位置正确就不会while，所以其实复杂度是O(n)
 
@@ -858,12 +859,12 @@ bool dup(int numbers[], int length, int* dup) {
                 *dup = numbers[i];
                 return true;
             }
-        }
 
-        //交换numbers[i]和numbers[numbers[i]]
-        int tmp = numbers[i];
-        numbers[i] = numbers[temp];
-        numbers[temp] = temp;
+            //交换numbers[i]和numbers[numbers[i]]
+            int tmp = numbers[i];
+            numbers[i] = numbers[temp];
+            numbers[temp] = temp;
+        }
     }
     return false;
 }
