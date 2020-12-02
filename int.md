@@ -219,7 +219,7 @@ public:
     + 第二个指针初始指向新的末尾。
     + 如果第一个指针指向的是空格，那么第二个指针往前移三格，并依次置```0```、```2```、```%```，并前移第一个指针
     + 如果第一个指针指向的不是空格，那么第二个指针把第一个指针的值拷过来，并前移两个指针
-    + 当两个指针相遇时结束
+    + 当两个指针**相遇**时结束
 
 其中，```char*str```，直接用下标来取就行```str[xxlength]```，所以上面说的两个指针，其实就是两个下标~！
 
@@ -227,7 +227,7 @@ public:
 ```c++
 class Solution {
 public:
-	void replaceSpace(char *str,int length) {
+    void replaceSpace(char *str,int length) {
         if (str == NULL || length <= 0) {
             return;
         }
@@ -235,7 +235,9 @@ public:
         int new_len = 0;
         int space_cnt = 0;
         while (str[old_len] != '\0') {
-            if (str[old_len] == ' ') space_cnt++;
+            if (str[old_len] == ' ') {
+                space_cnt++;
+            }
             old_len++;
         }
         new_len = old_len + 2 * space_cnt;
@@ -244,21 +246,19 @@ public:
         }
         int pOldlength = old_len; //注意不要减一因为隐藏个‘\0’也要算里
         int pNewlength = new_len;
-        while (pOldlength >= 0 && pNewlength > pOldlength) {
-             if (str[pOldlength] == ' ') {
-                 str[pNewlength--]='0';
-                 str[pNewlength--]='2';
-                 str[pNewlength--]='%';
-                 } else {//不是空格就把pOldlength指向的字符装入pNewlength指向的位置
-                     str[pNewlength--]=str[pOldlength];
-                 }
-                 pOldlength--; //不管是if还是else都要把pOldlength前移      
-          }       
-
-	}
+        while (pOldlength >= 0 && pNewlength > pOldlength) {// 相遇时结束
+            if (str[pOldlength] == ' ') {
+                str[pNewlength--] = '0';
+                str[pNewlength--] = '2';
+                str[pNewlength--] = '%';
+            } else {//不是空格就把pOldlength指向的字符装入pNewlength指向的位置
+                str[pNewlength--] = str[pOldlength];
+            }
+            pOldlength--; //不管是if还是else都要把pOldlength前移      
+        }       
+    }
 };
 ```
-
 
 
 ## 亲密字符串
