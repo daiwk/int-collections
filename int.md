@@ -219,15 +219,15 @@ public:
     + 第二个指针初始指向新的末尾。
     + 如果第一个指针指向的是空格，那么第二个指针往前移三格，并依次置```0```、```2```、```%```，并前移第一个指针
     + 如果第一个指针指向的不是空格，那么第二个指针把第一个指针的值拷过来，并前移两个指针
-    + 当两个指针相遇时结束
+    + 当两个指针**相遇**时结束
 
-```char*str```，直接用下标来取就行```str[xxlength]```，所以上面说的两个指针，其实就是两个下标~！
+其中，```char*str```，直接用下标来取就行```str[xxlength]```，所以上面说的两个指针，其实就是两个下标~！
 
 
 ```c++
 class Solution {
 public:
-	void replaceSpace(char *str,int length) {
+    void replaceSpace(char *str,int length) {
         if (str == NULL || length <= 0) {
             return;
         }
@@ -235,7 +235,9 @@ public:
         int new_len = 0;
         int space_cnt = 0;
         while (str[old_len] != '\0') {
-            if (str[old_len] == ' ') space_cnt++;
+            if (str[old_len] == ' ') {
+                space_cnt++;
+            }
             old_len++;
         }
         new_len = old_len + 2 * space_cnt;
@@ -244,21 +246,19 @@ public:
         }
         int pOldlength = old_len; //注意不要减一因为隐藏个‘\0’也要算里
         int pNewlength = new_len;
-        while (pOldlength >= 0 && pNewlength > pOldlength) {
-             if (str[pOldlength] == ' ') {
-                 str[pNewlength--]='0';
-                 str[pNewlength--]='2';
-                 str[pNewlength--]='%';
-                 } else {//不是空格就把pOldlength指向的字符装入pNewlength指向的位置
-                     str[pNewlength--]=str[pOldlength];
-                 }
-                 pOldlength--; //不管是if还是else都要把pOldlength前移      
-          }       
-
-	}
+        while (pOldlength >= 0 && pNewlength > pOldlength) {// 相遇时结束
+            if (str[pOldlength] == ' ') {
+                str[pNewlength--] = '0';
+                str[pNewlength--] = '2';
+                str[pNewlength--] = '%';
+            } else {//不是空格就把pOldlength指向的字符装入pNewlength指向的位置
+                str[pNewlength--] = str[pOldlength];
+            }
+            pOldlength--; //不管是if还是else都要把pOldlength前移      
+        }       
+    }
 };
 ```
-
 
 
 ## 亲密字符串
@@ -835,35 +835,33 @@ private:
 * 先从头往后走，到第i个位置，
     * 开始一个while循环，判断该位置的数字numbers[i]是不是和它的下标i相等（是否在正确的位置上）
         * 相等的话，跳出while, ++i
-        * 不相等，那么比较这个数字a=numbers[i]和以这个数字为下标的数b=numbers[numbers[i]]
-            * 相等，找到了！
-            * 不等，交换两个数，**继续前面的while，也就是比较换完后的b和numbers[b]**！！！
+        * 不相等，那么比较这个数字a=numbers[i]和以这个数字为下标的数b=numbers[numbers[i]](while完了后，只交换一次)
+            * 相等，找到了！直接return
+            * 不等，交换两个数
+            * 继续while，看当前位置上的这个数
 
 注意，中间那个while循环，每进行一次交换，就有一个数字在正确的位置上，而最外面的那个判断，如果位置正确就不会while，所以其实复杂度是O(n)
 
 ```c++
-bool dup(int numbers[], int length, int* dup) {
-    if(numbers == nullptr || length <= 0) {
+bool duplicate(int numbers[], int length, int* duplication) {
+    if (numbers == nullptr || length <= 0) {
         return false;
     }
-    for(int i = 0; i < length; ++i) {
-        if(numbers[i] < 0 || numbers[i] > length - 1) { // 边界检查
+    for (int i = 0; i < length; ++i) {
+        if (numbers[i] < 0 || numbers[i] > length - 1) {
             return false;
         }
     }
-
-    for(int i = 0; i < length; ++i) {
-        while (numbers[i] != i) {
+    for (int i = 0; i < length; ++i) {
+        while (numbers[i] != i) { //当前数不在他的位置上,那就把这个数放到他应该去的numbers[numbers[i]]上
             if (numbers[i] == numbers[numbers[i]]) {
-                *dup = numbers[i];
+                *duplication = numbers[i];
                 return true;
             }
+            int tmp = numbers[i];
+            numbers[i] = numbers[numbers[i]];
+            numbers[tmp] = tmp;
         }
-
-        //交换numbers[i]和numbers[numbers[i]]
-        int tmp = numbers[i];
-        numbers[i] = numbers[temp];
-        numbers[temp] = temp;
     }
     return false;
 }
@@ -2119,7 +2117,7 @@ public:
 };
 ```
 
-## 二叉树的最大深度--maybedone(offerNo55)
+## 二叉树的最大深度(offerNo55)
 
 给定一个二叉树，找出其最大深度。
 
@@ -2253,7 +2251,6 @@ TreeNode findAncestor(TreeNode root, TreeNode node1, TreeNode node2) {
 
 ## 二叉搜索树的第k大节点(offerNo54)--notdone
 
-## 二叉树的深度(offerNo55)--notdone
 
 # 递归法
 
