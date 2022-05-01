@@ -18,8 +18,8 @@
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-        int carry = 0;
-        ListNode* dummy_head = new ListNode(0);
+        int carry = 0;// 进位
+        ListNode* dummy_head = new ListNode(0); //需要有个dummy head，最后return head->next
         ListNode* tmp = dummy_head;
         ListNode* ptr1 = l1;
         ListNode* ptr2 = l2;
@@ -28,10 +28,10 @@ public:
             int val2 = ptr2 != NULL? ptr2->val: 0;
             int sum = val1 + val2 + carry;
             //cout << sum << " " << carry << " " << val1 << " " << val2 << endl;
-            carry = sum / 10;
+            carry = sum / 10; // 很重要！！！！！新的carry
             int remain = sum % 10;
             tmp->next = new ListNode(remain);
-            ptr1 = (NULL == ptr1? NULL: ptr1->next);
+            ptr1 = (NULL == ptr1? NULL: ptr1->next); //判断的是ptr1，而不是ptr1->next！！！！！！
             ptr2 = (NULL == ptr2? NULL: ptr2->next);
             tmp = tmp->next;
         }
