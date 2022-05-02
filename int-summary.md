@@ -70,4 +70,54 @@ vector<int> inorderTraversal(TreeNode* root) {
     }
 ```
 
+# 回溯法
+
+回溯法：一种通过探索所有可能的候选解来找出所有的解的算法。如果候选解被确认不是一个解（或者至少不是最后一个解），回溯算法会通过在上一步进行一些变化抛弃该解，即回溯并且再次尝试。
+
+套路：
+调用：
+
+```c++
+        vector<string> res;
+        string cur;
+        backtrace(res, cur, xxx);
+        return res;
+```
+
+回溯函数：
+
+```c++
+    void backtrace(vector<string>& res, string& cur, xxx) {
+        if (aaaa) {
+            res.push_back(cur);
+            return;
+        }
+        if (bbbb) {
+            cur.push_back('aaa');
+            backtrace(res, cur, xxxx); // xxxx可能是+1 -1之类的操作
+            cur.pop_back();
+        }
+    }
+```
+
+## 全排列
+
+```c++
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int> > res;
+        backtrace(res, nums, 0, nums.size());
+        return res;
+    }
+    void backtrace(vector<vector<int> >& res, vector<int>& output, int first, int len) {
+        if (first == len) {
+            res.push_back(output);
+        }
+        for (int i = first; i < len; ++i) {
+            swap(output[i], output[first]); // 交换
+            backtrace(res, output, first + 1, len);
+            swap(output[i], output[first]); // 换回去
+        }
+    }
+```
+
 # dp
