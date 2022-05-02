@@ -43,7 +43,7 @@ public:
             root = stk.top();
             stk.pop(); // 栈顶扔出来
             res.emplace_back(root->val); // 值搞进去
-            root = root->right; // 开始右子树
+            root = root->right; // 开始原栈顶的右子树
         }
         return res;
     }
