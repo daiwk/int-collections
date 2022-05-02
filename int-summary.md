@@ -46,4 +46,28 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 # 图
 
+## dfs
+
+岛屿数量：以1开始，dfs，visited置0，dfs就是上下左右地递归：
+
+```c++
+   void dfs(vector<vector<char> >& grid, int r, int c) {
+        int rows = grid.size();
+        int cols = grid[0].size();
+        grid[r][c] = '0';
+        if (r -1 >= 0 && grid[r - 1][c] == '1') {
+            dfs(grid, r - 1, c); // 上
+        }
+        if (r + 1 < rows && grid[r + 1][c] == '1') {
+            dfs(grid, r + 1, c); // 下
+        }
+        if (c - 1 >= 0 && grid[r][c - 1] == '1') {
+            dfs(grid, r, c - 1); // 左
+        }
+        if (c + 1 < cols && grid[r][c + 1] == '1') {
+            dfs(grid, r, c+1); // 右
+        }
+    }
+```
+
 # dp
