@@ -1,3 +1,6 @@
+
+参考1：[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/)
+
 # 数组和字符串
 ## 三数之和
 
@@ -668,6 +671,42 @@ vector<int> inorderTraversal(TreeNode* root) {
         return false;
     }
 ```
+
+# 排序与搜索
+
+各排序算法总结
+
+![sort](./assets/sort.png)
+
+## 颜色分类
+即荷兰国旗问题
+数组里有0 1 2，要求相同颜色的相邻
+单指针，还可以用双指针，没太懂
+
+```c++
+    void sortColors(vector<int>& nums) {
+        int n = nums.size();
+        int ptr = 0;
+        // 遍历两次，第一遍把0交换到前面去，第二遍把1交换到0之后
+        // 用指针ptr标记最后一个0的下一位，第二遍从ptr开始
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] == 0) {
+                swap(nums[i], nums[ptr]);
+                ++ptr;
+            }
+        }
+        for (int i = ptr; i < n; ++i) {
+            if (nums[i] == 1) {
+                swap(nums[i], nums[ptr]);
+                ++ptr;
+            }
+        }
+    }
+```
+
+## 前k个高频元素
+
+
 
 # dp
 
