@@ -676,7 +676,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 ## 各排序算法总结
 
-![sort](./assets/sort.png)
+![sort](./assets/sort.jpeg)
 
 大小顶堆参考：
 
