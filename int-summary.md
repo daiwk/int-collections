@@ -470,7 +470,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 # 回溯法
 
-## 回溯模板
+## 回溯小结
 
 回溯法：一种通过探索所有可能的候选解来找出所有的解的算法。如果候选解被确认不是一个解（或者至少不是最后一个解），回溯算法会通过在上一步进行一些变化抛弃该解，即回溯并且再次尝试。
 
@@ -674,9 +674,48 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 # 排序与搜索
 
-各排序算法总结
+## 各排序算法总结
 
 ![sort](./assets/sort.png)
+
+大小顶堆参考：
+
+```c++
+//小顶堆(是大于。。不是小于)，这也是默认
+priority_queue <int,vector<int>,greater<int> > q;
+//大顶堆
+priority_queue <int,vector<int>,less<int> >q;
+//默认大顶堆
+priority_queue<int> a;
+
+// 自定义比较函数：（小顶堆，实现大于操作）
+struct MyCmp {
+    bool operator()(pair<int, int>& a, pair<int, int>& b) {
+        return a.second > b.second;
+    }
+};
+// 小顶堆
+priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
+```
+
+## 二分小结
+
+```c++
+    int search(vector<int>& nums, int target) {
+        int low = 0, high = nums.size() - 1;
+        while (low <= high) { // 小于等于
+            int mid = low + (high - low) / 2; // 标准写法，背下来
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] > target) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return -1;
+    }
+```
 
 ## 颜色分类
 即荷兰国旗问题
@@ -705,6 +744,117 @@ vector<int> inorderTraversal(TreeNode* root) {
 ```
 
 ## 前k个高频元素
+多存个map，堆里存的是个pair
+```c++
+    struct MyCmp {
+        bool operator()(pair<int, int>& a, pair<int, int>& b) {
+            return a.second > b.second;
+        }
+    };
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        // 先遍历一遍，map存<k,cnt>，然后遍历map，用个小顶堆
+        // 如果堆的元素个数小于 k，就可以直接插入堆中。
+        // 如果堆的元素个数等于 k，则检查堆顶与当前出现次数的大小。
+        //   如果堆顶更大，说明至少有 k 个数字的出现次数比当前值大，故舍弃当前值；
+        //   否则，就弹出堆顶，并将当前值插入堆中。
+
+        // c++的堆是priority_queue
+        unordered_map<int, int> word_count;
+        for (auto& v: nums) {
+            word_count[v]++;
+        }
+        // pop的是优先级最高的元素，top也是优先级最高的
+        // priorty_queue<int, vector<int>, cmp> 这是定义方式，一定要有个vec
+        priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
+        for (auto& [num, cnt]: word_count) {
+            if (q.size() < k) {
+                q.emplace(num, cnt);
+            } else {
+                if (q.top().second < cnt) {
+                    q.pop();
+                    q.emplace(num, cnt);
+                }
+            }
+        }
+        vector<int> res;
+        while (!q.empty()){
+            res.emplace_back(q.top().first);
+            q.pop();
+        }
+        return res;
+    }
+```
+
+## 数组中的第k个最大元素
+
+堆顶就是了
+
+```c++
+    int findKthLargest(vector<int>& nums, int k) {
+        //小顶堆，堆顶就是要的
+        struct MyCmp {
+            bool operator()(int a, int b) {
+                return a > b;
+            }
+        };
+        priority_queue<int, vector<int>, MyCmp> q;
+        for (auto& i: nums) {
+            if (q.size() < k) {
+                q.emplace(i);
+            } else {
+                if (i > q.top()) {
+                    q.pop();
+                    q.emplace(i);
+                }
+            }
+        }
+        return q.top();
+    }
+```
+
+## 寻找峰值
+
+二分，类似旋转数组，如果mid不是符合条件的，那看看是在上升还是在下降，如果是在上升，那就看右边区间，如果是下降，那看左边。
+
+```c++
+    // 可以搞成匿名函数
+    // pair<int, int> get(int i, int n, vector<int> & nums) {
+    //     // 方便处理nums[-1]和nums[n]的边界情况
+    //     if (i == -1 || i == n) {
+    //         return {0, 0};
+    //     }
+    //     return {1, nums[i]};
+    //     //保证能取到的比越界的大，都能取到的时候，用实际的数比较
+    // }
+    int findPeakElement(vector<int>& nums) {
+        // 二分，类似旋转数组，如果mid不是符合条件的，那看看是在上升还是在下降，
+        // 如果是在上升，那就看右边区间，如果是下降，那看左边。
+        int left = 0, right = nums.size() - 1;
+        int n = nums.size();
+        auto get = [&](int i) -> pair<int, int> {
+            // 方便处理nums[-1]和nums[n]的边界情况
+            if (i == -1 || i == n) {
+                return {0, 0};
+            }
+            return {1, nums[i]};
+            //保证能取到的比越界的大，都能取到的时候，用实际的数比较
+        };
+        while (left <= right) {
+            int mid = left + (right - left) / 2; //标准mid写法
+            if (get(mid - 1) < get(mid) && get(mid) > get(mid + 1)) {
+                return mid;
+            }
+            if (get(mid) < get(mid + 1)) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return -1;
+    }
+```
+
+## 在排序数组中查找元素的第一个和最后一个位置
 
 
 
