@@ -1057,5 +1057,157 @@ public:
 ## 最长递增子序列
 
 ```c++
+    int lengthOfLIS(vector<int>& nums) {
+        // 不要求连续，比如[3,6,2,7]是[0,3,1,6,2,2,7]的子序列
+        // dp[i]：以第i个数字结尾（选了nums[i]）的最长递增子序列的长度
+        // dp[i] = max(dp[j]) +1, 0<=j<i，nums[j] < nums[i]，这样才能递增
+        // 最终的结果是max(dp[i])
+        int n = nums.size();
+        if (n == 0) {
+            return 0;
+        }
+        vector<int> dp(n, 0);
+        int res = 0;
+        for (int i = 0; i < n; ++i) {
+            dp[i] = 1;
+            for (int j = 0; j < i; ++j) {
+                if (nums[j] < nums[i]) {
+                    dp[i] = max(dp[i], dp[j] + 1);
+                }
+            }
+            res = max(res, dp[i]);
+        }
+        return res;
+    }
+```
+
+# 设计
+
+## 二叉树的序列化与反序列化
+
+```c++
+class Codec {
+public:
+
+    // 前序遍历，到叶子的时候，左右儿子均搞成None
+    void rser(TreeNode* root, string& str) {
+        if (root == nullptr) {
+            str += "None,";
+        } else {
+            str += to_string(root->val) + ",";
+            rser(root->left, str);
+            rser(root->right, str);
+            //cout << str << endl;
+        }
+    }
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        string res;
+        rser(root, res);
+        return res;
+    }
+
+    TreeNode* rde(list<string>& data_vec) {
+        // 如果当前的元素为 None，则当前为空树
+        // 否则先解析这棵树的左子树，再解析它的右子树
+        // list的front是第一个元素的值，begin是迭代器
+        if (data_vec.front() == "None") {
+            data_vec.erase(data_vec.begin());
+            return nullptr;
+        }
+        TreeNode* root = new TreeNode(stoi(data_vec.front()));
+        data_vec.erase(data_vec.begin());
+        root->left = rde(data_vec);
+        root->right = rde(data_vec);
+        return root;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        list<string> data_vec;
+        string str;
+        // 人肉实现下split
+        for (auto &ch: data) {
+            if (ch == ',') {
+                data_vec.push_back(str);
+                str.clear();
+            } else {
+                str.push_back(ch);
+            }
+        }
+        if (!str.empty()) {
+            data_vec.push_back(str);
+            str.clear();
+        }
+        return rde(data_vec);
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec ser, deser;
+// TreeNode* ans = deser.deserialize(ser.serialize(root));
 
 ```
+
+## O(1) 时间插入、删除和获取随机元素
+
+```c++
+class RandomizedSet {
+public:
+    // 数组可以o(1)地获取元素，哈希可以o(1)插入删除，
+    // 二者结合起来就是vec+hashmap
+    RandomizedSet() {
+        // 初始化随机种子
+        srand((unsigned)time(NULL));
+    }
+    
+    bool insert(int val) {
+        // 塞进vec里，同时记录下标到map中
+        if (indices.count(val)) {
+            return false;
+        }
+        int index = nums.size();
+        nums.emplace_back(val);
+        indices[val] = index;
+        return true;
+    }
+    
+    bool remove(int val) {
+        // 为了o(1)，先把这个数找出来，
+        // 然后在vec把这个元素换成最后一个元素，pop_back就行
+        // hashmap里也删掉，同时更新last的下标
+        if (!indices.count(val)) {
+            return false;
+        }
+        int index = indices[val];
+        int last = nums.back();
+        nums[index] = last;
+        nums.pop_back();
+        indices[last] = index;
+        indices.erase(val);
+        return true;
+    }
+    
+    int getRandom() {
+        int rand_idx = rand() % nums.size();
+        return nums[rand_idx];
+    }
+    vector<int> nums;
+    unordered_map<int, int> indices;
+};
+
+/**
+ * Your RandomizedSet object will be instantiated and called as such:
+ * RandomizedSet* obj = new RandomizedSet();
+ * bool param_1 = obj->insert(val);
+ * bool param_2 = obj->remove(val);
+ * int param_3 = obj->getRandom();
+ */
+```
+
+# 数学
+
+## 快乐数
+
+# 其他
+
