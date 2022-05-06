@@ -13,7 +13,7 @@ a的ascii码：97
 
 例如输入0xA，输出10
 
-```c++
+```cpp
     int a;
     while (cin >> hex >> a) {
         cout << a << endl;
@@ -21,7 +21,7 @@ a的ascii码：97
 ```
 
 
-# c++基础
+# cpp基础
 
 ## 实现单例模式
 
@@ -38,7 +38,7 @@ a的ascii码：97
 
 如果两个线程同时首次调用instance方法且**同时检测到p是NULL值**，则两个线程会**同时构造一个实例给p**，因此是线程不安全的！！但如果放在进程级的初始化是不是也行。。。
 
-```c++
+```cpp
 class SingletonLazy
 {
 protected:
@@ -69,7 +69,7 @@ SingletonLazy* SingletonLazy::instance()
 
 ### 加锁的经典版本懒汉实现
 
-```c++
+```cpp
 class SingletonLazyLock
 {
 protected:
@@ -109,7 +109,7 @@ SingletonLazyLock* SingletonLazyLock::instance()
     + 释放锁pthread_mutex_unlock
     + **返回其静态实例的地址**
 
-```c++
+```cpp
 class SingletonLazyLockNoPtr
 {
 protected:
@@ -140,7 +140,7 @@ SingletonLazyLockNoPtr* SingletonLazyLockNoPtr::instance()
 + 由一个**public**的类方法 **(instance函数)**返回单例类唯一的**static实例指针**，实现时**直接返回p**
 + 全局范围内**new一个对象给p**
 
-```c++
+```cpp
 class SingletonHungry
 {
 protected:
@@ -186,7 +186,7 @@ SingletonHungry* SingletonHungry::instance()
 对于本题而言，当 needle 是空字符串时我们应当返回 0 。这与C语言的 strstr() 以及 Java的 indexOf() 定义相符。
 
 
-```c++
+```cpp
 class Solution {
 public:
     int strStr(string haystack, string needle) {
@@ -224,7 +224,7 @@ public:
 其中，```char*str```，直接用下标来取就行```str[xxlength]```，所以上面说的两个指针，其实就是两个下标~！
 
 
-```c++
+```cpp
 class Solution {
 public:
     void replaceSpace(char *str,int length) {
@@ -305,7 +305,7 @@ public:
 + 如果AB完全相等，看看有没有重复数字，有的话，随便交换两个就能达到要求，否则不可能
 + else，只要遍历数组，找到两个位置i和j，```A[i]!=B[i]```，且```A[j]!=B[j]```，且```A[i]=B[j]```，且```A[j]=B[i]```
 
-```c++
+```cpp
 class Solution {
 public:
     bool buddyStrings(string A, string B) {
@@ -402,7 +402,7 @@ public:
 
 由于处于中位的数字不影响回文（它总是与自己相等），所以我们可以简单地将其去除。所以对于奇数位，就是判断x==revertedNumber/10
 
-```c++
+```cpp
 class Solution {
 public:
     bool isPalindrome(int x) {
@@ -450,7 +450,7 @@ public:
 
 写一个valid函数，记得参数变成long，然后去看这个long是不是在int32的范围里
 
-```c++
+```cpp
 class Solution {
 public:
     bool valid(long x) { // 注意，这里要是long
@@ -548,7 +548,7 @@ M             1000
 + 第一，如果当前数字是**最后一个数字**，或者**之后的数字比它小**的话，则加上当前数字
 + 第二，其他情况则减去这个数字(例如，IV，看到I的时候就是减去I，然后到V就是加V; XL，看到X的时候就是-X，然后到L就是加L)
 
-```c++
+```cpp
 class Solution {
 public:
     int romanToInt(string s) {
@@ -611,7 +611,7 @@ public:
 **解答：**
 注意一定要先判断st.size()>0再取top，不然会出错，其他的是常规操作
 
-```c++
+```cpp
 class Solution {
 public:
     bool isValid(string s) {
@@ -657,7 +657,7 @@ public:
 
 如果先出现了右括号，前面没有左括号的时候（top=0时出现了右括号），直接是NO
 
-```c++
+```cpp
 #include<iostream>
 #include<cstdio>
 #include<string>
@@ -701,7 +701,7 @@ int main()
 
 方法一：直接找到后一个数比上一个小的位置，那这后一个数就是我们要的了：
 
-```c++
+```cpp
 class Solution {
 public:
     int minNumberInRotateArray(vector<int> rotateArray) {
@@ -755,7 +755,7 @@ array[low] = 4 ;array[mid] = 4 ; array[high] = 6 ;
 
 + 最终返回array[low]或者array[high]都行
 
-```c++
+```cpp
 class Solution {
 public:
     int minNumberInRotateArray(vector<int> rotateArray) {
@@ -785,7 +785,7 @@ public:
     + 如果为空，则将栈A中所有元素pop，并push进栈B，栈B出栈；
     + 如果不为空，栈B直接出栈。
 
-```c++
+```cpp
 class Solution
 {
 public:
@@ -842,7 +842,7 @@ private:
 
 注意，中间那个while循环，每进行一次交换，就有一个数字在正确的位置上，而最外面的那个判断，如果位置正确就不会while，所以其实复杂度是O(n)
 
-```c++
+```cpp
 bool duplicate(int numbers[], int length, int* duplication) {
     if (numbers == nullptr || length <= 0) {
         return false;
@@ -875,7 +875,7 @@ bool duplicate(int numbers[], int length, int* duplication) {
 
 二分的思想，数字是1~n，那么分成两半，各x个，算一下左边那一半在这个数组里出现的次数，如果比x大，说明重复数字出现在这个区间里，否则在另一个区间里。
 
-```c++
+```cpp
 int dup2(const int* numbers, int length) {
     if (numbers == nullptr || length <= 0) {
         return -1;
@@ -927,7 +927,7 @@ int count_range(const int* numbers, int length, int start, int end) {
 * 要查找数字比左下角数字小时，上移
 * 别写两重while
 
-```c++
+```cpp
 class Solution {
 public:
     bool Find(int target, vector<vector<int> > array) {
@@ -980,7 +980,7 @@ public:
 
 其实就是把按行遍历改成按列遍历输出，拿笔画一下就知道，例如有一个2x3的，push的顺序就是```a[0][0]、a[1][0]、a[2][0]、a[0][1]、...```
 
-```c++
+```cpp
 class Solution {
 public:
     vector<vector<int>> transpose(vector<vector<int>>& A) {
@@ -1038,7 +1038,7 @@ public:
 
 你可以想象内部操作如下:
 
-```c++
+```cpp
 // nums 是以“引用”方式传递的。也就是说，不对实参作任何拷贝
 int len = removeElement(nums, val);
 
@@ -1054,7 +1054,7 @@ for (int i = 0; i < len; i++) {
 **关键： 保留两个指针 i 和 j，其中 i 是慢指针，j是快指针。**
 用j来遍历数组，当nums[j]!=val时，把num[j]赋值给num[i]，然后移动i
 
-```c++
+```cpp
 class Solution {
 public:
     int removeElement(vector<int>& nums, int val) {
@@ -1086,7 +1086,7 @@ public:
 
 用一个map，key是元素值，value是idx 看新来的这个元素的目标值（tgt - nums[i]）在不在map里，在的话把它的value拿出来就行了。。
 
-```c++
+```cpp
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
@@ -1136,7 +1136,7 @@ public:
 * 对于j，如果在set中没找到这个元素s[j]，更新res，并把s[j]扔进set，再++j；
 * 如果找到了，那么，说明s[j]在set里了，这时候需要把开头的元素s[i]从set里删了，把i++，窗口的开始往右移一格
 
-```c++
+```cpp
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
@@ -1191,7 +1191,7 @@ nums2 = [3, 4]
 
 先归并两个数组，再取中点，归并的复杂度是O(m+n)，参考第88题[https://leetcode-cn.com/problems/merge-sorted-array/description/](https://leetcode-cn.com/problems/merge-sorted-array/description/)
 
-```c++
+```cpp
 class Solution {
 public:
     double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
@@ -1265,7 +1265,7 @@ nums2 = [2,5,6],       n = 3
 + 改变数组的索引，再次进行上面的比较，把最大的元素插入到array1中的第m+n-1位。
 + 循环一直到结束。循环结束条件：当index1或index2有一个小于0时，此时就可以结束循环了。如果index2小于0，说明目的达到了。如果index1小于0，就把array2中剩下的前面的元素都复制到array1中去就行。
 
-```c++
+```cpp
 class Solution {
 public:
     void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
@@ -1333,7 +1333,7 @@ dp[i] = max(dp[i - 1] + array[i], array[i]);
 + 如果dp[i-1]小于0，那么加上dp[i-1]后会变小，所以只取array[i]
 + 反之，array[i] + dp[i-1]
 
-```c++
+```cpp
 class Solution {
 public:
     int FindGreatestSumOfSubArray(vector<int> array) {
@@ -1399,7 +1399,7 @@ public:
 
 直接按顺序扔到一个vec里，然后返回前调用```std::reverse```把这个vec反转一下
 
-```c++
+```cpp
 /**
 *  struct ListNode {
 *        int val;
@@ -1427,7 +1427,7 @@ public:
 
 使用栈，后进先出：
 
-```c++
+```cpp
 #include <stack>
 
 class Solution {
@@ -1461,7 +1461,7 @@ public:
 
 我们遍历所有结点并在哈希表中存储每个结点的引用（或内存地址）。如果当前结点为空结点 null（即已检测到链表尾部的下一个结点），那么我们已经遍历完整个链表，并且该链表不是环形链表。如果当前结点的引用已经存在于哈希表中，那么返回 true（即该链表为环形链表）。
 
-```c++
+```cpp
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -1495,7 +1495,7 @@ public:
 
 时间复杂度的分析见[https://leetcode-cn.com/problems/linked-list-cycle/solution/](https://leetcode-cn.com/problems/linked-list-cycle/solution/)
 
-```c++
+```cpp
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -1563,7 +1563,7 @@ public:
 
 这样就相当于把4前移了到3的位置，然后把4删了。。成立的前提是，我们要删除的节点不是末尾。
 
-```c++
+```cpp
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -1601,7 +1601,7 @@ public:
 **方法一：set+双指针**
 双指针，记得理清楚什么时候两个指针后移就行，记得用new ListNode(xx)，还有insert的时间点
 
-```c++
+```cpp
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -1641,7 +1641,7 @@ public:
 
 注意：只有当next!=当前值时，才i = i->next；不然超过两个连续的重复就干不掉了，例如[1,1,1,1,2]
 
-```c++
+```cpp
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -1687,7 +1687,7 @@ public:
 * while的条件是或，处理两个链表不等长的情况
 * while外面，如果还有carry，要再new一个
 
-```c++
+```cpp
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -1744,7 +1744,7 @@ public:
 
 递归：
 
-```c++
+```cpp
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -1782,7 +1782,7 @@ public:
 + push根，
 + while栈不空：pop栈顶，输出数字，push**栈顶右孩子**，push**栈顶左孩子**
 
-```c++
+```cpp
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode *root) {
@@ -1810,7 +1810,7 @@ public:
 
 不是非常非常懂。。先记着
 
-```c++
+```cpp
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -1850,7 +1850,7 @@ public:
 
 递归：
 
-```c++
+```cpp
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -1885,7 +1885,7 @@ public:
 
 前序遍历 根->左->右 变成 根->右->左 结果再reverse一下
 
-```c++
+```cpp
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -1925,7 +1925,7 @@ public:
 
 先从根往左一直入栈，直到为空，然后判断栈顶元素的右孩子，如果不为空且未被访问过，则从它开始重复左孩子入栈的过程；否则说明此时栈顶为要访问的节点（因为左右孩子都是要么为空要么已访问过了），出栈然后访问即可，接下来再判断栈顶元素的右孩子...直到栈空。
 
-```c++
+```cpp
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -1991,7 +1991,7 @@ public:
 + head->right就是递归rightt_pre,right_in的返回结果
 + 返回head
 
-```c++
+```cpp
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -2072,7 +2072,7 @@ public:
 * 它们的两个根结点具有相同的值。
 * 每个树的右子树都与另一个树的左子树镜像对称。
 
-```c++
+```cpp
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -2107,9 +2107,9 @@ public:
 
 当队列为空时，或者我们检测到树不对称（即从队列中取出**两个不相等的连续结点**）时，该算法结束。
 
-注意，c++的queue的front不会pop，要手动pop
+注意，cpp的queue的front不会pop，要手动pop
 
-```c++
+```cpp
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -2174,7 +2174,7 @@ public:
 
 空间复杂度：在最糟糕的情况下，树是完全不平衡的，例如每个结点只剩下左子结点，递归将会被调用 N 次，因此保持调用栈的存储将是O(N)。但在最好的情况下（树是完全平衡的），树的高度将是 log(N)。因此，在这种情况下的空间复杂度将是O(log(N))。
 
-```c++
+```cpp
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -2207,7 +2207,7 @@ public:
 
 注意，push的时候是cur_depth + 1，而非depth+1
 
-```c++
+```cpp
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -2248,7 +2248,7 @@ public:
 
 递归
 
-```c++
+```cpp
 TreeNode findAncestor(TreeNode root, TreeNode node1, TreeNode node2) {
     if (root == null) return null;
     if (root == node1 || root == node2) return root;
@@ -2376,7 +2376,7 @@ leetcode78: [https://leetcode-cn.com/problems/subsets/](https://leetcode-cn.com/
 3. j=0|| i-1时，直接放1
 4. else，放```res[i-2][j-1]+res[i-2][j]```
 
-```c++
+```cpp
 class Solution {
 public:
     vector<vector<int>> generate(int numRows) {
@@ -2431,7 +2431,7 @@ public:
 + minprice ：**迄今为止**所得到的**最小的谷值**。初始化为int_max，如果当前价格有比它小，那就更新它为当前价格
 + maxprofit，**迄今为止**所得到的**最大的利润**（卖出价格与最低价格之间的最大差值）。如果当前价格与minprice的差比它大，那就更新它
 
-```c++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -2498,7 +2498,7 @@ $$totalprofit=\sum_i{height(peak_i)-height(valley_i)}$$
 
 空间复杂度：O(1)。需要常量的空间。 
 
-```c++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -2529,7 +2529,7 @@ public:
 
 空间复杂度：O(1)。需要常量的空间。
 
-```c++
+```cpp
 class Solution {
 public:
      int maxProfit(vector<int>& prices) {
@@ -2580,14 +2580,14 @@ public:
 
 使用**栈**！！！因为我们只处理涉及最后或倒数第二轮的操作。
 
-1. c++11里的string和各种数值类型的互转：[http://www.cnblogs.com/gtarcoder/p/4925592.html](http://www.cnblogs.com/gtarcoder/p/4925592.html)
+1. cpp11里的string和各种数值类型的互转：[http://www.cnblogs.com/gtarcoder/p/4925592.html](http://www.cnblogs.com/gtarcoder/p/4925592.html)
 1. 如果是数字，就push进去
 1. 如果是C，就pop掉top，因为这个stack只存『有效的』
 1. 如果是D，就把top乘以2，push进去（因为这个stack只存『有效的』）
 1. 如果是+，计算top两个元素的和，当做这轮的得分，扔进去（注意，前面几轮的得分不能变，而因为是栈，所以我们先把top给pop出来，算原来两个top的和得到新的top，然后把原来的top扔回去，再把新的top扔进去。。。）
 1. stack没有迭代器，不能被遍历。。。所以只能一个个pop出来
 
-```c++
+```cpp
 class Solution {
 public:
     int calPoints(vector<string>& ops) {
@@ -2669,7 +2669,7 @@ public:
 
 用两个变量，分别表示5块和10块的个数。因为20块没用。。找不出去
 
-```c++
+```cpp
 class Solution {
 public:
     bool lemonadeChange(vector<int>& bills) {
