@@ -979,3 +979,83 @@ public:
 
 # dp
 
+## 跳跃游戏
+
+```c++
+    bool canJump(vector<int>& nums) {
+        // 贪心
+        // 对于每个位置x，实时维护最远可到达的位置x+nums[x]，
+        // 如果这个位置x在最远可到达位置内，那么可以从起点经过若干次跳跃到达
+        // 在遍历的过程中，如果最远可到达位置>=数组最后一个位置 ，就可以return True
+        int n = nums.size();
+        int most_right = 0;
+        for (int i = 0; i < n; ++i) {
+            if (i <= most_right) {
+                most_right = max(most_right, i + nums[i]);
+                if (most_right >= n - 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+```
+
+## 不同路径
+简单二维dp，注意边界条件
+
+```c++
+    int uniquePaths(int m, int n) {
+        // f(i,j)表示从左上角走到(i,j)的路径数量，
+        // 这个点只可能是从左边或者上面走过来的，所以
+        // f(i,j) = f(i-1,j) + f(i, j-1)
+        // 对于第0行和第0列，f(i,0)=1，f(0,j)=1，因为只有直着能走到
+        // f(0,0) = 1
+        vector<vector<int> > f(m, vector<int>(n));
+        for (int i = 0; i < m; ++i) {
+            f[i][0] = 1;
+        }
+        for (int j = 0; j < n; ++j) {
+            f[0][j] = 1;
+        }
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j <n; ++j) {
+                f[i][j] = f[i - 1][j] + f[i][j - 1];
+            }
+        }
+        return f[m - 1][n - 1];
+    }
+```
+
+## 零钱兑换
+
+```c++
+    int coinChange(vector<int>& coins, int amount) {
+        // dp[i]：组成金额i需要的最少硬币数
+        // dp[i] = min(dp[i-c[j]) + 1, j = 0,...,n-1，
+        // ！！！注意，是两项,dp[i]和dp[i - coins[j]]+ 1
+        // dp[i] = min(dp[i], dp[i - coins[j]]+ 1);
+        // c[j]是第j个面额，+1表示选择这个面额，那i-c[j]就是剩下的面额了
+        // ！！需要判断凑不出的情况：把dp初始化为amount + 1，如果凑不出就不更新，
+        // 如果最后还是amount +1那就是凑不出，当然也可以是amount+999
+        int xmax = amount + 1;
+        // 因为最后一个下标要是amount，所以大小是amount + 1
+        vector<int> dp(amount + 1, xmax);
+        dp[0] = 0;
+        for(int i = 1; i <= amount; ++i) {
+            for (int j = 0; j < coins.size(); ++j) {
+                // 遍历每种面额
+                if (coins[j] <= i) {
+                    dp[i] = min(dp[i], dp[i - coins[j]]+ 1);
+                }
+            }
+        }
+        return dp[amount] > amount? -1: dp[amount];
+    }
+```
+
+## 最长递增子序列
+
+```c++
+
+```
