@@ -9,6 +9,8 @@ git add *.md
 git add *.pdf
 git add run.sh
 git add commit.sh
+git add book.json
+git add gen_pdf.sh
 
 git config --global user.name daiwk
 
