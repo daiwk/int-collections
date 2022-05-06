@@ -1,3 +1,14 @@
 {
-    "plugins": ["mathjax", "katex"]
+    "plugins": [
+        "prism",
+        "-highlight"
+    ],
+    "pluginsConfig": {
+        "prism": {
+            "css": [
+                "prism-themes/themes/prism-base16-ateliersulphurpool.light.css"
+            ]
+        }
+    }
+   
 }
