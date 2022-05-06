@@ -60,7 +60,7 @@
 
 一个数是0，那就把这行和这列都变成0
 
-```
+```cpp
     void setZeroes(vector<vector<int>>& matrix) {
         int row = matrix.size();
         int col = matrix[0].size();
@@ -88,7 +88,7 @@
 
 其实就是个倒排
 
-```
+```cpp
     vector<vector<string>> groupAnagrams(vector<string>& strs) {
         unordered_map<string, vector<string> > xmap;
         for (auto& it: strs) {
@@ -108,7 +108,7 @@
 
 双指针
 
-```
+```cpp
    int lengthOfLongestSubstring(string s) {
         set<char> set_char;
         int res = 0;
@@ -138,7 +138,7 @@
 
 head->...->tail 是倒序的整数，求两个整数的和，并返回同样格式的链表
 
-```
+```cpp
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         int carry = 0;// 进位
         ListNode* dummy_head = new ListNode(0); //需要有个dummy head，最后return head->next
@@ -168,7 +168,7 @@ head->...->tail 是倒序的整数，求两个整数的和，并返回同样格�
 
 12345 变成13524
 
-```
+```cpp
     ListNode* oddEvenList(ListNode* head) {
         // 先把第一个偶数保存下来，
         // 跳着指(2->4,3->5)，
@@ -195,7 +195,7 @@ head->...->tail 是倒序的整数，求两个整数的和，并返回同样格�
 
 dp
 
-```
+```cpp
     string longestPalindrome(string s) {
         // p(i,j)表示i:j是回文串
         // 转移：
@@ -246,7 +246,7 @@ dp
 
 ### 递增的三元子序列
 
-```
+```cpp
     bool increasingTriplet(vector<int>& nums) {
         // first < second,且second肯定大于first，那么如果second右边的比second大，就是找到了
         int n = nums.size();
@@ -273,7 +273,7 @@ dp
 
 返回交点
 
-```
+```cpp
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
         // a b一直走，判断是否相等，假设b比a长
         // a到null的时候，a从b的头开始，这样和b一起走b-a的长度；
@@ -298,7 +298,7 @@ dp
 
 栈 一直塞左子树，取出栈顶，扔到res里去，pop出来，开始遍历原栈顶的右子树
 
-```
+```cpp
 vector<int> inorderTraversal(TreeNode* root) {
         stack<TreeNode*> stk;
         vector<int> res;
@@ -324,7 +324,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 队列+优先队列deque
 
-```
+```cpp
     vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
         // 层序遍历，加个参数，奇数左到右，偶数右到左
         // dequeue，双端队列
@@ -364,7 +364,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 前序：根 \[左]\[右] 中序：\[左] 根 \[右] 找到根在中序里的位置（先用map存好值-位置关系，o1查），然后递归
 
-```
+```cpp
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
         // 递归：
         // 通过前序找到根，再在中序里找到根的位置，左边是左子树，右边是右子树，这样就知道在前序里走几步是左，后面的就是右
@@ -406,7 +406,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 左边比根小，右边比根大，那就中序遍历，遍历完成左，然后根，然后右，然后k--，减到0就是了 中序就是栈
 
-```
+```cpp
     int kthSmallest(TreeNode* root, int k) {
         // 栈，中序遍历,左子树都比它小，所以找topk小，就先遍历完左的，再遍历它，再右
         stack<TreeNode*> stk;
@@ -433,7 +433,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 以1开始，dfs，visited置0，dfs就是上下左右地递归：
 
-```
+```cpp
     int numIslands(vector<vector<char>>& grid) {
         // dfs，看成一个无向图，垂直或者水平相邻的1之间是一条边
         // 遇到1，就以它为起点，dfs，每个走到的1重新记为0！！！
@@ -483,7 +483,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 套路： 调用：
 
-```
+```cpp
         vector<string> res; // 也可能是vec的vec
         string cur; // 也可能是vec，看题目
         backtrace(res, cur, xxx);
@@ -492,7 +492,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 回溯函数：
 
-```
+```cpp
     void backtrace(vector<string>& res, string& cur, xxx) { // xxx一般有两个参数，当前值a，上限len
         if (aaaa) { // a+1之类的 加到上限了如
             res.push_back(cur);
@@ -520,7 +520,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 ### 电话号码的字母组合
 
-```
+```cpp
     vector<string> letterCombinations(string digits) {
         // 回溯+dfs
         unordered_map<char, string> phone_map {
@@ -561,7 +561,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 ### 括号生成
 
-```
+```cpp
     vector<string> generateParenthesis(int n) {
         vector<string> res;
         string cur;
@@ -589,7 +589,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 ### 全排列
 
-```
+```cpp
     vector<vector<int>> permute(vector<int>& nums) {
         vector<vector<int> > res;
         backtrace(res, nums, 0, nums.size());
@@ -611,7 +611,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 调用两次dfs，因为对于子集来说，每个数字可以选也可以不选。
 
-```
+```cpp
     void dfs(vector<vector<int> > &res, const vector<int>& nums, vector<int>& cur_res, int cur) {
         if (cur == nums.size()) {
             res.push_back(cur_res);
@@ -634,7 +634,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 ### 单词搜索
 
-```
+```cpp
     bool check(vector<vector<char> >& board, vector<vector<int> >& visited, 
         int i, int j, string word, int k) {
         if (board[i][j] != word[k]) { //不匹配，不行 
@@ -685,7 +685,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 大小顶堆参考：
 
-```
+```cpp
 //小顶堆(是大于。。不是小于)，这也是默认
 priority_queue <int,vector<int>,greater<int> > q;
 //大顶堆
@@ -705,7 +705,7 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 ### 二分小结
 
-```
+```cpp
     int search(vector<int>& nums, int target) {
         int low = 0, high = nums.size() - 1;
         while (low <= high) { // 小于等于
@@ -726,7 +726,7 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 即荷兰国旗问题 数组里有0 1 2，要求相同颜色的相邻 单指针，还可以用双指针，没太懂
 
-```
+```cpp
     void sortColors(vector<int>& nums) {
         int n = nums.size();
         int ptr = 0;
@@ -751,7 +751,7 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 多存个map，堆里存的是个pair
 
-```
+```cpp
     struct MyCmp {
         bool operator()(pair<int, int>& a, pair<int, int>& b) {
             return a.second > b.second;
@@ -795,7 +795,7 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 堆顶就是了
 
-```
+```cpp
     int findKthLargest(vector<int>& nums, int k) {
         //小顶堆，堆顶就是要的
         struct MyCmp {
@@ -822,7 +822,7 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 二分，类似旋转数组，如果mid不是符合条件的，那看看是在上升还是在下降，如果是在上升，那就看右边区间，如果是下降，那看左边。
 
-```
+```cpp
     // 可以搞成匿名函数
     // pair<int, int> get(int i, int n, vector<int> & nums) {
     //     // 方便处理nums[-1]和nums[n]的边界情况
@@ -862,7 +862,7 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 ### 在排序数组中查找元素的第一个和最后一个位置
 
-```
+```cpp
 public:
     int binary_search(vector<int>& nums, int target, bool lower) {
         // ans初始化为n！！！，因为外面要-1，对于[1]且target=1的case，会有问题
@@ -897,7 +897,7 @@ public:
 
 ### 合并区间
 
-```
+```cpp
     vector<vector<int>> merge(vector<vector<int>>& intervals) {
         // 先排序，然后第一个区间扔进去，遍历下一个的时候，
         // 看看和前面的最后一个区间有没交集，如果无交集（当前左>已有右），那就扔到最后
@@ -921,7 +921,7 @@ public:
 
 ### 搜索旋转排序数组
 
-```
+```cpp
     int search(vector<int>& nums, int target) {
         // 局部有序，二分
         int n = nums.size();
@@ -960,7 +960,7 @@ public:
 
 ### 搜索二维矩阵II
 
-```
+```cpp
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
         // 右上角开始，保证只有一个搜索方向，要么变大要么变小，z字形
         int m = matrix.size(), n = matrix[0].size();
@@ -983,7 +983,7 @@ public:
 
 ### 跳跃游戏
 
-```
+```cpp
     bool canJump(vector<int>& nums) {
         // 贪心
         // 对于每个位置x，实时维护最远可到达的位置x+nums[x]，
@@ -1007,7 +1007,7 @@ public:
 
 简单二维dp，注意边界条件
 
-```
+```cpp
     int uniquePaths(int m, int n) {
         // f(i,j)表示从左上角走到(i,j)的路径数量，
         // 这个点只可能是从左边或者上面走过来的，所以
@@ -1032,7 +1032,7 @@ public:
 
 ### 零钱兑换
 
-```
+```cpp
     int coinChange(vector<int>& coins, int amount) {
         // dp[i]：组成金额i需要的最少硬币数
         // dp[i] = min(dp[i-c[j]) + 1, j = 0,...,n-1，
@@ -1059,7 +1059,7 @@ public:
 
 ### 最长递增子序列
 
-```
+```cpp
     int lengthOfLIS(vector<int>& nums) {
         // 不要求连续，比如[3,6,2,7]是[0,3,1,6,2,2,7]的子序列
         // dp[i]：以第i个数字结尾（选了nums[i]）的最长递增子序列的长度
@@ -1088,7 +1088,7 @@ public:
 
 ### 二叉树的序列化与反序列化
 
-```
+```cpp
 class Codec {
 public:
 
@@ -1153,7 +1153,7 @@ public:
 
 ### O(1) 时间插入、删除和获取随机元素
 
-```
+```cpp
 class RandomizedSet {
 public:
     // 数组可以o(1)地获取元素，哈希可以o(1)插入删除，
