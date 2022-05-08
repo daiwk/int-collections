@@ -1,6 +1,6 @@
 # int-summary
 
-## xx
+## 概述
 
 参考1：[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/)
 
@@ -1211,4 +1211,400 @@ public:
 
 ### 快乐数
 
+```cpp
+    int square_sum(int n) {
+        int sum = 0;
+        while (n > 0) {
+            int bit = n % 10;
+            sum += bit * bit;
+            n /= 10;
+        }
+        return sum;
+    }
+    bool isHappy(int n) {
+        // 只有两种情况，
+        // 一直走，最后是1，相当于无环链表，是快乐数，可以快慢指针
+        // 一个有环链表，可以快慢指针，相遇点不是1
+        // 没有第三种情况，因为数字再大，也会归结到一个小很多的数开始的链表，
+        // 具体证明可以参考https://leetcode-cn.com/problems/happy-number/solution/kuai-le-shu-by-leetcode-solution/
+        int fast = n, slow = n;
+        // ！！用do while，因为一开始fast=slow，但仍想走一次循环
+        do {
+            fast = square_sum(square_sum(fast));
+            slow = square_sum(slow);
+        } while (fast != slow);
+        if (fast == 1) {
+            return true;
+        }
+        return false;
+    }
+```
+
+### 阶乘后的零
+
+![](assets/trailing-zeros.png)
+其实这个就是n一直除以5，然后加起来
+
+```cpp
+    int trailingZeroes(int n) {
+        // 因为5*2=10,其实就是看质因子中5和2的个数，5的个数肯定没有2多，
+        // 如上图，其实就是一直除以5，再加起来
+        int res = 0;
+        while (n) {
+            n /= 5;
+            res += n;
+        }
+        return res;
+    }
+```
+
+###  Excel 表列序号
+
+```cpp
+    int titleToNumber(string columnTitle) {
+        // 其实是26进制转10进制
+        int num = 0;
+        long multiple = 1; // 从1开始，需要是long，因为int会爆！！！！！
+        //倒着来，其实是从最低位开始
+        for (int i = columnTitle.size() - 1; i >= 0; --i) {
+            int k = columnTitle[i] - 'A' + 1; // 记得+1...
+            num += k * multiple;
+            multiple *= 26;
+        }
+        return num;
+    }
+```
+
+### Pow(x, n)
+
+```cpp
+    double pow_sub(double x, long long N) {
+        double res = 1.0;
+        double x_contribute = x;
+        while (N > 0) {
+            if (N % 2 == 1) {
+                res *= x_contribute;
+            }
+            x_contribute *= x_contribute;
+            N /= 2;
+        }
+        return res;
+    }
+    double myPow(double x, int n) {
+        // 其实就是把幂指数n进行二进制拆分，如n=9，那就是
+        // 1 * 2^3 + 0 * 2^2 + 0 * 2^1 + 1 * 2^0= 2^3+1 
+        // ==> x^9=x^8 *x^1
+        // 这么变成二进制：
+        // n=9，n %2 =1,要！ 
+        // n/=2==> n=4, n%2=0，不要！
+        // n/=2==>n=2, n%2=0，不要！
+        // n/=2 ==>n=1, n%2=1，要！
+        // 因为除了1外，2^n全是偶数，所以如果n%2=1，那就需要这个1
+        // 还需要考虑如果n是负的，那就是1/xx
+        long long N = n;
+        return N >= 0? pow_sub(x, N): 1 / pow_sub(x,-N);
+    }
+```
+
+### x 的平方根
+
+```cpp
+    int mySqrt(int x) {
+        // 二分
+        // 只返回整数部分，那就是k^2<=x的最大k，可以从0到x开始二分
+        int left = 0, right = x, res = -1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if ((long long)mid * mid <= x) {
+                res = mid; // 一直更新 不break
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return res;
+    }
+```
+
+### 两数相除
+
+```cpp
+    // 求dividend / divisor
+    int divide(int dividend, int divisor) {
+        // // 参考https://leetcode-cn.com/problems/divide-two-integers/solution/jian-dan-yi-dong-javac-pythonjs-liang-sh-ptbw/
+        // // 先处理边界
+        // // INT_MIN：-2147483648=2^31，INT_MAX：2147483648=-2^31
+        // // int 属于[-2^31 +1, 2^31 - 1]
+        // 假设x <0， y <0，求x/y相当于找个最大的正数z，使得
+        // yz>=x，注意应该是最大！，举例：算-10/-2，
+        // 如果z=5, -10=-10，z=4，那-8>-10,z=6，那-12<-10
+        // 因此，是最大的z，使得yz>=x，因为z=6就yz<x了
+
+        if (dividend == INT_MIN) {
+            if (divisor == 1) {
+                return INT_MIN;
+            }
+            if (divisor == -1) {
+                return INT_MAX;
+            }
+        }
+        if (divisor == INT_MIN) {
+            // a / (-2^31) = 0，因为除数绝对值最大
+            return dividend == INT_MIN? 1: 0;
+        }
+        if (dividend == 0) {
+            return 0;
+        }
+        bool rev = false; // 看最后要不要变号
+        if (dividend > 0) {
+            dividend = -dividend;
+            rev = !rev;
+        }
+        if (divisor > 0) {
+            divisor = -divisor;
+            rev = !rev;
+        }
+        auto quick_add = [](int y, int z, int x) {
+            // 判断zy是否>=x
+            // y负数，x负数，z正数！
+            // 对于三个负数a b c，要比较a+b与c，因为a+b可能溢出
+            // 所以要改成a与c-b比较，因为两个负数的差不会越界
+
+            // 计算y*z类似y^z
+            // 3^5= 3^(1*2^2 + 0*2^1 + 1)
+            // 3 * 5 = 3 * (1*2^2+ 0*2^1 + 1)=3*1*2^2+ 3*0 + 3 *1
+            // 都是相当于对z=5不断除以2
+            // y^z：如果是1，那就res*=y，然后y*=y
+            // y*z：如果是1，那就res+=y，然后y+=y
+
+            int result = 0, add = y;
+            while(z) {
+                if (z & 1) {
+                    // z的二进制的最后一位是1,z % 2 == 1，
+                    // 要保证result + add >= x
+                    if (result < x - add) {
+                        return false; //注意这里是直接return false
+                    }
+                    result += add;
+                }
+                if (z != 1) {
+                    // 要保add + add >= x
+                    if (add < x - add) {
+                        return false; //注意这里是直接return false
+                    }
+                    add += add;
+                }
+                z >>= 1;// z/2
+            }
+            return true;
+        };
+
+        int left = 0, right = INT_MAX, res = 0;
+        while (left <= right) {
+            int mid = left + ((right - left) >> 1);
+            bool check = quick_add(divisor, mid, dividend);
+            if (check) {
+                res = mid;
+                if (mid == INT_MAX) {
+                    break;
+                }
+                left = mid + 1; // 想找更大的 直到找到最大的
+            } else {
+                right = mid - 1;
+            }
+        }
+        return rev? -res: res;
+
+    }
+```
+
+### 分数到小数
+
+有限小数：
+![](assets/fraction-to-decimal-2.png)
+无限循环小数：
+![](assets/fraction-to-decimal.png)
+
+```cpp
+    string fractionToDecimal(int numerator, int denominator) {
+        // !!!!!无限不循环小数属于实数中的无理数，
+        // !!!!!并且任何一个无限不循环小数都找不到一个与之相等的分数来对应。
+        // 所以如果是无限小数，肯定是无限循环小数
+        // 每一位小数=余数*10再除以除数得到的商。
+        // 循环小数：通过判断被除数（*10之前）有没有出现过，
+        // 出现的位置就是循环节的开始，到结尾就是循环节的结束(哈希记录)
+        // 如果余数==0，那就是可以除尽了，不是循环小数
+        long numerator_long = numerator; //防止溢出，转成int64！！！
+        long denominator_long = denominator;
+        if (numerator_long % denominator_long == 0) { //整除
+            return to_string(numerator_long / denominator_long);
+        }
+        string res;
+        if ((numerator_long < 0) ^ (denominator_long < 0)) {
+            //异或，为true说明二者异号
+            res.push_back('-');
+        }
+        numerator_long = abs(numerator_long);
+        denominator_long = abs(denominator_long);
+        long integer = numerator_long / denominator_long;
+        res += to_string(integer);
+        res.push_back('.');
+        string fraction;
+        unordered_map<long, int> remainder_index_map;
+        long remainder = numerator_long % denominator_long;
+        int idx = 0;
+        while (remainder != 0 && !remainder_index_map.count(remainder)) {
+            remainder_index_map[remainder] = idx; // 记录*10之前的remainder的位置
+            remainder *= 10;
+            fraction += to_string(remainder / denominator_long);
+            remainder %= denominator;
+            ++idx;
+        }
+        if (remainder != 0) {
+            int first_idx = remainder_index_map[remainder];
+            // 把循环节部分用括号包起来
+            fraction = fraction.substr(0, first_idx) + '(' + \
+                fraction.substr(first_idx) + ')';
+        }
+        res += fraction;
+        return res;
+    }
+```
+
+
 ## 其他
+
+### 两整数之和
+
+```cpp
+    int getSum(int a, int b) {
+        // 不能用+-，那就位运算
+        // 正整数的补码与原码相同；
+        // 负整数的补码为其原码除符号位外的所有位取反后加1。
+        // 可以将减法运算转化为补码的加法运算来实现。
+        // 0 + 0 = 0
+        // 0 + 1 = 1
+        // 1 + 0 = 1
+        // 1 + 1 = 0 (进位)
+        // 相当于不考虑进位，就是a^b（异或），
+        // 而进位的值是a&b，进位完就是左移一位 (a&b) << 1
+        // 注意，实际的a b是很多位的，所以进位也是很多位的，
+        // 所以要有个while，一直加进位直到没有进位为止！！！
+        while (b != 0) {
+            // 当我们赋给signed类型一个超出它表示范围的值时，结果是undefined；
+            // 而当我们赋给unsigned类型一个超出它表示范围的值时，结果是
+            // 初始值对无符号类型表示数值总数取模的余数！！
+            // 因此，我们可以使用无符号类型来防止溢出。
+            unsigned int carry = (unsigned int)(a & b) << 1;
+            // 另外，这里得是(unsigned int)(a & b) 再<<1，而不是(a & b) << 1再unsigned int!!!
+            a = a ^ b;
+            b = carry;
+        }
+        return a;
+    }
+```
+
+### 逆波兰表达式求值
+
+```cpp
+    bool is_num(string& token) {
+        return !(token == "+" || token == "-" || token == "*" | token == "/");
+    }
+
+    int evalRPN(vector<string>& tokens) {
+        // 栈：从左到右遍历表达式
+        // 遇到数字，入栈
+        // 遇到运算符号op，pop栈顶b出来作为右，再pop栈顶a出来作为左，
+        //   计算a op b的结果再入栈
+        // 遍历完后，栈内只有一个数，就是结果
+        // 注意 题目要求除法只保留整除的结果，所以stk用int就行
+        stack<int> stk;
+        int n = tokens.size();
+        for (int i = 0; i < n; ++i) {
+            string& token = tokens[i];
+            if (is_num(token)) {
+                stk.push(atoi(token.c_str())); // string转int
+            } else {
+                int right = stk.top();
+                stk.pop();
+                int left = stk.top();
+                stk.pop();
+                switch (token[0]) {
+                    case '+':
+                        stk.push(left + right);
+                        break;
+                    case '-':
+                        stk.push(left - right);
+                        break;
+                    case '*':
+                        stk.push(left * right);
+                        break;
+                    case '/':
+                        stk.push(left / right);
+                        break;
+                }
+            }
+        }
+        return stk.top();
+    }
+```
+
+### 多数元素
+
+```cpp
+    int majorityElement(vector<int>& nums) {
+        // 因为题目说了大于半数，所以排序后肯定会占据一半一上的区间，
+        // 所以中间的数肯定是它
+        sort(nums.begin(), nums.end());
+        return nums[nums.size() / 2];
+    }
+```
+
+### 
+
+![](assets/task-distribute.png)
+
+```cpp
+    int leastInterval(vector<char>& tasks, int n) {
+        unordered_map<char, int> freq; // 记录每一种任务的个数
+        for (auto& i: tasks) {
+            ++freq[i];
+        }
+        // stl的max_element
+        // 获取所有任务中最多的次数
+        int max_exec = max_element(freq.begin(), freq.end(), 
+            [](const auto& a, const auto& b) {
+                return a.second < b.second;
+            })->second;
+        // <1> [var] 表示值传递方式捕捉变量var
+        // <2> [=] 表示值传递方式捕捉所有父作用域的变量（包括this指针）
+        // <3> [&var] 表示引用传递捕捉变量var
+        // <4> [&] 表示引用传递捕捉所有父作用域的变量（包括this指针）
+        // <5> [this] 表示值传递方式捕捉当前的this指针
+        // <6> [=，&a，&b] 表示以引用传递的方式捕捉变量 a 和 b，而以值传递方式捕捉其他所有的变量
+        // <7> [&，a，this] 表示以值传递的方式捕捉 a 和 this，而以引用传递方式捕捉其他所有变量
+        
+        // 计算总共有多少个任务出现了max_exec次
+        int max_cnt = accumulate(freq.begin(), freq.end(), 0, 
+            [=](int acc, const auto& u){
+                return acc + (u.second == max_exec);
+            });
+        
+        // 对于max_exec个任务a来讲，每执行一次后面要n个空位，
+        // 所以要(max_exec -1) * (n+1) +1，最后这个+1是最后一个a任务，因为它执行完就行了
+        // 而总共有max_cnt个a任务，如果max_cnt<= n+1，那么可以塞进去
+        // 就有max_exec - 1) * (n + 1) + max_cnt了
+        // 填后面任务按这个方法：
+        // 我们从倒数第二行开始，按照反向列优先的顺序（即先放入靠左侧的列，同一列中先放入下方的行），
+        // 依次放入每一种任务，并且同一种任务需要连续地填入。
+        // 如果max_cnt > n+1，那排完n+1后还要再排k列，然后才是其他任务，
+        // 这个时候就不需要再这么按顺序了，因为任意两个任务间肯定大于n，所以总时间就是|tasks|
+        // xx.size()需要强转成int，因为原来是size_t
+        return max((max_exec - 1) * (n + 1) + max_cnt, static_cast<int>(tasks.size()));
+    }
+```
+
+
+
+
+
