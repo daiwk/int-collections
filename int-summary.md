@@ -1351,7 +1351,7 @@ dp，存left_max和right_max，然后min(left_max, right_max) - height
     }
 ```
 
-### 最大子序和
+### 最大子数组和
 
 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
 
