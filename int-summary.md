@@ -1236,6 +1236,42 @@ public:
     }
 ```
 
+### 接雨水
+
+给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+dp，存left_max和right_max，然后min(left_max, right_max) - height
+
+```cpp
+    int trap(vector<int>& height) {
+        int n = height.size();
+        if (n == 0) {
+            return 0;
+        }
+        vector<int> left_max(n, 0), right_max(n, 0);
+        for (int i = 0; i < n; ++i) {
+            if (i > 0) {
+                left_max[i] = max(height[i], left_max[i - 1]); // 注意，这里是left_max[i-1]
+            } else {
+                left_max[i] = height[i];
+            }
+        }
+        for (int i = n - 1; i >= 0; --i) {
+            if (i < n - 1) {
+                right_max[i] = max(height[i], right_max[i + 1]);// 注意，这里是right_max[i+1]
+            } else {
+                right_max[i] = height[i];
+            }
+        }
+        int res = 0;
+        for (int i = 0; i < n; ++i) {
+            res += min(left_max[i], right_max[i]) - height[i];
+        }
+        return res;
+    }
+````
+
+
 ## 设计
 
 ### 二叉树的序列化与反序列化
