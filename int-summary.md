@@ -70,6 +70,8 @@
     void setZeroes(vector<vector<int>>& matrix) {
         int row = matrix.size();
         int col = matrix[0].size();
+        // 用两个辅助数组，存这行和这列是否要变成0，
+        // 然后再遍历原矩阵，如果二者有一个要变0，那就变成0
         vector<bool> rows(row, false);
         vector<bool> cols(col, false);
         for (int i = 0; i < row; ++i) {
