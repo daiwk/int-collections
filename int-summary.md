@@ -1571,8 +1571,147 @@ max_gain(root)：计算二叉树中的一个节点的最大贡献值，即在**�
 
 ### 编辑距离
 
-```cpp
+给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
 
+你可以对一个单词进行如下三种操作：
+```
+插入一个字符
+删除一个字符
+替换一个字符
+```
+
+**解答：**
+
+本质不同的操作实际上只有三种：
+
++ 在单词 A 中插入一个字符；（等价于B中删掉一个字符）
++ 在单词 B 中插入一个字符；（等价于A中删掉一个字符）
++ 修改单词 A 的一个字符。（等价于A中修改一个字符）
+
+D[i][j] 表示 A 的前 i 个字母和 B 的前 j 个字母之间的编辑距离。
+
+若 A 和 B 的最后一个字母相同：
+
+D[i][j] = min(D[i-1][j]+1, D[i][j-1]+1, D[i-1][j-1])
+
+若 A 和 B 的最后一个字母不同：
+
+D[i][j] = min(D[i-1][j]+1, D[i][j-1]+1, D[i-1][j-1]+1)
+
+
+二者差别就是D[i-1][j-1]，A[i]!=B[j]时，需要+1
+
+对于边界情况，一个空串和一个非空串的编辑距离为 D[i][0] = i 和 D[0][j] = j，D[i][0] 相当于对 word1 执行 i 次删除操作，D[0][j] 相当于对 word1执行 j 次插入操作。
+
+
+```cpp
+    int minDistance(string word1, string word2) {
+        int n = word1.length();
+        int m = word2.length();
+        vector<vector<int> > D(n+1, vector<int>(m+1));
+        for (int i = 0; i < n + 1; ++i) {
+            D[i][0] = i;
+        }
+        for (int j = 0; j < m + 1; ++j) {
+            D[0][j] = j;
+        }
+        for (int i = 1; i < n + 1; ++i) {
+            for (int j = 1; j < m + 1; ++j) {
+                int a = D[i][j - 1] + 1;
+                int b = D[i - 1][j] + 1;
+                int c = D[i - 1][j - 1];
+                if (word1[i - 1] != word2[j - 1]) { // 注意这里要-1
+                    c += 1;
+                }
+                D[i][j] = min(a, min(b, c));
+            }
+        }
+        return D[n][m];
+    }
+```
+
+### 最大正方形
+
+在一个由 '0' 和 '1' 组成的二维矩阵内，找到只包含 '1' 的最大正方形，并返回其面积。
+
+dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最大值
+
+```cpp
+    int maximalSquare(vector<vector<char>>& matrix) {
+        int m = matrix.size();// row
+        if (m < 1) return 0;
+        int n = matrix[0].size(); // col
+        int maxnum = 0;
+
+        vector<vector<int> > dp(m, vector<int>(n));
+        
+        for (int i = 0; i < m; ++i) {
+            if (matrix[i][0] == '1') {
+                dp[i][0] = 1;
+                maxnum = 1;
+            }
+        }
+        for (int j = 0; j < n; ++j) {
+            if (matrix[0][j] == '1') {
+                dp[0][j] = 1;
+                maxnum = 1;
+            }
+        }
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                if (matrix[i][j] == '1') {
+                    dp[i][j] = min(min(dp[i - 1][j], dp[i - 1][j - 1]), dp[i][j - 1]) + 1;
+                    maxnum = max(maxnum, dp[i][j]);
+                }
+            }
+        }
+        return maxnum * maxnum;
+    }
+```
+
+### 统计全为 1 的正方形子矩阵
+
+和上面那题几乎一样，只是最终求值不太一样
+
+dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最大值
+
+而dp(i,j)恰好也表示以(i,j)为右下角的正方形有多少个，依次是边长为1,2,3,...,dp(i,j)的正方形
+
+```cpp
+    int countSquares(vector<vector<int>>& matrix) {
+        int m = matrix.size();// row
+        if (m < 1) return 0;
+        int n = matrix[0].size(); // col
+        int maxnum = 0;
+
+        vector<vector<int> > dp(m, vector<int>(n));
+        
+        for (int i = 0; i < m; ++i) {
+            if (matrix[i][0] == 1) {
+                dp[i][0] = 1;
+                maxnum += 1;
+            }
+        }
+        for (int j = 0; j < n; ++j) {
+            if (matrix[0][j] == 1) {
+                dp[0][j] = 1;
+                // 如果不判断，dp[0][0]就算了两次。。
+                if (j != 0) {
+                    maxnum += 1;
+                }
+            }
+        }
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                if (matrix[i][j] == 1) {
+                    dp[i][j] = min(min(dp[i - 1][j], dp[i - 1][j - 1]), dp[i][j - 1]) + 1; 
+                }
+                //cout << dp[i][j] << " " << i << " " << j << endl;
+                maxnum += dp[i][j];
+            }
+        }
+        return maxnum;
+    }
 ```
 
 ## 设计

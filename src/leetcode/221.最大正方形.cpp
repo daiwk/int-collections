@@ -13,14 +13,7 @@ public:
         int n = matrix[0].size(); // col
         int maxnum = 0;
 
-        vector<vector<int> > dp;
-        for (int i = 0; i < m; ++i) {
-            vector<int> vec;
-            for (int j = 0; j < n; ++j) {
-                vec.emplace_back(0);
-            }
-            dp.emplace_back(vec);
-        }
+        vector<vector<int> > dp(m, vector<int>(n));
         
         for (int i = 0; i < m; ++i) {
             if (matrix[i][0] == '1') {
