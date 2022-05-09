@@ -240,7 +240,7 @@ dp
     string longestPalindrome(string s) {
         // p(i,j)表示i:j是回文串
         // 转移：
-        // if  si == sj then p(i,j) = p(i+i, j-1)
+        // if  si == sj then p(i,j) = p(i+1, j-1)
         // 边界：len=1是，len=2，如果si==sj那是
         // 结果就是所有p(i,j)=1的j-i+1的max
         int n = s.size();
@@ -266,7 +266,7 @@ dp
                 if (s[i] != s[j]) {
                     dp[i][j] = false;
                 } else {
-                    if (j - i < 3) {
+                    if (j - i < 3) { // a aa aba 都ok
                         dp[i][j] = true;
                     } else {
                         dp[i][j] = dp[i + 1][j - 1];
@@ -1117,6 +1117,13 @@ public:
 
 ### 跳跃游戏
 
+给定一个非负整数数组 nums ，你最初位于数组的 第一个下标 。
+
+数组中的每个元素代表你在该位置可以跳跃的最大长度。
+
+判断你是否能够到达最后一个下标。
+
+
 ```cpp
     bool canJump(vector<int>& nums) {
         // 贪心
@@ -1126,6 +1133,7 @@ public:
         int n = nums.size();
         int most_right = 0;
         for (int i = 0; i < n; ++i) {
+             // 如果i>most_right，那这个点永远不可达，所以最后是return false
             if (i <= most_right) {
                 most_right = max(most_right, i + nums[i]);
                 if (most_right >= n - 1) {
@@ -1216,6 +1224,8 @@ public:
         // 不要求连续，比如[3,6,2,7]是[0,3,1,6,2,2,7]的子序列
         // dp[i]：以第i个数字结尾（选了nums[i]）的最长递增子序列的长度
         // dp[i] = max(dp[j]) +1, 0<=j<i，nums[j] < nums[i]，这样才能递增
+        // 相当于前面i-1个数里，有一个和i是递增关系，那就可以把i选了
+        // 要么就直接dp[i]，这两个取max
         // 最终的结果是max(dp[i])
         int n = nums.size();
         if (n == 0) {
@@ -1427,22 +1437,143 @@ f(i) = max(f(i-1) + nums[i], nums[i])
 '*' 匹配零个或多个前面的那一个元素
 所谓匹配，是要涵盖 整个 字符串 s的，而不是部分字符串。
 
+保证每次出现字符 * 时，前面都匹配到有效的字符===> '*'不会是第一个字符！！
+
 输入：s = "ab", p = ".*"
 输出：true
 解释：".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
 
 ```
 
-f[i][j]表示字符串s的前i个字符与正则p的前j个字符是否match
+f[i][j]表示字符串s的前i个字符与正则p的前j个字符是否match（完全一致）
 
-假设第j位是字母，如果s[i]与p[j]不一样，那肯定不行，反之，这位ok，就看f[i-1][j-1]：
++ 如果p[j]是字母，如果s[i]与p[j]不一样，那肯定不行，反之，这位ok，就看f[i-1][j-1]：
 
 $$
 f[i][j]= \begin{cases}f[i-1][j-1], & s[i]=p[j] \\ \text { false, } & s[i] \neq p[j]\end{cases}
 $$
 
++ 如果p[j]是'*'，那么就可以对p[j-1]匹配n次，也就是说
 
+    + 如果p[j-1]==s[i]，那么，就算我把s[i]给删了，这个pattern(即p[j-1]p[j])还可以继续用：
 
+f[i][j] = f[i-1][j]
+
+而与此同时，我把这个pattern扔了也行，因为已经匹配至少一次了：
+
+f[i][j] = f[i][j-2]
+
+所以，f[i][j] =  f[i-1][j] or f[i][j-2], p[j-1] == s[i]
+
+    + 如果p[j-1]!=s[i]，那么这个组合就扔了
+
+f[i][j] = f[i][j-2], p[j-1] != s[i]
+
+所以，
+
+$$
+f[i][j]= \begin{cases}f[i-1][j] \text { or } f[i][j-2], & s[i]=p[j-1] \\ f[i][j-2], & s[i] \neq p[j-1]\end{cases}
+$$
+
+综合起来就是
+
+$$
+f[i][j]= \begin{cases}\text { if }\left(p[j] \neq{ }'*'\right)= \begin{cases}f[i-1][j-1], & \text { matches }(s[i], p[j]) \\ \text { false, } & \text { otherwise }\end{cases} \\ \text { otherwise }= \begin{cases}f[i-1][j] \text { or } f[i][j-2], & \text { matches }(s[i], p[j-1]) \\ f[i][j-2], & \text { otherwise }\end{cases} \end{cases}
+$$
+
+其中的matches只有当y是.或者x=y时才会匹配
+
+边界f[0][0] = 1，因为两个空串是匹配的。
+
+注意：
+
+当s为空，```p=a*```，这样这样是可以匹配的。因为可以决定前面的那个a一个都不选，带着它一起消失。
+
+```cpp
+    bool isMatch(string s, string p) {
+        int m = s.size();
+        int n = p.size();
+
+        // 因为f是n+1 * m+1，所以这里其实是比较 s[i-1]和p[j-1]
+        // [&]：父作用域的按引用传，其实[=]也行，父作用域的按值传
+        auto matches = [=](int i, int j) {
+            if (i == 0) {
+                return false; // 不太懂这个
+            }
+            if (p[j - 1] == '.') {
+                return true;
+            }
+            return s[i - 1] == p[j - 1];
+        };
+
+        vector<vector<int>> f(m + 1, vector<int>(n + 1));
+        f[0][0] = true;
+        for (int i = 0; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (p[j - 1] != '*')  {
+                    if (matches(i, j)) { //比较的是i-1和j-1
+                        f[i][j] |= f[i - 1][j - 1];
+                    }
+                } else { 
+                    f[i][j] |= f[i][j - 2];
+                    if (matches(i, j - 1)) { // 比较的是i-1和j-2
+                        f[i][j] |= f[i - 1][j];
+                    }
+                }
+            }
+        }
+        return f[m][n];
+    }
+```
+
+### 二叉树中的最大路径和
+
+路径 被定义为一条从树中任意节点出发，沿父节点-子节点连接，达到任意节点的序列。同一个节点在一条路径序列中 至多出现一次 。该路径 至少包含一个 节点，且不一定经过根节点。
+
+路径和 是路径中各节点值的总和。
+
+给你一个二叉树的根节点 root ，返回其 最大路径和 。
+
+相当于不能走回头路
+
+递归。。其实不是dp
+
+max_gain(root)：计算二叉树中的一个节点的最大贡献值，即在**以该节点为根节点的子树中**寻找**以该节点为起点**的一条路径，使得该**路径上的节点值之和最大**。
+
+叶节点的最大贡献值等于节点值
+
+计算完叶子后，中间节点的max_gain=他的值+max(左孩子max_gain, 右孩子max_gain)
+
+最大路径和：对于二叉树中的一个节点，该节点的最大路径和取决于该节点的值与该节点的左右子节点的最大贡献值，如果子节点的最大贡献值为正，则计入该节点的最大路径和，否则不计入该节点的最大路径和。
+
+然后维护一个全局变量，只保留最终的max，注意初始化为INT_MIN
+
+```cpp
+    int max_sum = INT_MIN; //需要初始化为INT_MIN，因为如果整棵树全为负，max_sum得小于0
+    int max_gain(TreeNode* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+        // 只有在最大贡献值大于 0 时，才会选取对应子节点
+        int left_gain = max(max_gain(root->left), 0);
+        int right_gain = max(max_gain(root->right), 0);
+        // 节点的最大路径和取决于该节点的值与该节点的左右子节点的最大贡献值, 这里是加！！，因为可以左边走上来，再往右边走下去
+        int cur_max_gain = root->val + left_gain + right_gain;
+        max_sum = max(max_sum, cur_max_gain);
+        // 这里是max，因为定义的时候，是以root为起点，不能回头，所以只有一个方向 
+        return root->val + max(left_gain, right_gain);
+    }
+    int maxPathSum(TreeNode* root) {
+        max_gain(root);
+        return max_sum;
+    }
+```
+
+### 编辑距离
+
+```cpp
+
+```
 
 ## 设计
 
