@@ -1671,6 +1671,8 @@ dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最�
 
 ### 统计全为 1 的正方形子矩阵
 
+给你一个 m * n 的矩阵，矩阵中的元素不是 0 就是 1，请你统计并返回其中完全由 1 组成的 正方形 子矩阵的个数。
+
 和上面那题几乎一样，只是最终求值不太一样
 
 dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最大值
@@ -1713,6 +1715,34 @@ dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最�
         return maxnum;
     }
 ```
+
+### 乘积最大子数组
+
+给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。
+
+测试用例的答案是一个 32-位 整数。
+
+子数组 是数组的连续子序列。
+
+
+![](assets/maxmul.jpg)
+
+```cpp
+    int maxProduct(vector<int>& nums) {
+        int n = nums.size();
+        int min_f = nums[0], max_f = nums[0];
+        int res = nums[0];
+        for (int i = 1; i < n; ++i) {
+            int cur = nums[i];
+            int mx = max_f, mn = min_f; //必须搞个临时变量，因为改完max_f后，算min_f的时候还要用原来的max_f
+            max_f = max(max(mn * cur, mx * cur), cur);
+            min_f = min(min(mn * cur, mx * cur), cur);
+            res = max(res, max_f);
+        }
+        return res;
+    }
+```
+
 
 ## 设计
 
