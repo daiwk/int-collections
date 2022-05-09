@@ -1288,7 +1288,7 @@ dp，存left_max和right_max，然后min(left_max, right_max) - height
         }
         return res;
     }
-````
+```
 
 ### 跳跃游戏 II
 
@@ -1313,12 +1313,33 @@ dp，存left_max和right_max，然后min(left_max, right_max) - height
 
 ![](./assets/jump.png)
 
+**解法：**
+
 这个点所有可能到达的位置中，选下一步能跳得最远的那个
 
+在遍历数组时，我们不访问最后一个元素，这是因为在访问最后一个元素之前，我们的边界一定大于等于最后一个位置，否则就无法跳到最后一个位置了。
+
+如果访问最后一个元素，在边界正好为最后一个位置的情况下，我们会增加一次「不必要的跳跃次数」，因此我们不必访问最后一个元素。
+
 ```cpp
-
+    int jump(vector<int>& nums) 
+    {
+        // 目前能跳到的最远位置，要么是i+nums[i]，要么是原来的max_far
+        // max_far > i+nums[i]的情况就是比如i=3，nums[3]=1，但原来可以跳到10。
+        int max_far = 0;
+        int step = 0;   // 跳跃次数
+        // 上次跳跃可达范围右边界（下次的最右起跳点）
+        int end = 0; 
+        for (int i = 0; i < nums.size() - 1; ++i) {
+            max_far = max(max_far, i + nums[i]);
+            if (end == i) { // 到了这个点，开始跳一步
+                end = max_far;
+                ++step;
+            }
+        }
+        return step;
+    }
 ```
-
 
 ## 设计
 
