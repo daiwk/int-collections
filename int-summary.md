@@ -97,6 +97,7 @@
 给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
 
 字母异位词 是由重新排列源单词的字母得到的一个新单词，所有源单词中的字母通常恰好只用一次。
+
 其实就是个倒排
 
 ```cpp
@@ -104,6 +105,7 @@
         unordered_map<string, vector<string> > xmap;
         for (auto& it: strs) {
             string xit = it;
+            // 对string进行sort，搞成一个词，扔进map
             sort(xit.begin(), xit.end());
             xmap[xit].emplace_back(it);
         }
@@ -118,6 +120,7 @@
 ### 无重复字符的最长子串
 
 给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+
 双指针
 
 ```cpp
