@@ -9,15 +9,17 @@ class Solution {
 public:
     int maxProfit(vector<int>& prices) {
         int minprice = INT_MAX;
-        int maxprofit = 0;
+        int max_profit = 0;
         for (int i = 0; i < prices.size(); ++i) {
             if (prices[i] < minprice) {
+                // 不卖
                 minprice = prices[i];
-            } else if (prices[i] - minprice > maxprofit) {
-                maxprofit = prices[i] - minprice;
+            } else {
+                // 卖或者不卖的最大profit
+                max_profit = max(max_profit, prices[i] - minprice);
             }
         }
-        return maxprofit;
+        return max_profit;
     }
 };
 // @lc code=end
