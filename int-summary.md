@@ -792,6 +792,47 @@ struct MyCmp {
 priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 ```
 
+### 快排
+
+[https://blog.csdn.net/weixin_41009689/article/details/106391673](https://blog.csdn.net/weixin_41009689/article/details/106391673)
+
+```
+设置两个变量i和j（也称为哨兵），令序列第一个元素作为基准元素
+i指向序列的最左边，j指向序列的最右边，j从右往左试探，i从左往右试探，直到j找到小于基准的数就停止，i找到大于基准的数就停止，交换i和j指向的两个数，j继续往左试探，i继续往右试探
+如果i和j相遇，则i或j上的元素与基准元素交换，则这一轮排序结束
+对基准元素两边的序列重复以上操作（即 quickSort(vi, lo, i-1); quickSort(vi, i+1, hi);）
+```
+
+```cpp
+void quickSort(vector<int>& vi, int lo, int hi)
+{
+	int pivot = vi[lo];
+    int i = lo;
+    int j = hi;
+    if (lo < hi)
+    {
+        while (i != j)
+        {
+            while (vi[j] >= pivot && j > i)
+            {
+                j--;
+            }
+            while (vi[i] <= pivot && j > i)
+            {
+                i++;
+            }
+            if(i<j)
+            {
+                swap(vi[i], vi[j]);
+            }
+        }
+        swap(vi[lo], vi[i]);
+        quickSort(vi, lo, i-1);
+        quickSort(vi, i+1, hi);
+    }
+}
+```
+
 ### 二分小结
 
 ```cpp
