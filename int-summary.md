@@ -2887,7 +2887,16 @@ AB -> 28
 
 方法二：先按score排序，然后倒着看每个对应的真实label，如果是0那就a+1，如果是1，那就res+a，res就是分子，分母还是mxn
 
-方法三：包括了rank的那个公式
+方法三：包括了rank的那个公式，也就是先排序，然后计算label=1的rank之和（最大的rank是n，次大是n-1），【其实算的就是当前数比多少个要大】，再减掉两个都是正样本的情况，分母还是mxn
+
+注意，是先对rank求和，再减掉xxx，不是每个rank都要减掉xxx！！！
+
+$$
+A U C=\frac{\sum_{\mathrm{i} \in \text { positiveClass }} \operatorname{rank}_{i}-\frac{M(1+M)}{2}}{M \times N}
+$$
+
+[https://zhuanlan.zhihu.com/p/411010918](https://zhuanlan.zhihu.com/p/411010918)这里是升序，一个道理，只是把rank倒过来了
+
 
 ```python
 def calc_auc2(labels, scores):
@@ -2904,7 +2913,7 @@ def calc_auc2(labels, scores):
     sorted_scores = sorted(scores, reverse=True)
     xdic = {}
     for i in range(0, len(scores)):
-        xdic[scores[i]] = i    
+        xdic[scores[i]] = i
     a = 0
     xres = 0
     idx = len(scores) - 1
@@ -2915,8 +2924,8 @@ def calc_auc2(labels, scores):
         if label == 1:
             xres += a
         idx -= 1
-       
-    return xres / (pos_cnt * neg_cnt)
+
+    return float(xres) / (pos_cnt * neg_cnt)
 
 def calc_auc(labels, scores):
     """calc_auc"""
@@ -2942,19 +2951,70 @@ def calc_auc(labels, scores):
                 xlabel = labels[xdic[sorted_scores[j]]]
                 if xlabel == 0:
                     xpos_cnt += 1
-            
-    return xpos_cnt / (pos_cnt * neg_cnt)
+
+    return float(xpos_cnt) / (pos_cnt * neg_cnt)
+
+def calc_auc3(labels, scores):
+    """calc_auc3"""
+    pos_cnt = 0
+    neg_cnt = 0
+    for i in labels:
+        if i == 0:
+            neg_cnt +=1
+        elif i == 1:
+            pos_cnt += 1
+    if pos_cnt == 0 or neg_cnt == 0:
+        return -1
+    sorted_scores = sorted(scores, reverse=True)
+    xdic = {}
+    for i in range(0, len(scores)):
+        xdic[scores[i]] = i
+    auc = 0
+    xpos_cnt = 0
+    rank = 0
+    for idx in range(0, len(sorted_scores)):
+        label = labels[xdic[sorted_scores[idx]]]
+        if label == 1:
+            rank += len(sorted_scores) - idx
+
+    return (rank - pos_cnt * (pos_cnt + 1) / 2.) / (pos_cnt * neg_cnt)
 
 if __name__ == "__main__":
-    labels = [1,0,0, 1]
-    scores = [0.2, 0.3, 0.2, 0.8]
-    #print calc_auc(labels, scores)
+    labels = [0,1,0, 1]
+    scores = [0.3, 0.3, 0.2, 0.8]
+    print calc_auc(labels, scores)
     print calc_auc2(labels, scores)
+    print calc_auc3(labels, scores)
 ```
 
-但上面这些对于相同预估值的情况会有问题，看下标准答案。。
-[https://zhuanlan.zhihu.com/p/411010918](https://zhuanlan.zhihu.com/p/411010918)
+但第三种解法对于相同预估值的情况会有问题，下面这种解法比较标准了，背下来。。 
 
 ```python
-
+def calcAUC_byProb(labels, probs):
+    N = 0           # 正样本数量
+    P = 0           # 负样本数量
+    neg_prob = []   # 负样本的预测值
+    pos_prob = []   # 正样本的预测值
+    for index, label in enumerate(labels):
+        if label == 1:
+            # 正样本数++
+            P += 1
+            # 把其对应的预测值加到“正样本预测值”列表中
+            pos_prob.append(probs[index])
+        else:
+            # 负样本数++
+            N += 1
+            # 把其对应的预测值加到“负样本预测值”列表中
+            neg_prob.append(probs[index])
+    number = 0
+    # 遍历正负样本间的两两组合
+    for pos in pos_prob:
+        for neg in neg_prob:
+            # 如果正样本预测值>负样本预测值，正序对数+1
+            if (pos > neg):
+                number += 1
+            # 如果正样本预测值==负样本预测值，算0.5个正序对
+            elif (pos == neg):
+                number += 0.5
+    return number / (N * P)
 ```
