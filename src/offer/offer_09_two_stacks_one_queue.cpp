@@ -14,6 +14,10 @@ public:
                 stack1.pop();
             }
         }
+        // 要判断下，如果没数据，就返回-1
+        if (stack2.empty()) { 
+            return -1;
+        }
         a = stack2.top();
         stack2.pop();
         return a;

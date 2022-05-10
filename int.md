@@ -785,6 +785,8 @@ public:
     + 如果为空，则将栈A中所有元素pop，并push进栈B，栈B出栈；
     + 如果不为空，栈B直接出栈。
 
+[https://leetcode.cn/problems/yong-liang-ge-zhan-shi-xian-dui-lie-lcof/](https://leetcode.cn/problems/yong-liang-ge-zhan-shi-xian-dui-lie-lcof/)
+
 ```cpp
 class Solution
 {
@@ -801,6 +803,10 @@ public:
                 stack2.push(a);
                 stack1.pop();
             }
+        }
+        // 要判断下，如果没数据，就返回-1
+        if (stack2.empty()) { 
+            return -1;
         }
         a = stack2.top();
         stack2.pop();
