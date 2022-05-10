@@ -942,7 +942,201 @@ int main() {
 ```
 
 
+### 课程表 II
 
+现在你总共有 numCourses 门课需要选，记为 0 到 numCourses - 1。给你一个数组 prerequisites ，其中 prerequisites[i] = [ai, bi] ，表示在选修课程 ai 前 必须 先选修 bi 。
+
+例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示：[0,1] 。
+返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 任意一种 就可以了。如果不可能完成所有课程，返回 一个空数组 。
+
+```
+输入：numCourses = 2, prerequisites = [[1,0]]
+输出：[0,1]
+解释：总共有 2 门课程。要学习课程 1，你需要先完成课程 0。因此，正确的课程顺序为 [0,1] 。
+
+输入：numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
+输出：[0,2,1,3]
+解释：总共有 4 门课程。要学习课程 3，你应该先完成课程 1 和课程 2。并且课程 1 和课程 2 都应该排在课程 0 之后。
+因此，一个正确的课程顺序是 [0,1,2,3] 。另一个正确的排序是 [0,2,1,3] 。
+
+输入：numCourses = 1, prerequisites = []
+输出：[0]
+```
+
+```cpp
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<int> res;
+        unordered_map<int, int> in_degree_map;
+        unordered_set<int> node_set;
+        if (prerequisites.size() == 0) {
+            for (int i = numCourses - 1; i >= 0; --i) {
+                res.emplace_back(i);
+            }
+            return res;
+        }
+        for (int i = 0; i < numCourses; ++i) {
+            node_set.emplace(i);
+        }
+        for (auto& it: prerequisites) {
+            if (it.size() == 2) {
+                in_degree_map[it[0]]++;
+                node_set.emplace(it[1]);
+                node_set.emplace(it[0]);
+                // cout << it[0] << "xx" << it[1] <<endl;
+            }
+        }
+        queue<int> q;
+        for (auto& it: node_set) { //无入度的节点不会在in_degree_map中
+            // cout << it << "ooo" << endl;
+            if (in_degree_map.find(it) == in_degree_map.end()) {
+                q.push(it);
+                // cout << it << endl;
+            }
+        }
+        while (!q.empty()) {
+            int val = q.front(); // 先进先出
+            res.emplace_back(val);
+            q.pop(); // 记得pop
+            for (const auto& edge: prerequisites) {
+                int node_from = edge[1];
+                int node_to = edge[0];
+                if (node_from != val) {
+                    continue;
+                }
+                --in_degree_map[node_to];
+                // cout << node_to << "qq" << in_degree_map[node_to] << endl;
+                if (in_degree_map[node_to] == 0) {
+                    q.push(node_to); // 入度为0，就push进队列里
+                }
+            }
+        }
+        // 有环
+        if (res.size() != numCourses) {
+            res.clear();
+            return res;
+        }
+        return res;
+    }
+```
+
+上面的是基于string版本改的。。官方解法简单一点。。
+
+```cpp
+private:
+    // 存储有向图
+    vector<vector<int>> edges;
+    // 存储每个节点的入度
+    vector<int> indeg;
+    // 存储答案
+    vector<int> result;
+
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        edges.resize(numCourses);
+        indeg.resize(numCourses);
+        for (const auto& info: prerequisites) {
+            edges[info[1]].push_back(info[0]);
+            ++indeg[info[0]];
+        }
+
+        queue<int> q;
+        // 将所有入度为 0 的节点放入队列中
+        for (int i = 0; i < numCourses; ++i) {
+            if (indeg[i] == 0) {
+                q.push(i);
+            }
+        }
+
+        while (!q.empty()) {
+            // 从队首取出一个节点
+            int u = q.front();
+            q.pop();
+            // 放入答案中
+            result.push_back(u);
+            for (int v: edges[u]) {
+                --indeg[v];
+                // 如果相邻节点 v 的入度为 0，就可以选 v 对应的课程了
+                if (indeg[v] == 0) {
+                    q.push(v);
+                }
+            }
+        }
+        // 有环
+        if (result.size() != numCourses) {
+            return {};
+        }
+        return result;
+    }
+
+```
+
+### 课程表
+
+你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。
+
+在选修某些课程之前需要一些先修课程。 先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
+
+例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。
+请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
+
+```
+示例 1：
+
+输入：numCourses = 2, prerequisites = [[1,0]]
+输出：true
+解释：总共有 2 门课程。学习课程 1 之前，你需要完成课程 0 。这是可能的。
+示例 2：
+
+输入：numCourses = 2, prerequisites = [[1,0],[0,1]]
+输出：false
+解释：总共有 2 门课程。学习课程 1 之前，你需要先完成​课程 0 ；并且学习课程 0 之前，你还应先完成课程 1 。这是不可能的。
+
+```
+
+其实和上面那题完全一样，只是改成了判断是否有环，那就是判断res的长度和节点数是否一样多就行
+
+```cpp
+private:
+    // 存储有向图
+    vector<vector<int>> edges;
+    // 存储每个节点的入度
+    vector<int> indeg;
+    // 存储答案
+    vector<int> result;
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        edges.resize(numCourses);
+        indeg.resize(numCourses);
+        for (const auto& info: prerequisites) {
+            edges[info[1]].push_back(info[0]);
+            ++indeg[info[0]];
+        }
+
+        queue<int> q;
+        // 将所有入度为 0 的节点放入队列中
+        for (int i = 0; i < numCourses; ++i) {
+            if (indeg[i] == 0) {
+                q.push(i);
+            }
+        }
+
+        while (!q.empty()) {
+            // 从队首取出一个节点
+            int u = q.front();
+            q.pop();
+            // 放入答案中
+            result.push_back(u);
+            for (int v: edges[u]) {
+                --indeg[v];
+                // 如果相邻节点 v 的入度为 0，就可以选 v 对应的课程了
+                if (indeg[v] == 0) {
+                    q.push(v);
+                }
+            }
+        }
+        return result.size() == numCourses;
+    }
+```
 
 ### 颜色分类
 
