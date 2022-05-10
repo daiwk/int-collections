@@ -997,41 +997,7 @@ public:
 };
 ```
 
-## 两数之和
 
-给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。
-
-你可以假设每个输入只对应一种答案，且同样的元素不能被重复利用。
-
-**示例:**
-
-给定 nums = [2, 7, 11, 15], target = 9
-
-因为 nums[0] + nums[1] = 2 + 7 = 9 所以返回 [0, 1]
-
-**解法：**
-
-用一个map，key是元素值，value是idx 看新来的这个元素的目标值（tgt - nums[i]）在不在map里，在的话把它的value拿出来就行了。。
-
-```cpp
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        vector<int> res;
-        unordered_map<int, int> map;
-        for (int i = 0; i < nums.size(); ++i) {
-            const int& tgt_val = target - nums[i];
-            if (map.find(tgt_val) != map.end()) {   
-                res.push_back(map[tgt_val]);
-                res.push_back(i);
-                return res;
-            } else {
-                map.insert(std::make_pair(nums[i], i));
-            }
-        }
-    }
-};
-```
 
 ## 无重复字符的最长子串
 
@@ -1087,83 +1053,6 @@ public:
     }
 };
 ```
-
-## 两个排序数组的中位数
-
-给定两个大小为 m 和 n 的有序数组 nums1 和 nums2 。
-
-请找出这两个有序数组的中位数。要求算法的时间复杂度为 O(log (m+n)) 。
-
-你可以假设 nums1 和 nums2 不同时为空。
-
-```
-示例 1:
-
-nums1 = [1, 3]
-nums2 = [2]
-
-中位数是 2.0
-
-示例 2:
-
-nums1 = [1, 2]
-nums2 = [3, 4]
-
-中位数是 (2 + 3)/2 = 2.5
-```
-
-**解答：**
-
-方法1(复杂度O(m+n))：
-
-先归并两个数组，再取中点，归并的复杂度是O(m+n)，参考第88题[https://leetcode-cn.com/problems/merge-sorted-array/description/](https://leetcode-cn.com/problems/merge-sorted-array/description/)
-
-```cpp
-class Solution {
-public:
-    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-        vector<int> tmp;
-        int m = nums1.size();
-        int n = nums2.size();
-        int total_size = n + m;
-        tmp.resize(total_size);
-        int j = n - 1;
-        int i = m - 1;
-        while (j >= 0) {
-            if (i < 0) {
-                // 如果i数组遍历完了，要把j数据剩下的全部拷过来,记住是<j+1
-                for(int k = 0; k < j + 1; ++k) {
-                    tmp[k] = nums2[k];
-                }
-                break;
-            }
-            if (nums2[j] > nums1[i]) {
-                tmp[i + j + 1] = nums2[j];
-                j--;
-            } else {
-                tmp[i + j + 1] = nums1[i];
-                i--;
-            }
-        }
-        if (j < 0) {
-            for(int k = 0; k < i + 1; ++k) {
-                tmp[k] = nums1[k];
-            }
-        }
-        // 以上是归并两个数组的方法
-        if (total_size % 2 != 0) {
-            return tmp[total_size / 2];
-        } else {
-            return (tmp[total_size / 2 - 1] + tmp[total_size / 2]) *1.0 / 2;
-        }
-    }
-};
-```
-
-方法2：二分查找
-
-[https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
-
 
 ## 合并两个有序数组
 
