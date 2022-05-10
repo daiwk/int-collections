@@ -2,17 +2,137 @@
 
 ## 概述
 
+主要是leetcode相关的题
+
 参考1：[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/)
 
 ## 数组和字符串
+
+### 罗马数字转整数
+
+罗马数字包含以下七种字符: I， V， X， L，C，D 和 M。
+
+```
+字符          数值
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+```
+
+例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。
+
+通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：
+
++ I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。
++ X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。 
++ C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
+
+给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。
+
+```
+示例 1:
+
+输入: "III"
+输出: 3
+示例 2:
+
+输入: "IV"
+输出: 4
+示例 3:
+
+输入: "IX"
+输出: 9
+示例 4:
+
+输入: "LVIII"
+输出: 58
+解释: L = 50, V= 5, III = 3.
+示例 5:
+
+输入: "MCMXCIV"
+输出: 1994
+解释: M = 1000, CM = 900, XC = 90, IV = 4.
+
+```
+
+**解答：**
+
++ 第一，如果当前数字是**最后一个数字**，或者**之后的数字比它小**的话，则加上当前数字
++ 第二，其他情况则减去这个数字(例如，IV，看到I的时候就是减去I，然后到V就是加V; XL，看到X的时候就是-X，然后到L就是加L)
+
+```cpp
+class Solution {
+public:
+    int romanToInt(string s) {
+        unordered_map<char, int> x_map;
+        x_map.insert(std::make_pair('I', 1));
+        x_map.insert(std::make_pair('V', 5));
+        x_map.insert(std::make_pair('X', 10));
+        x_map.insert(std::make_pair('L', 50));
+        x_map.insert(std::make_pair('C', 100));
+        x_map.insert(std::make_pair('D', 500));
+        x_map.insert(std::make_pair('M', 1000));
+        int res = 0;
+        for (int i = 0; i < s.size(); ++i) {
+            cout << i << s[i] << endl;
+            int val = x_map[s[i]];
+            if (i == s.size() - 1 || x_map[s[i+1]] <= x_map[s[i]]) {
+                res += val;
+            } else {
+                res -= val;
+            }
+        }
+        return res;
+    }
+};
+```
+
+### 两数之和
+
+给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。
+
+你可以假设每个输入只对应一种答案，且同样的元素不能被重复利用。
+
+**示例:**
+
+给定 nums = [2, 7, 11, 15], target = 9
+
+因为 nums[0] + nums[1] = 2 + 7 = 9 所以返回 [0, 1]
+
+**解法：**
+
+用一个map，key是元素值，value是idx 看新来的这个元素的目标值（tgt - nums[i]）在不在map里，在的话把它的value拿出来就行了。。
+
+```cpp
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> res;
+        unordered_map<int, int> map;
+        for (int i = 0; i < nums.size(); ++i) {
+            const int& tgt_val = target - nums[i];
+            if (map.find(tgt_val) != map.end()) {   
+                res.push_back(map[tgt_val]);
+                res.push_back(i);
+                return res;
+            } else {
+                map.insert(std::make_pair(nums[i], i));
+            }
+        }
+    }
+};
+```
+
 
 ### 三数之和
 
 给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
 
 注意：答案中不可以包含重复的三元组。
-
-
 
 ```cpp
     vector<vector<int>> threeSum(vector<int>& nums) 
@@ -153,6 +273,83 @@
         return res;
     }
 ```
+
+### 寻找两个正序数组的中位数
+
+给定两个大小为 m 和 n 的有序数组 nums1 和 nums2 。
+
+请找出这两个有序数组的中位数。要求算法的时间复杂度为 O(log (m+n)) 。
+
+你可以假设 nums1 和 nums2 不同时为空。
+
+```
+示例 1:
+
+nums1 = [1, 3]
+nums2 = [2]
+
+中位数是 2.0
+
+示例 2:
+
+nums1 = [1, 2]
+nums2 = [3, 4]
+
+中位数是 (2 + 3)/2 = 2.5
+```
+
+**解答：**
+
+方法1(复杂度O(m+n))：
+
+先归并两个数组，再取中点，归并的复杂度是O(m+n)，参考第88题[https://leetcode-cn.com/problems/merge-sorted-array/description/](https://leetcode-cn.com/problems/merge-sorted-array/description/)
+
+```cpp
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        vector<int> tmp;
+        int m = nums1.size();
+        int n = nums2.size();
+        int total_size = n + m;
+        tmp.resize(total_size);
+        int j = n - 1;
+        int i = m - 1;
+        while (j >= 0) {
+            if (i < 0) {
+                // 如果i数组遍历完了，要把j数据剩下的全部拷过来,记住是<j+1
+                for(int k = 0; k < j + 1; ++k) {
+                    tmp[k] = nums2[k];
+                }
+                break;
+            }
+            if (nums2[j] > nums1[i]) {
+                tmp[i + j + 1] = nums2[j];
+                j--;
+            } else {
+                tmp[i + j + 1] = nums1[i];
+                i--;
+            }
+        }
+        if (j < 0) {
+            for(int k = 0; k < i + 1; ++k) {
+                tmp[k] = nums1[k];
+            }
+        }
+        // 以上是归并两个数组的方法
+        if (total_size % 2 != 0) {
+            return tmp[total_size / 2];
+        } else {
+            return (tmp[total_size / 2 - 1] + tmp[total_size / 2]) *1.0 / 2;
+        }
+    }
+};
+```
+
+方法2：二分查找
+
+[https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
+
 
 ## 链表
 
