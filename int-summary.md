@@ -852,6 +852,10 @@ void quickSort(vector<int>& vi, int lo, int hi)
     }
 ```
 
+### 拓扑排序
+
+
+
 ### 颜色分类
 
 给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
@@ -2394,6 +2398,84 @@ AB -> 28
 ```
 
 
+## 其他
 
+### auc计算
 
+自己写的，假设m正例，n负例，
 
+方法一：先按score排序，然后看1后面多少个0，就是分对了多少个pair对，加起来就是分子，分母是mxn
+
+方法二：先按score排序，然后倒着看每个对应的真实label，如果是0那就a+1，如果是1，那就res+a，res就是分子，分母还是mxn
+
+方法三：包括了rank的那个公式
+
+```python
+def calc_auc2(labels, scores):
+    """xx"""
+    pos_cnt = 0
+    neg_cnt = 0
+    for i in labels:
+        if i == 0:
+            neg_cnt +=1
+        elif i == 1:
+            pos_cnt += 1
+    if pos_cnt == 0 or neg_cnt == 0:
+        return -1
+    sorted_scores = sorted(scores, reverse=True)
+    xdic = {}
+    for i in range(0, len(scores)):
+        xdic[scores[i]] = i    
+    a = 0
+    xres = 0
+    idx = len(scores) - 1
+    while idx >= 0:
+        label = labels[xdic[sorted_scores[idx]]]
+        if label == 0:
+            a += 1
+        if label == 1:
+            xres += a
+        idx -= 1
+       
+    return xres / (pos_cnt * neg_cnt)
+
+def calc_auc(labels, scores):
+    """calc_auc"""
+    pos_cnt = 0
+    neg_cnt = 0
+    for i in labels:
+        if i == 0:
+            neg_cnt +=1
+        elif i == 1:
+            pos_cnt += 1
+    if pos_cnt == 0 or neg_cnt == 0:
+        return -1
+    sorted_scores = sorted(scores, reverse=True)
+    xdic = {}
+    for i in range(0, len(scores)):
+        xdic[scores[i]] = i
+    auc = 0
+    xpos_cnt = 0
+    for idx in range(0, len(sorted_scores)):
+        label = labels[xdic[sorted_scores[idx]]]
+        if label == 1:
+            for j in range(idx + 1, len(sorted_scores)):
+                xlabel = labels[xdic[sorted_scores[j]]]
+                if xlabel == 0:
+                    xpos_cnt += 1
+            
+    return xpos_cnt / (pos_cnt * neg_cnt)
+
+if __name__ == "__main__":
+    labels = [1,0,0, 1]
+    scores = [0.2, 0.3, 0.2, 0.8]
+    #print calc_auc(labels, scores)
+    print calc_auc2(labels, scores)
+```
+
+但上面这些对于相同预估值的情况会有问题，看下标准答案。。
+[https://zhuanlan.zhihu.com/p/411010918](https://zhuanlan.zhihu.com/p/411010918)
+
+```python
+
+```
