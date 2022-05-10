@@ -854,6 +854,94 @@ void quickSort(vector<int>& vi, int lo, int hi)
 
 ### 拓扑排序
 
+参考[https://zhuanlan.zhihu.com/p/260112913](https://zhuanlan.zhihu.com/p/260112913)
+
+[https://www.cnblogs.com/crab-in-the-northeast/p/topological-sort.html](https://www.cnblogs.com/crab-in-the-northeast/p/topological-sort.html)
+
+拓扑排序是对DAG（有向无环图）上的节点进行排序，使得对于每一条有向边u->v， u都在v之前出现。简单地说，是在不破坏节点先后顺序的前提下，把DAG拉成一条链。
+
+DAG的拓扑序可能并不唯一
+
+#### Kahn算法(BFS)
+
++ 首先，先拿出所有入度为0的点排在前面，并在原图中将它们删除：
+
++ 这时有些点的入度减少了，于是再拿出当前所有入度为0的点放在已经排序的序列后面，然后删除：
+
+因为是有向无环图，而且删除操作不会产生环，所以每时每刻都一定存在入度为0的点，一定可以不断进行下去，直到所有点被删除。
+
+```src/data_structures/toposort.cpp```
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+
+void toposort(const unordered_map<string, vector<string> >& G, vector<string>& res) {
+    unordered_map<string, int> in_degree_map;
+    unordered_set<string> node_set;
+    for (auto& it: G) {
+        for (auto& node: it.second) {
+            in_degree_map[node]++;
+            node_set.emplace(node);
+        }
+        node_set.emplace(it.first);
+    }
+    queue<string> q;
+    for (auto& it: node_set) { //无入度的节点不会在in_degree_map中
+        if (in_degree_map.find(it) == in_degree_map.end()) {
+            q.push(it);
+        }
+    }
+    while (!q.empty()) {
+        string val = q.front(); // 先进先出
+        res.emplace_back(val);
+        q.pop(); // 记得pop
+        const auto& xit = G.find(val);
+        if (xit != G.end()) {
+            for (const auto& node: xit->second) {
+                --in_degree_map[node];
+                if (in_degree_map[node] == 0) {
+                    q.push(node); // 入度为0，就push进队列里
+                }
+            }
+        }
+    }
+
+}
+
+int main() {
+    // [A,B], [C,F], [F,B], [B,D], [D,E]
+
+    unordered_map<string, vector<string> > G;
+    G.emplace("A", vector<string>{"B"});
+    G.emplace("C", vector<string>{"F"});
+    G.emplace("F", vector<string>{"B"});
+    G.emplace("B", vector<string>{"D"});
+    G.emplace("E", vector<string>{"D"});
+    vector<string> res;
+    toposort(G, res);
+    int i = 0;
+    for (auto& it: res) {
+        cout << it;
+        if (i != res.size() - 1) {
+            cout << ",";
+        } else {
+            cout << endl;
+        }
+        ++i;
+    }
+
+    return 0;
+}
+
+```
+
+
 
 
 ### 颜色分类
@@ -2398,7 +2486,7 @@ AB -> 28
 ```
 
 
-## 其他
+## 其他2
 
 ### auc计算
 
