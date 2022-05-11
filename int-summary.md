@@ -305,16 +305,16 @@ nums2 = [3, 4]
 先归并两个数组，再取中点，归并的复杂度是O(m+n)，参考第88题[https://leetcode-cn.com/problems/merge-sorted-array/description/](https://leetcode-cn.com/problems/merge-sorted-array/description/)
 
 ```cpp
-class Solution {
-public:
     double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
         vector<int> tmp;
         int m = nums1.size();
         int n = nums2.size();
         int total_size = n + m;
         tmp.resize(total_size);
-        int j = n - 1;
+        // 倒着来
         int i = m - 1;
+        int j = n - 1;
+        // 如果有重复的，也要复制两遍
         while (j >= 0) {
             if (i < 0) {
                 // 如果i数组遍历完了，要把j数据剩下的全部拷过来,记住是<j+1
@@ -324,6 +324,7 @@ public:
                 break;
             }
             if (nums2[j] > nums1[i]) {
+                // 留大的下来，留谁的就谁的指针--
                 tmp[i + j + 1] = nums2[j];
                 j--;
             } else {
@@ -332,6 +333,7 @@ public:
             }
         }
         if (j < 0) {
+            // 同理，j遍历完了就把i剩下的搞过来
             for(int k = 0; k < i + 1; ++k) {
                 tmp[k] = nums1[k];
             }
@@ -343,12 +345,177 @@ public:
             return (tmp[total_size / 2 - 1] + tmp[total_size / 2]) *1.0 / 2;
         }
     }
-};
 ```
 
 方法2：二分查找
 
 [https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
+
+### 最长公共前缀
+
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。
+
+```
+示例 1：
+
+输入：strs = ["flower","flow","flight"]
+输出："fl"
+示例 2：
+
+输入：strs = ["dog","racecar","car"]
+输出：""
+解释：输入不存在公共前缀。
+```
+
+注意这里说的是前缀，不是子序列，所以两个str都从0开始，同一个指针一起移动就行。。可以只遍历短的长度
+
+另外，随着遍历的字符串变多，公共前缀是会变短的，变成0就可以return，如果完了还不是0，那就是要的了
+
+另外，不用str[i]和str[i+1]比较再和prefix，直接str[i]和prefix比较就行，这样循环简单点
+
+```cpp
+    string longestCommonPrefix(vector<string>& strs) {
+        string comm_prefix = strs[0];
+        for (int i = 0; i < strs.size(); ++i) {
+            lcp_sub(strs[i], comm_prefix);
+            if (comm_prefix == "") {
+                return comm_prefix;
+            }
+        }
+        return comm_prefix;
+    }
+    void lcp_sub(const string &a, string& b) {
+        int len = min(a.length(), b.length());
+        int i = 0;
+        while(i < len) {
+            if (a[i] != b[i]) {
+                break;
+            }
+            ++i;
+        }
+        if (a[i] != b[i]) {
+            b = b.substr(0, i);
+        } else {
+            b = b.substr(0, i + 1);
+        }
+    }
+```
+
+有点绕，还是抄答案吧：
+
+```cpp
+    string longestCommonPrefix(vector<string>& strs) {
+        string comm_prefix = strs[0];
+        for (int i = 0; i < strs.size(); ++i) {
+            lcp_sub(strs[i], comm_prefix);
+            if (comm_prefix == "") {
+                return comm_prefix;
+            }
+        }
+        return comm_prefix;
+    }
+    void lcp_sub(const string &a, string& b) {
+        int len = min(a.length(), b.length());
+        int i = 0;
+        // while一起判断了，就不用再对i i+1处理了。。
+        while (i < len && a[i] == b[i]) {
+            ++i;
+        }
+        b = b.substr(0, i);
+    }
+```
+
+### 存在重复元素
+
+给你一个整数数组 nums 。如果任一值在数组中出现 至少两次 ，返回 true ；如果数组中每个元素互不相同，返回 false 。
+
+```cpp
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_set<int> xset;
+        for(auto& i: nums) {
+            if (xset.count(i)) {
+                return true;
+            }
+            xset.emplace(i);
+        }
+        return false;
+    }
+```
+
+### 整数反转
+
+给定一个 32 位有符号整数，将整数中的数字进行反转。
+
+**示例：**
+
+```
+示例 1:
+
+输入: 123
+输出: 321
+ 示例 2:
+
+输入: -123
+输出: -321
+示例 3:
+
+输入: 120
+输出: 21
+
+```
+
+注意:
+
+假设我们的环境只能存储 32 位有符号整数，其数值范围是 [−231,  231 − 1]。根据这个假设，如果反转后的整数溢出，则返回 0。
+
+**解答**
+
+写一个valid函数，记得参数变成long，然后去看这个long是不是在int32的范围里
+
+```cpp
+class Solution {
+public:
+    bool valid(long x) { // 注意，这里要是long
+        if (x > 0) {
+            if (x >= pow(2, 31) -1)
+                return false;
+        }
+        if (x < 0) {
+            if (x <= -pow(2, 31)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    int reverse(int x) {
+        long tmp = 0;
+        if (!valid(x)) {
+            return 0;
+        }
+        bool flag = true;
+        if (x < 0) {
+            x = -x;
+            flag = false;
+        }
+        while (x != 0) {
+            tmp *= 10;
+            tmp += x % 10;
+            x /= 10;
+        }
+        if (flag == false) {
+            tmp = -tmp;
+        }
+        if (valid(tmp)) {
+            return tmp;
+        }
+        return 0;
+    }
+};
+```
+
 
 
 ## 链表
@@ -1780,6 +1947,8 @@ public:
     int climbStairs(int n) {
         // 斐波那契
         int p= 0, q = 0, r = 1;
+        // 注意，这里是从1开始，相当于把上面那三个数往右平移一格
+        // i<=n，注意有等号
         for (int i = 1; i <= n; ++i) {
             p = q;
             q = r;
