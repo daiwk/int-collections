@@ -495,14 +495,15 @@ public:
             return 0;
         }
         bool flag = true;
+        // 统一变成正数，处理完如果原来是负的再变回去
         if (x < 0) {
             x = -x;
             flag = false;
         }
         while (x != 0) {
-            tmp *= 10;
-            tmp += x % 10;
-            x /= 10;
+            tmp *= 10; // tmp向左移一位
+            tmp += x % 10; // 取出x的最低位
+            x /= 10; // x往右移一位
         }
         if (flag == false) {
             tmp = -tmp;
@@ -511,11 +512,9 @@ public:
         if (valid(tmp)) {
             return tmp;
         }
-        return 0;
-    }
+        return 0; 
 };
 ```
-
 
 
 ## 链表
@@ -2056,17 +2055,18 @@ dp，存left_max和right_max，然后min(left_max, right_max) - height
 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
 ```
 
-f(i)表示以第i个数结尾的连续子数组最大和，那要求的就是i=0,...,n-1的max f(i)
+f(i)表示以第i个数结尾的连续子数组最大和，那么求的就是i=0,...,n-1的max f(i)
 
 f(i) = max(f(i-1) + nums[i], nums[i])
 
-如果加上这个数能变得更大，那就加上；如果不行，那这个数就是新的起点
+如果加上这个数能变得更大，那就加上；**如果不行，那这个数就是新的起点**
 
 而只和f(i-1)有关的话，且最后要的是max，那么可以只用一个变量，不需要数组
 
 ```cpp
     int maxSubArray(vector<int>& nums) {
-        int pre = 0, max_res = nums[0];
+        int pre = 0;
+        int max_res = INT_MIN; // 初始化极小值，或者nums[0]
         for (int i = 0; i < nums.size(); ++i) {
             pre = max(pre + nums[i], nums[i]);
             max_res = max(max_res, pre);
@@ -2576,6 +2576,167 @@ public:
  * bool param_2 = obj->remove(val);
  * int param_3 = obj->getRandom();
  */
+```
+
+### LRU 缓存
+
+请你设计并实现一个满足  LRU (最近最少使用) 缓存 约束的数据结构。
+实现 LRUCache 类：
+
+LRUCache(int capacity) 以 正整数 作为容量 capacity 初始化 LRU 缓存
+
+int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1 。
+
+void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
+
+函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
+
+**解法**
+
+hash表+双向链表
+
+**最近用的放最开头，这样自然链表尾部的就是最近没用的了**
+
+**双向链表需要同时有dummyhead和dummytail**
+
+**hashmap存的key是int，但value要是DLinkNode\*!!!**
+
+```
+get(key):
+if key不存在:
+    return -1;
+else:
+    把数据(key, val)移到开头（！！最近使用了）
+    return val
+
+put(key, val):
+if key已存在:
+    删掉旧数据
+    把新数据扔到开头（！！注意）
+else:
+    if cache已满:
+        删掉链表最后一个位置的元素
+        删掉map里的元素
+    新节点扔到开头
+    map中加入kv
+```
+
+```cpp
+struct DLinkeList {
+    int key;
+    int value;
+    DLinkeList* pre;
+    DLinkeList* next;
+    DLinkeList(): key(0), value(0), pre(nullptr), next(nullptr) {}
+    DLinkeList(int k, int v): key(k), value(v), pre(nullptr), next(nullptr) {}
+};
+
+class LRUCache {
+private:
+    unordered_map<int, DLinkeList*> cache;  
+    DLinkeList* head;
+    DLinkeList* tail;
+    int capacity;
+    int size; // 还要存实际size
+
+public:    
+    // 这里记得加上初始化列表！！！！
+    LRUCache(int capacity): capacity(capacity), size(0) {
+        head = new DLinkeList();
+        tail = new DLinkeList();
+        head->next = tail;// 把head和tail连起来
+        tail->pre = head;
+    }
+    
+    int get(int key) {
+        if (!cache.count(key)) {
+            return -1;
+        } else {
+            DLinkeList* node = cache[key];
+            move_to_head(node);
+            return node->value;
+        }
+    }
+
+    void remove_node(DLinkeList* node) {
+        node->pre->next = node->next;
+        node->next->pre = node->pre;
+    }
+
+    void add_to_head(DLinkeList* node) {
+        // 标准答案是别的顺序，效果应该一样吧。。
+        node->next = head->next;
+        head->next->pre = node;
+        head->next = node;
+        node->pre = head;     
+    }
+
+    void move_to_head(DLinkeList* node) {
+        // 先把node删了，这样node就是孤立的节点了
+        remove_node(node);
+        // 然后把这个node插入头部
+        add_to_head(node);
+    }
+
+    DLinkeList* remove_tail() {
+        // 直接复用前面写的remove_node
+        // 这样也方便return
+        DLinkeList* node = tail->pre;
+        remove_node(node);
+        return node;
+    }
+
+    void put(int key, int value) {
+        if(!cache.count(key)) {
+            DLinkeList* node = new DLinkeList(key, value);
+            add_to_head(node);
+            cache[key] = node;
+            ++size; //记得更新size
+            // 开始LRU的操作
+            if (size > capacity) {
+                DLinkeList* remove_node = remove_tail();
+                cache.erase(remove_node->key);
+                delete remove_node; // 防止内存泄漏
+                --size;
+            }
+        } else {
+            DLinkeList* node = cache[key];
+            node->value = value;
+            move_to_head(node); // 记得扔到最前面去，这样才能lru
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+```
+
+### 只出现一次的数字
+
+异或：
+
++ 任何数和 0 做异或运算，结果仍然是原来的数
++ 任何数和其自身做异或运算，结果是 0
++ 异或运算满足交换律和结合律
+
+所以
+
+a^b^a=a^a^b=(a^a)^b=0^b=b
+
+所以把所有数异或一遍就是那个只出现一次的数了。。
+
+```cpp
+    int singleNumber(vector<int>& nums) {
+        int res = 0; // 初始化为0
+        for (auto& i: nums) {
+            res ^= i;
+        }
+        return res;
+    }
 ```
 
 ## 数学
