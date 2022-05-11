@@ -2739,6 +2739,121 @@ a^b^a=a^a^b=(a^a)^b=0^b=b
     }
 ```
 
+### 有效的括号
+
+给定一个只包括``` '('，')'，'{'，'}'，'['，']' ```的字符串，判断字符串是否有效。
+
+有效字符串需满足：
+
++ 左括号必须用相同类型的右括号闭合。
++ 左括号必须以正确的顺序闭合。
++ 注意空字符串可被认为是有效字符串。
+
+```
+示例 1:
+
+输入: "()"
+输出: true
+示例 2:
+
+输入: "()[]{}"
+输出: true
+示例 3:
+
+输入: "(]"
+输出: false
+示例 4:
+
+输入: "([)]"
+输出: false
+示例 5:
+
+输入: "{[]}"
+输出: true
+```
+
+**解答：**
+
+注意一定要**先判断st.size()>0再取top**，不然会出错
+
+```cpp
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> st;
+        unordered_map<char, char> mp;
+        // 先用map存一下左右括号的映射关系，
+        // 因为是栈，遇到右括号才想着pop，所以key是右括号！！
+        mp.insert(std::make_pair('}', '{'));
+        mp.insert(std::make_pair(']', '['));
+        mp.insert(std::make_pair(')', '('));
+        for (int i = 0; i < s.size(); i++) {
+            if (mp.find(s[i]) != mp.end() && 
+                st.size() > 0 && 
+                mp[s[i]] == st.top()) {
+                st.pop();
+            } else {
+                st.push(s[i]);
+            }
+        }
+        if (st.size() == 0) return true;
+        return false;
+    }
+};
+```
+
+#### 基础的括号匹配
+
+[https://www.luogu.com.cn/problem/P1739](https://www.luogu.com.cn/problem/P1739)
+
+```
+假设一个表达式有英文字母（小写）、运算符（+，—，*，/）和左右小（圆）括号构成，以“@”作为表达式的结束符。请编写一个程序检查表达式中的左右圆括号是否匹配，若匹配，则返回“YES”；否则返回“NO”。表达式长度小于255，左圆括号少于20个。
+
+输入格式
+一行：表达式
+
+输出格式
+一行：“YES” 或“NO”
+```
+
+解答：
+
+栈的思想，可以不用栈，用一个变量top，遇到左括号++,右括号--，看最后是不是0
+
+注意：
+
+**如果先出现了右括号，前面没有左括号的时候（top=0时出现了右括号），直接是NO**
+
+```cpp
+#include<iostream>
+#include<cstdio>
+#include<string>
+using namespace std;
+char c;
+int top = 0;
+int main()
+{
+    for(; ; )
+    {
+        cin >> c;
+        if (c == '@') break;
+        if (c == '(') top++;
+        else if( c==')' && top > 0) {
+            top--;
+        } else if(c==')') {
+            cout << "NO";
+            return 0;
+        }
+    }
+    if(top == 0) {
+        cout<<"YES";
+    } else {
+        cout<<"NO";
+    }
+    return 0;
+}
+```
+
 ## 数学
 
 ### 快乐数
