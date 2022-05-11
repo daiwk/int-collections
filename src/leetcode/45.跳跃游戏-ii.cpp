@@ -18,7 +18,7 @@ public:
         for (int i = 0; i < nums.size() - 1; ++i) {
             max_far = max(max_far, i + nums[i]);
             if (end == i) { // 到了这个点，开始跳一步
-                end = max_far;
+                end = max_far; // 更新end为下一个最远的地方
                 ++step;
             }
         }
