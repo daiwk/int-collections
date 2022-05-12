@@ -12,8 +12,10 @@ public:
         int i = 0;
         for (int j = 1; j < nums.size(); j++) {
             if (nums[j] != nums[i]) {
-                i++;
-                nums[i] = nums[j];
+                // 不相等，且j比i快，那就说明ij中间可能是一串重复的数，
+                // 就把num[j]赋值给num[i+1],然后两个指针都往后移
+                nums[i + 1] = nums[j];
+                ++i;
             }
         }
         return i + 1;

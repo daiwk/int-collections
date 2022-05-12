@@ -778,10 +778,204 @@ public:
 类似三数之和，双指针，固定第一个数，希望剩下b+c最接近target
 
 
-
 ```cpp
+    int threeSumClosest(vector<int>& nums, int target) {
+        int n = nums.size();
+        if (n < 3) {
+            return -1;
+        }
+        sort(nums.begin(), nums.end());
+        int dist = INT_MAX;
+        int res = INT_MIN;
+        for (int i = 0; i < n; ++i) {
+            int left = i + 1;
+            int right = n - 1;
+            // 保证和上一次枚举的元素不相等
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            while (left < right) {
+                int sum = nums[i] + nums[left] + nums[right];
+                if (sum < target) {
+                    ++left;
+                    // 注意，这个和三数之和那题的位置不一样
+                    while (left < right && nums[left] == nums[left - 1]) {
+                        left++;
+                    }
+                } else if(sum > target) {
+                    --right;
+                    // 注意，这个和三数之和那题的位置不一样
+                    while (left < right && nums[right] == nums[right + 1]) {
+                        --right;
+                    }
+                } else {
+                    return sum;
+                }
+                if (dist > abs(sum - target)) {
+                    res = sum;
+                    dist = abs(sum - target);
+                }
+            }
+        }
+        return res;
+    }
+```
+
+### Z 字形变换
+
+将一个给定字符串 s 根据给定的行数 numRows ，以从上往下、从左到右进行 Z 字形排列。
+
+比如输入字符串为 "PAYPALISHIRING" 行数为 3 时，排列如下：
 
 ```
+P   A   H   N
+A P L S I I G
+Y   I   R
+```
+
+之后，你的输出需要从左往右逐行读取，产生出一个新的字符串，比如："PAHNAPLSIIGYIR"。
+
+请你实现这个将字符串进行指定行数变换的函数：
+
+```
+示例 2：
+输入：s = "PAYPALISHIRING", numRows = 4
+输出："PINALSIGYAHRPI"
+解释：
+P     I    N
+A   L S  I G
+Y A   H R
+P     I
+```
+
+画个图，直接找出新字符串每一位对应原来的下标
+
+会向下填写 r 个字符，然后向右上继续填写 r−2 个字符(斜线的r扣掉最后一行，和新的第一行的各一个字符)，所以变换周期是t=2r-2。
+
+所以第一行的下标都是2r-2的倍数即0+kt，而最后一行就应该是r-1 + kt
+
+而中间的第i行，除了k个数外，每一轮间还有一个数，那个数是(k + 1)t-i 
+
+
+```cpp
+    string convert(string s, int numRows) {
+        
+        int t = 2 * numRows - 2;
+        int i = 0;
+        if (t == 0) {
+            return s;
+        }
+        int round = s.length() / t;
+        string res;
+        while (i < numRows) {
+            int k = 0;
+            int idx = 0;
+            if (i == 0) {
+                while (k <= round) {
+                    idx = k * t;
+                    if (idx < s.length()) {
+                        res.push_back(s[idx]);
+                    }
+                    k++;
+                }
+            } else if (i < numRows -1) {
+                k = 0;
+                while (k <= round) {
+                   idx = i + k * t;
+                   if (idx < s.length()) {
+                        res.push_back(s[idx]);
+                   }
+                   idx = (k + 1) * t - i;
+                   if (idx > 0 && idx < s.length()) {
+                        res.push_back(s[idx]); 
+                   }
+                   ++k;
+                }
+            } else {
+                k = 0;
+                while (k <= round) {
+                    idx = numRows - 1 + k * t;
+                    if (idx < s.length()) {
+                        res.push_back(s[idx]);
+                    }
+                    k++;
+                }
+            }
+            ++i;
+        }
+        return res;
+    }
+```
+
+标准答案简单很多：
+
+其实就是。。而中间的第i行，除了k个数外，每一轮间还有一个数，那个数是(k + 1)t-i = kt + t-i
+
+这样，就都有kt了
+
+所以就是每个周期塞两个数（不越界的情况下），
+
+第一个数是每个周期的起始下标kt + i
+
+第二个数是kt+t-i
+
+限制一下最后一行和第一行只插入一个数，不然会出问题！！
+
+```cpp
+    string convert(string s, int numRows) {
+        int t = 2 * numRows - 2;
+        int i = 0;
+        if (t == 0) {
+            return s;
+        }
+        int round = s.length() / t;
+        string res;
+        while (i < numRows) {
+            for (int j = 0; j + i < s.length(); j += t) {
+                // 循环k轮，枚举每轮的起始下标
+                res.push_back(s[j + i]); // 当前周期第一个字符
+                // 注意，这里要限制0<i < numRows -1，因为第一行和最后一行只加一个数！！！！！
+                if (0 < i && i < numRows - 1 && j + t - i < s.length()) {
+                    res.push_back(s[j + t - i]);
+                }
+            }
+            ++i;
+        }
+        return res;
+    }
+```
+
+### 删除有序数组中的重复项
+
+给你一个 升序排列 的数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，返回删除后数组的新长度。元素的 相对顺序 应该保持 一致 。
+
+由于在某些语言中不能改变数组的长度，所以必须将结果放在数组nums的第一部分。更规范地说，如果在删除重复项之后有 k 个元素，那么 nums 的前 k 个元素应该保存最终结果。
+
+将最终结果插入 nums 的前 k 个位置后返回 k 。
+
+不要使用额外的空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
+
+**解法**
+
+双指针，一快一慢，如果遇到不相等的，那就把快的值复制到慢的下一位，两个指针继续移动。
+
+```cpp
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.size() == 0) return 0;
+        int i = 0;
+        for (int j = 1; j < nums.size(); j++) {
+            if (nums[j] != nums[i]) {
+                // 不相等，且j比i快，那就说明ij中间可能是一串重复的数，
+                // 就把num[j]赋值给num[i+1],然后两个指针都往后移
+                nums[i + 1] = nums[j];
+                ++i;
+            }
+        }
+        return i + 1;
+    }
+```
+
+
 
 ## 链表
 
@@ -1290,7 +1484,6 @@ vector<int> inorderTraversal(TreeNode* root) {
 输入：nums = [1,2,3]
 输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
 ```
-
 
 ```cpp
     vector<vector<int>> permute(vector<int>& nums) {
