@@ -794,59 +794,6 @@ public:
 };
 ```
 
-## 合并两个有序数组
-
-给定两个有序整数数组 nums1 和 nums2，将 nums2 合并到 nums1 中，使得 num1 成为一个有序数组。
-
-说明:
-
-+ 初始化 nums1 和 nums2 的元素数量分别为 m 和 n。
-+ 你可以假设 nums1 有足够的空间（空间大小大于或等于 m + n）来保存 nums2 中的元素。
-
-示例:
-
-```
-输入:
-nums1 = [1,2,3,0,0,0], m = 3
-nums2 = [2,5,6],       n = 3
-
-输出: [1,2,2,3,5,6]
-```
-
-**解答：**
-
-提示中已经给出，假设array1有足够的空间了，于是我们不需要额外构造一个数组，并且可以**从后面**不断地比较元素进行合并。
-
-+ 比较array2与array1中**最后面**的那个元素，把最大的插入第m+n位
-+ 改变数组的索引，再次进行上面的比较，把最大的元素插入到array1中的第m+n-1位。
-+ 循环一直到结束。循环结束条件：当index1或index2有一个小于0时，此时就可以结束循环了。如果index2小于0，说明目的达到了。如果index1小于0，就把array2中剩下的前面的元素都复制到array1中去就行。
-
-```cpp
-class Solution {
-public:
-    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
-        int j = n - 1;
-        int i = m - 1;
-        while (j >= 0) {
-            if (i < 0) {
-                // 如果i数组遍历完了，要把j数据剩下的全部拷过来,记住是<j+1
-                for(int k = 0; k < j + 1; ++k) {
-                    nums1[k] = nums2[k];
-                }
-                break;
-            }
-            if (nums2[j] > nums1[i]) {
-                nums1[i + j + 1] = nums2[j];
-                j--;
-            } else {
-                nums1[i + j + 1] = nums1[i];
-                i--;
-            }
-        }
-    }
-};
-```
-
 ## 数值的整数次方(offerNo16)--notdone
 
 ## 打印从1到最大的n位数(offerNo17)--notdone

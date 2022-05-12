@@ -325,6 +325,7 @@ nums2 = [3, 4]
             }
             if (nums2[j] > nums1[i]) {
                 // 留大的下来，留谁的就谁的指针--
+                // 注意是i + j + 1
                 tmp[i + j + 1] = nums2[j];
                 j--;
             } else {
@@ -678,15 +679,15 @@ int main()
 
 **解答**
 
-为了避免数字反转可能导致的溢出问题，为什么不考虑只反转 数字的一半？毕竟，如果该数字是回文，其后半部分反转后应该与原始数字的前半部分相同。
+为了避免数字反转可能导致的溢出问题，为什么不考虑只反转 数字的一半？毕竟，如果该数字是回文，**其后半部分反转后应该与原始数字的前半部分相同。**
 
 例如，输入 1221，我们可以将数字“1221”的后半部分从“21”反转为“12”，并将其与前半部分“12”进行比较，因为二者相同，我们得知数字 1221 是回文。
 
 * 特判
 
-所有负数都不可能是回文，例如：-123 不是回文，因为 - 不等于 3
+**所有负数都不可能是回文，例如：-123 不是回文，因为 - 不等于 3**
 
-尾数能被10整除，即尾数是0的也不行，因为首位不是0
+**!!!!尾数能被10整除，即尾数是0的也不行，因为首位不是0**
 
 * 反转
 
@@ -704,7 +705,7 @@ int main()
 
 举个是回文数的例子，原数字是3223，32==32，break了；原数字121，12>1，break掉
 
-当数字长度为奇数时，我们可以通过 revertedNumber/10 去除处于中位的数字。
+**当数字长度为奇数时，我们可以通过 revertedNumber/10 去除处于中位的数字。**
 
 例如，当输入为 12321 时，在 while 循环的末尾我们可以得到 x = 12，revertedNumber = 123
 
@@ -714,12 +715,12 @@ int main()
 class Solution {
 public:
     bool isPalindrome(int x) {
-        if(x < 0 || (x % 10 == 0 && x != 0)) {
+        if(x < 0 || (x % 10 == 0 && x != 0)) { //边界！！
             return false;
         }
         int revertedNumber = 0;
-        while(x > revertedNumber) {
-            revertedNumber = revertedNumber * 10 + x % 10;
+        while(x > revertedNumber) { // 大于
+            revertedNumber = revertedNumber * 10 + x % 10; // 这么判断 
             x /= 10;
         }
         return (x == revertedNumber || x == revertedNumber / 10);
@@ -727,7 +728,60 @@ public:
 };
 ```
 
+### 盛最多水的容器
 
+给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+
+找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。
+
+说明：你不能倾斜容器。
+
+双指针！！
+
+对于i，j两个点，能接的水量是min(num[i],num[j]) * (j - i)
+
+这个时候应该移动的是num[i]和num[j]中较小的那个，因为j-i肯定会变小，
+
+而想要变大，只能min(num[i],num[j])变大，所以要把小的移一下试试，如果小的在左边那就右移，否则同理
+
+```cpp
+    int maxArea(vector<int>& height) {
+        int max_res = 0;
+        int i = 0, j = height.size() - 1;
+        while (i < j) {
+            int cur_water = min(height[i], height[j]) * (j - i);
+            max_res = max(max_res, cur_water);
+            if (height[i] >= height[j]) {
+                --j;
+            } else {
+                ++i;
+            }
+        }
+        return max_res;
+    }
+```
+
+### 最接近的三数之和
+
+给你一个长度为 n 的整数数组 nums 和 一个目标值 target。请你从 nums 中选出三个整数，使它们的和与 target 最接近。
+
+返回这三个数的和。
+
+假定每组输入只存在恰好一个解。
+
+**解法**
+
+「最接近」即为**差值的绝对值最小**
+
+类似三数之和，双指针，固定第一个数，希望剩下b+c最接近target
+
+
+
+```cpp
+
+```
 
 ## 链表
 
@@ -1713,6 +1767,63 @@ public:
     }
 ```
 
+### 合并两个有序数组
+
+给定两个有序整数数组 nums1 和 nums2，将 nums2 合并到 nums1 中，使得 num1 成为一个有序数组。
+
+说明:
+
++ 初始化 nums1 和 nums2 的元素数量分别为 m 和 n。
++ 你可以假设 nums1 有足够的空间（空间大小大于或等于 m + n）来保存 nums2 中的元素。
+
+示例:
+
+```
+输入:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+
+输出: [1,2,2,3,5,6]
+```
+
+**解答：**
+
+**归并排序**
+
+提示中已经给出，假设array1有足够的空间了，于是我们不需要额外构造一个数组，并且可以**从后面**不断地比较元素进行合并。
+
++ 比较array2与array1中**最后面**的那个元素，把最大的插入第m+n位
++ 改变数组的索引，再次进行上面的比较，把最大的元素插入到array1中的第m+n-1位。
++ 循环一直到结束。循环结束条件：当index1或index2有一个小于0时，此时就可以结束循环了。如果index2小于0，说明目的达到了。如果index1小于0，就把array2中剩下的前面的元素都复制到array1中去就行。
+
+```cpp
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        int j = n - 1;
+        int i = m - 1;
+        while (j >= 0) {
+            if (i < 0) {
+                // 如果i数组遍历完了，要把j数据剩下的全部拷过来,记住是<j+1
+                for(int k = 0; k < j + 1; ++k) {
+                    nums1[k] = nums2[k];
+                }
+                break;
+            }
+            if (nums2[j] > nums1[i]) {
+                // 留大的下来，留谁的就谁的指针--
+                // 注意是i + j + 1
+                nums1[i + j + 1] = nums2[j];
+                j--;
+            } else {
+                nums1[i + j + 1] = nums1[i];
+                i--;
+            }
+        }
+    }
+};
+```
+
 ### 颜色分类
 
 给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
@@ -1921,6 +2032,7 @@ public:
 ### 合并区间
 
 以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
+
 ```cpp
     vector<vector<int>> merge(vector<vector<int>>& intervals) {
         // 先排序，然后第一个区间扔进去，遍历下一个的时候，
@@ -3418,6 +3530,33 @@ $$
 
 
 ```python
+def calc_auc(labels, scores):
+    """calc_auc"""
+    pos_cnt = 0
+    neg_cnt = 0
+    for i in labels:
+        if i == 0:
+            neg_cnt +=1
+        elif i == 1:
+            pos_cnt += 1
+    if pos_cnt == 0 or neg_cnt == 0:
+        return -1
+    sorted_scores = sorted(scores, reverse=True)
+    xdic = {}
+    for i in range(0, len(scores)):
+        xdic[scores[i]] = i
+    auc = 0
+    xpos_cnt = 0
+    for idx in range(0, len(sorted_scores)):
+        label = labels[xdic[sorted_scores[idx]]]
+        if label == 1:
+            for j in range(idx + 1, len(sorted_scores)):
+                xlabel = labels[xdic[sorted_scores[j]]]
+                if xlabel == 0:
+                    xpos_cnt += 1
+
+    return float(xpos_cnt) / (pos_cnt * neg_cnt)
+
 def calc_auc2(labels, scores):
     """xx"""
     pos_cnt = 0
@@ -3445,33 +3584,6 @@ def calc_auc2(labels, scores):
         idx -= 1
 
     return float(xres) / (pos_cnt * neg_cnt)
-
-def calc_auc(labels, scores):
-    """calc_auc"""
-    pos_cnt = 0
-    neg_cnt = 0
-    for i in labels:
-        if i == 0:
-            neg_cnt +=1
-        elif i == 1:
-            pos_cnt += 1
-    if pos_cnt == 0 or neg_cnt == 0:
-        return -1
-    sorted_scores = sorted(scores, reverse=True)
-    xdic = {}
-    for i in range(0, len(scores)):
-        xdic[scores[i]] = i
-    auc = 0
-    xpos_cnt = 0
-    for idx in range(0, len(sorted_scores)):
-        label = labels[xdic[sorted_scores[idx]]]
-        if label == 1:
-            for j in range(idx + 1, len(sorted_scores)):
-                xlabel = labels[xdic[sorted_scores[j]]]
-                if xlabel == 0:
-                    xpos_cnt += 1
-
-    return float(xpos_cnt) / (pos_cnt * neg_cnt)
 
 def calc_auc3(labels, scores):
     """calc_auc3"""
@@ -3506,10 +3618,35 @@ if __name__ == "__main__":
     print calc_auc3(labels, scores)
 ```
 
-但第三种解法对于相同预估值的情况会有问题，下面这种解法比较标准了，背下来。。 
+但第三种解法对于相同预估值的情况会有问题，正确的解法是
+
+学习下pnr：
+
+[https://www.jianshu.com/p/e9813ac25cb6](https://www.jianshu.com/p/e9813ac25cb6)
+
+auc和pnr的关系？
+
+随便找一个正负pair，auc是预测对的pair数/总pair数
+
+pnr是预测对的pair数/错的pair数
+
+a=对的pair数，b=错的pair数
+
+auc=a/(a+b)
+
+pnr = a/b
+
+==>1/auc = 1+b/a = 1+1/pnr
+
+==> auc= 1/(1+1/pnr)=pnr/(pnr+1)
+
+o(n^2)解法如下
 
 ```python
-def calcAUC_byProb(labels, probs):
+#encoding=utf8
+from itertools import groupby
+import sys
+def calc_auc_and_pnr(labels, probs):
     N = 0           # 正样本数量
     P = 0           # 负样本数量
     neg_prob = []   # 负样本的预测值
@@ -3526,14 +3663,73 @@ def calcAUC_byProb(labels, probs):
             # 把其对应的预测值加到“负样本预测值”列表中
             neg_prob.append(probs[index])
     number = 0
+    r_number = 0
     # 遍历正负样本间的两两组合
     for pos in pos_prob:
         for neg in neg_prob:
             # 如果正样本预测值>负样本预测值，正序对数+1
             if (pos > neg):
-                number += 1
+                number += 1.
             # 如果正样本预测值==负样本预测值，算0.5个正序对
             elif (pos == neg):
                 number += 0.5
-    return number / (N * P)
+                r_number += 0.5
+            else:
+                r_number += 1.
+    pnr = number / r_number
+    auc = number / (N * P)
+    return auc, pnr
+
+
+if __name__ == '__main__':
+    for user, lines in groupby(sys.stdin, key=lambda x:x.split('\t')[0]):
+        lines = list(lines)
+        #print lines
+        trues = [float(x.strip().split('\t')[1]) for x in lines]
+        preds = [float(x.strip().split('\t')[2]) for x in lines]
+        auc, pnr = calc_auc_and_pnr(trues, preds)
+        ## auc = 1/(1+1/pnr) ==> pnr = 1/ (1/a - 1)
+        pnr_check = 1. / (1. / auc - 1 + 1e-9)
+        print auc, pnr, pnr_check
+```
+
+O(nlogn)如下：
+
+```python
+from itertools import groupby
+import sys
+def calc_auc_and_pnr_fast(label,pred):
+    sample = zip(label,pred)
+    ## 根据pred倒排
+    sample_sorted = sorted(sample,key=lambda x: -x[1])
+    pos = 0
+    cnt = 0
+    r_cnt = 0
+    last_pred = 0
+    for i in range(len(sample_sorted)):
+        l, p = sample_sorted[i]
+        if l == 1:
+            pos += 1
+        elif l == 0:
+            cnt += pos # 截止目前，有pos个正样本比他大
+            if (i != 0 and last_pred == p):
+                cnt -= 0.5
+        last_pred = p
+    n = len(label)
+    negs = n - pos
+    r_cnt = pos * negs - cnt
+    auc = float(cnt) / float(pos * negs)
+    pnr = float(cnt) / r_cnt
+    return auc, pnr
+
+if __name__ == '__main__':
+    for user, lines in groupby(sys.stdin, key=lambda x:x.split('\t')[0]):
+        lines = list(lines)
+        #print lines
+        trues = [float(x.strip().split('\t')[1]) for x in lines]
+        preds = [float(x.strip().split('\t')[2]) for x in lines]
+        auc, pnr = calc_auc_and_pnr_fast(trues, preds)
+        ## auc = 1/(1+1/pnr) ==> pnr = 1/ (1/a - 1)
+        pnr_check = 1. / (1. / auc - 1 + 1e-9)
+        print auc, pnr, pnr_check
 ```
