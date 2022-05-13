@@ -860,7 +860,66 @@ public:
 
 ## 第一个只出现一次的字符(offerNo50)--notdone
 
-## 数组中的逆序对(offerNo51)--notdone
+## 数组中的逆序对(offerNo51)
+
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数。
+
+```
+示例 1:
+输入: [7,5,6,4]
+输出: 5
+```
+
+```cpp
+    vector<int> tmp;
+    int mergeSort(vector<int>& nums, int l, int r) {
+        //递归终止条件，l>=r
+        if (l >= r) return 0;
+        //先找到中点
+        int mid = (l + r) >> 1;
+        //左半边递归，两边都是闭区间
+        int c1 = mergeSort(nums, l, mid);
+        //右半边递归，两边都是闭区间
+        int c2 = mergeSort(nums, mid + 1, r);
+        int inv_cnt = c1 + c2;
+        // 3个指针，左半边的起点、右半边的起点、新数组的下标
+        int i = l, j = mid + 1;
+        int cnt = 0;
+        while (i <= mid && j <= r) { //是&&,因为有一个遍历完就比较不了了
+            //把小的放进tmp，放的那半边的指针++
+            if (nums[i] <= nums[j]) {
+                tmp[cnt++] = nums[i];
+                //这个时候nums[i]比nums[j]小，
+                //而nums[j]比mid+1...j-1的都要大，
+                //故nums[i]与j-1-(mid+1)+1= j-(mid+1)个数构成逆序对
+                inv_cnt += j - (mid + 1);
+                i++;
+            }
+            else {
+                tmp[cnt++] = nums[j++];
+            }
+        }
+        //剩下的搞进来
+        while (i <= mid) {
+            tmp[cnt++] = nums[i];
+            inv_cnt += j - (mid + 1);//同上
+            i++;
+        }
+        while (j <= r) {
+            tmp[cnt++] = nums[j++];
+        }
+        //把tmp复制回nums的l-r部分之中
+        for (int i = 0; i < r - l + 1; ++i) {
+            nums[i + l] = tmp[i];
+        }
+        return inv_cnt;
+    }
+public:
+    int reversePairs(vector<int>& nums) {
+        tmp.resize((int)nums.size(), 0);
+        return mergeSort(nums, 0, (int)nums.size() - 1);
+    }
+```
 
 ## 在排序数组中查找数字(offerNo53)--notdone
 

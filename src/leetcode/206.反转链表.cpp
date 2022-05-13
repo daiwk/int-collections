@@ -18,7 +18,20 @@
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {
-
+        //prev cur next三个指针
+        ListNode* prev = nullptr;
+        ListNode* cur = head;
+        while (cur) {
+            // 记录下一个节点next
+            ListNode* next = cur->next;
+            // 往回指
+            cur->next = prev;
+            // 更新prev
+            prev = cur;
+            // 更新cur
+            cur = next;
+        }
+        return prev;
     }
 };
 // @lc code=end

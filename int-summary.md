@@ -1301,6 +1301,37 @@ dp
     }
 ```
 
+### 链表反转
+
+给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。
+ 
+```
+示例 1：
+输入：head = [1,2,3,4,5]
+输出：[5,4,3,2,1]
+```
+
+背下来
+
+```cpp
+    ListNode* reverseList(ListNode* head) {
+        //prev cur next三个指针
+        ListNode* prev = nullptr;
+        ListNode* cur = head;
+        while (cur) {
+            // 记录下一个节点next
+            ListNode* next = cur->next;
+            // 往回指
+            cur->next = prev;
+            // 更新prev
+            prev = cur;
+            // 更新cur
+            cur = next;
+        }
+        return prev;
+    }
+```
+
 ## 树
 
 ### 二叉树的中序遍历
@@ -1756,9 +1787,6 @@ struct MyCmp {
 priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 ```
 
-### 快排
-
-
 ### 排序数组
 
 给你一个整数数组 nums，请你将该数组升序排列。
@@ -1822,6 +1850,50 @@ public:
 
 #### 归并
 
+变种：数组中的逆序对(offerNo51)
+
+```cpp
+    vector<int> tmp;
+    void mergeSort(vector<int>& nums, int l, int r) {
+        //递归终止条件，l>=r
+        if (l >= r) return;
+        //先找到中点
+        int mid = (l + r) >> 1;
+        //左半边递归，两边都是闭区间
+        mergeSort(nums, l, mid);
+        //右半边递归，两边都是闭区间
+        mergeSort(nums, mid + 1, r);
+        // 3个指针，左半边的起点、右半边的起点、新数组的下标
+        int i = l, j = mid + 1;
+        int cnt = 0;
+        while (i <= mid && j <= r) { //是&&,因为有一个遍历完就比较不了了
+            //把小的放进tmp，放的那半边的指针++
+            if (nums[i] <= nums[j]) {
+                tmp[cnt++] = nums[i++];
+            }
+            else {
+                tmp[cnt++] = nums[j++];
+            }
+        }
+        //剩下的搞进来
+        while (i <= mid) {
+            tmp[cnt++] = nums[i++];
+        }
+        while (j <= r) {
+            tmp[cnt++] = nums[j++];
+        }
+        //把tmp复制回nums的l-r部分之中
+        for (int i = 0; i < r - l + 1; ++i) {
+            nums[i + l] = tmp[i];
+        }
+    }
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        tmp.resize((int)nums.size(), 0);
+        mergeSort(nums, 0, (int)nums.size() - 1);
+        return nums;
+    }
+```
 
 
 ### 二分小结
@@ -2913,7 +2985,7 @@ $$
 
 给你一个二叉树的根节点 root ，返回其 最大路径和 。
 
-相当于不能走回头路
+相当于**不能走回头路**
 
 递归。。其实不是dp
 
@@ -2921,9 +2993,9 @@ max_gain(root)：计算二叉树中的一个节点的最大贡献值，即在**�
 
 叶节点的最大贡献值等于节点值
 
-计算完叶子后，中间节点的max_gain=他的值+max(左孩子max_gain, 右孩子max_gain)
+计算完叶子后，中间节点的```max_gain=他的值+max(左孩子max_gain, 右孩子max_gain)```
 
-最大路径和：对于二叉树中的一个节点，该节点的最大路径和取决于该节点的值与该节点的左右子节点的最大贡献值，如果子节点的最大贡献值为正，则计入该节点的最大路径和，否则不计入该节点的最大路径和。
+最大路径和：对于二叉树中的一个节点，该节点的最大路径和取决于**该节点的值**与该节点的**左右子节点的最大贡献值**，如果子节点的最大贡献值为正，则计入该节点的最大路径和，否则不计入该节点的最大路径和。
 
 然后维护一个全局变量，只保留最终的max，注意初始化为INT_MIN
 
