@@ -519,6 +519,8 @@ public:
 
 ### 只出现一次的数字
 
+给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
 异或：
 
 + 任何数和 0 做异或运算，结果仍然是原来的数
@@ -975,6 +977,106 @@ P     I
     }
 ```
 
+### 螺旋矩阵
+
+给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
+
+参考[https://leetcode.cn/problems/spiral-matrix/solution/cxiang-xi-ti-jie-by-youlookdeliciousc-3/](https://leetcode.cn/problems/spiral-matrix/solution/cxiang-xi-ti-jie-by-youlookdeliciousc-3/)
+
++ 首先设定上下左右边界
++ 其次向右移动到最右，此时第一行因为已经使用过了，可以将其从图中删去，体现在代码中就是重新定义上边界
++ 判断若重新定义后，上下边界交错，表明螺旋矩阵遍历结束，跳出循环，返回答案
++ 若上下边界不交错，则遍历还未结束，接着向下向左向上移动，操作过程与第一，二步同理
++ 不断循环以上步骤，直到某两条边界交错，跳出循环，返回答案
+
+```cpp
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> res;
+        if (matrix.empty()) {
+            return res;
+        }
+        int up = 0;
+        int right = matrix[0].size() - 1;
+        int down = matrix.size() - 1;
+        int left = 0;
+        while(true) {
+            for (int i = left; i <= right; ++i) {
+                res.push_back(matrix[up][i]);
+            }
+            if (++up > down) break;
+            for (int i = up; i <= down; ++i) {
+                res.push_back(matrix[i][right]);
+            }
+            if (--right < left) break;
+            for (int i = right; i >= left; --i) {
+                res.push_back(matrix[down][i]);
+            }
+            if (--down < up) break;
+            for (int i = down; i >= up; --i) {
+                res.push_back(matrix[i][left]);
+            }
+            if (++left > right) break;
+        }
+        return res;
+    }
+```
+
+### 判定字符是否唯一
+
+实现一个算法，确定一个字符串 s 的所有字符是否全都不同。
+
+```
+示例 1：
+输入: s = "leetcode"
+输出: false 
+```
+
+位运算
+
+其实就是位图，假设当前是b，那1左移'b'-'a'位，和mark&一下，如果是0，说明这一位还没有出现过，那就和mark|一下得到新的mark，反之，不是0的话，就说明这一位之前出现过了
+
+```cpp
+    bool isUnique(string astr) {
+        int mark = 0;
+        for (auto& i: astr) {
+            int bit = i - 'a';
+            int res = 1<<bit;
+            // 这里要加括号！！因为!=比&的优先级要高。。
+            //或者也可以直接 if(res&mark)
+            if ((res & mark) != 0) {
+                return false;
+            }
+            mark |= res;
+        }
+        return true;
+    }
+```
+
+### 第一个错误的版本
+
+你是产品经理，目前正在带领一个团队开发新的产品。不幸的是，你的产品的最新版本没有通过质量检测。由于每个版本都是基于之前的版本开发的，所以错误的版本之后的所有版本都是错的。
+
+假设你有 n 个版本 [1, 2, ..., n]，你想找出导致之后所有版本出错的第一个错误的版本。
+
+你可以通过调用 bool isBadVersion(version) 接口来判断版本号 version 是否在单元测试中出错。实现一个函数来查找第一个错误的版本。你应该尽量减少对调用 API 的次数。
+
+二分
+
+```cpp
+    int firstBadVersion(int n) {
+        int left = 0, right = n - 1;
+        while(left <= right) {
+            int mid = left + (right - left) / 2;
+            if (isBadVersion(mid + 1)) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+       return left + 1;
+    }
+```
+
 
 
 ## 链表
@@ -1156,6 +1258,46 @@ dp
             p2 = (p2 == nullptr? headA: p2->next);
         }
         return p1;
+    }
+```
+
+### 合并两个有序链表
+
+将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+
+**解法**
+
+当 l1 和 l2 都不是空链表时，判断 l1 和 l2 哪一个链表的**头节点的值更小**，将**较小值的节点添加到结果**里，当一个节点被添加到结果里之后，将对应链表中的节点向后移一位。
+
+设定一个哨兵节点 pre_head
+
+然后3个指针，l1 l2分别有一个，还有一个prev
+
+比较l1 l2，假设l1小，那就prev指向l1，然后prev+1，l1+1
+
+比较l1 l2，假设l2小，那就prev指向l2，然后prev+1，l2+1
+
+所以prev都要+1，可以只写一次
+
+```cpp
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        // dummy head也得有个值，不能是个空的。。
+        ListNode* pre_head = new ListNode(-1);
+        ListNode* prev = pre_head;
+        // 用&&，因为只要有一个到头了，其实就可以结束了
+        while (list1 != nullptr && list2 != nullptr) {
+            if (list1->val < list2->val) {
+                prev->next = list1;
+                list1 = list1->next;
+            } else {
+                prev->next = list2;
+                list2 = list2->next;
+            }
+            prev = prev->next;
+        }
+        //如果l1到头了，那就指向l2剩下的元素
+        prev->next = (list1 == nullptr? list2: list1);
+        return pre_head->next;
     }
 ```
 
@@ -1616,44 +1758,71 @@ priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
 
 ### 快排
 
-[https://blog.csdn.net/weixin_41009689/article/details/106391673](https://blog.csdn.net/weixin_41009689/article/details/106391673)
 
-```
-设置两个变量i和j（也称为哨兵），令序列第一个元素作为基准元素
-i指向序列的最左边，j指向序列的最右边，j从右往左试探，i从左往右试探，直到j找到小于基准的数就停止，i找到大于基准的数就停止，交换i和j指向的两个数，j继续往左试探，i继续往右试探
-如果i和j相遇，则i或j上的元素与基准元素交换，则这一轮排序结束
-对基准元素两边的序列重复以上操作（即 quickSort(vi, lo, i-1); quickSort(vi, i+1, hi);）
-```
+### 排序数组
+
+给你一个整数数组 nums，请你将该数组升序排列。
+
+借这题复习快排、堆排和归并
+
+#### 快排
+
+背起来，几个注意点：
+
++ vector一直是按引用传，中间函数都不返回vector
++ 主函数先随机一下```srand((unsigned)time(NULL));```
++ partion/randomized_partition都是返回下标int，qsort返回的是void
++ qsort一进来```l<r```，然后先通过l和r拿到pos，再递归两次qsort，分别是l, pos -1和pos + 1, r
++ randomized_partition
+    + 先随机一个i出来(l之后加一个r-l+1范围内的随机数，```i=rand()%(r-l+1)+l```)
+    + 然后把num[i]和num[r]互换（```swap(nums[i], nums[r]);```）
+    + 然后```return partition(nums, l, r);```
++ partition
+    + xx
+
 
 ```cpp
-void quickSort(vector<int>& vi, int lo, int hi)
-{
-	int pivot = vi[lo];
-    int i = lo;
-    int j = hi;
-    if (lo < hi)
-    {
-        while (i != j)
-        {
-            while (vi[j] >= pivot && j > i)
-            {
-                j--;
-            }
-            while (vi[i] <= pivot && j > i)
-            {
-                i++;
-            }
-            if(i<j)
-            {
-                swap(vi[i], vi[j]);
+    int partition(vector<int>& nums, int l, int r) {
+        int pivot = nums[r];
+        int i = l;
+        // 期望num[i]都比pivot小，num[j]都比pivot大
+        // 所以一旦num[j]比pivot小，就交换下num[i]与num[j]，并i++
+        for (int j = l; j <= r - 1; ++j) {
+            if (nums[j] <= pivot) { // 和pivot比较
+                swap(nums[i], nums[j]);
+                ++i;
             }
         }
-        swap(vi[lo], vi[i]);
-        quickSort(vi, lo, i-1);
-        quickSort(vi, i+1, hi);
+        //i已经++过了，与pivot交换下，保证pivot左边都比他小，右边比他大
+        swap(nums[i], nums[r]);
+        return i;
     }
-}
+    int randomized_partition(vector<int>& nums, int l, int r) {
+        int i = rand() % (r - l + 1) + l;  //随机选个pivot_idx，换到最右边去
+        swap(nums[r], nums[i]);
+        return partition(nums, l, r);
+    }
+    void randomized_quicksort(vector<int>& nums, int l, int r) {
+        if (l < r) {
+            int pos = randomized_partition(nums, l, r);
+            randomized_quicksort(nums, l, pos - 1);// 左半边递归下
+            randomized_quicksort(nums, pos + 1, r);// 右半边递归下
+        }
+    }
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        srand((unsigned)time(NULL));
+        randomized_quicksort(nums, 0, (int)nums.size() - 1);
+        return nums;
+    }
 ```
+
+#### 堆排
+
+
+#### 归并
+
+
 
 ### 二分小结
 

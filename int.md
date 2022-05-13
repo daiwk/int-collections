@@ -499,39 +499,27 @@ private:
 
 可以用交换的思路：
 
-* 先从头往后走，到第i个位置，
-    * 开始一个while循环，判断该位置的数字numbers[i]是不是和它的下标i相等（是否在正确的位置上）
-        * 相等的话，跳出while, ++i
-        * 不相等，那么比较这个数字a=numbers[i]和以这个数字为下标的数b=numbers[numbers[i]](while完了后，只交换一次)
-            * 相等，找到了！直接return
-            * 不等，交换两个数
-            * 继续while，看当前位置上的这个数
+没有任何重复的情况下，数组的每个下标i处存放的就是i值，这是“正确 ”的位置；
 
-注意，中间那个while循环，每进行一次交换，就有一个数字在正确的位置上，而最外面的那个判断，如果位置正确就不会while，所以其实复杂度是O(n)
+有重复，遍历时，前面的重复元素会放到它“正确”的位置上，后面一个重复元素在想要也放到该位置时，发现该位置已有“正确”元素了，即判断重复。
+
+写的时候注意：要交换i，j元素的时候，i的值更新了还需要在下一次遍历中判断，**此时i指针不动，只有当值在“正确”位置时，才将i右移一位**
 
 ```cpp
-bool duplicate(int numbers[], int length, int* duplication) {
-    if (numbers == nullptr || length <= 0) {
-        return false;
-    }
-    for (int i = 0; i < length; ++i) {
-        if (numbers[i] < 0 || numbers[i] > length - 1) {
-            return false;
-        }
-    }
-    for (int i = 0; i < length; ++i) {
-        while (numbers[i] != i) { //当前数不在他的位置上,那就把这个数放到他应该去的numbers[numbers[i]]上
-            if (numbers[i] == numbers[numbers[i]]) {
-                *duplication = numbers[i];
-                return true;
+    int findRepeatNumber(vector<int>& nums) {
+        int i = 0;
+        while (i < nums.size()) {
+            if (nums[i] == i) {
+                ++i;
+                continue;
             }
-            int tmp = numbers[i];
-            numbers[i] = numbers[numbers[i]];
-            numbers[tmp] = tmp;
+            if (nums[i] == nums[nums[i]]) {
+                return nums[i];
+            }
+            swap(nums[i], nums[nums[i]]);
         }
+        return -1;
     }
-    return false;
-}
 ```
 
 ### 重复数字变种
