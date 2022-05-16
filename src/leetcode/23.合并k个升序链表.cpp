@@ -19,18 +19,32 @@
 class Solution {
 public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
-        auto head = ListNode(0);
-        auto comp = [](ListNode* const &a, ListNode* const &b){return a->val > b->val;}; // 数值越大，优先级越低，也就是每次取出来的是最小的那个
-        priority_queue<ListNode*, vector<ListNode*>, decltype(comp)> q(comp);
-        for (auto &h : lists) if (h != nullptr) q.push(h);
-        auto p = &head;
+        
+        struct MyCmp {
+            bool operator()(ListNode* a, ListNode* b) {
+                return a->val > b->val;
+            }
+        };
+        // 小顶堆
+        priority_queue<ListNode*, vector<ListNode*>, MyCmp> q;
+
+        for (auto &h : lists) {
+            if (h != nullptr) {
+                q.push(h);
+            }
+        }
+        ListNode* head = new ListNode(0); // dummy head
+        ListNode* p = head;
         while (!q.empty()) {
             p->next = q.top();
             p = p->next;
             q.pop();
-            if (p->next != nullptr) q.push(p->next);
+            if (p->next != nullptr){
+                // 用了第xx个链表的节点，那就把它的下一个节点丢进来
+                q.push(p->next);
+            }
         }
-        return head.next;
+        return head->next;// 因为head是dummy，所以返回next
     }
 };
 // @lc code=end

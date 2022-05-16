@@ -1077,6 +1077,68 @@ P     I
     }
 ```
 
+### 字符串相乘
+
+给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+
+注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
+
+就是模拟竖式计算。。
+
+```cpp
+    string multiply(string num1, string num2) {
+        if (num1 == "0" || num2 == "0") {
+            return "0";
+        }
+        string res = "0";
+        int m = num1.size(), n = num2.size();
+        //遍历num2
+        for (int i = n - 1; i >= 0; --i) {
+            string cur; // 先都扔原始数字进去，后面一起+'0'
+            for (int j = n - 1; j > i; j--) {
+                cur.push_back(0); 
+            }
+            int y = num2.at(i) - '0'; 
+            int add = 0; // 进位
+            for (int j = m - 1; j >= 0; --j) {
+                // 遍历num1
+                int x = num1[j] - '0';
+                int product = x * y + add;
+                cur.push_back(product % 10);
+                add = product / 10; //进位
+            }
+            while (add != 0) {
+                // 因为最终可以进好多位，要逐位产出
+                cur.push_back(add % 10);
+                add /= 10;
+            }
+            reverse(cur.begin(), cur.end());
+            for (auto& i: cur) {
+                i += '0';
+            }
+            res = add_string(res, cur);
+        }
+        return res;
+    }
+    string add_string(string num1, string num2) {
+        int i = num1.size() - 1, j = num2.size() - 1, add = 0;
+        string res;
+        while (i >= 0 || j >= 0 || add != 0) {
+            int x = i >= 0? num1.at(i) - '0': 0; //防越界
+            int y = j >= 0? num2.at(j) - '0': 0; //防越界
+            int result = x + y + add;
+            res.push_back(result % 10);
+            add = result / 10;
+            --i;
+            --j;
+        }
+        reverse(res.begin(), res.end());
+        for (auto& i: res) {
+            i += '0';
+        }
+        return res;
+    }
+```
 
 
 ## 链表
@@ -1301,6 +1363,47 @@ dp
     }
 ```
 
+### 合并K个升序链表
+
+给你一个链表数组，每个链表都已经按升序排列。
+
+请你将所有链表合并到一个升序链表中，返回合并后的链表。
+
+**解法**
+
+维护当前**每个链表没有被合并的元素的最前面一个**，k个链表就最多有 k 个满足这样条件的元素，每次在这些元素里面**选取 $$\textit{val}$$ 属性最小的元素**合并到答案中。在选取最小元素的时候，我们可以用优先队列来优化这个过程。(**即小顶堆，比较函数是a>b**)
+
+```cpp
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        
+        struct MyCmp {
+            bool operator()(ListNode* a, ListNode* b) {
+                return a->val > b->val;
+            }
+        };
+        // 小顶堆
+        priority_queue<ListNode*, vector<ListNode*>, MyCmp> q;
+
+        for (auto &h : lists) {
+            if (h != nullptr) {
+                q.push(h);
+            }
+        }
+        ListNode* head = new ListNode(0); // dummy head
+        ListNode* p = head;
+        while (!q.empty()) {
+            p->next = q.top();
+            p = p->next;
+            q.pop();
+            if (p->next != nullptr){
+                // 用了第xx个链表的节点，那就把它的下一个节点丢进来
+                q.push(p->next);
+            }
+        }
+        return head->next;// 因为head是dummy，所以返回next
+    }
+```
+
 ### 链表反转
 
 给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。
@@ -1321,7 +1424,7 @@ dp
         while (cur) {
             // 记录下一个节点next
             ListNode* next = cur->next;
-            // 往回指
+            // 往回指，涉及到xx->next的时候，只有cur->next=pre
             cur->next = prev;
             // 更新prev
             prev = cur;
@@ -1329,6 +1432,56 @@ dp
             cur = next;
         }
         return prev;
+    }
+```
+
+### K 个一组翻转链表
+
+给你链表的头节点 head ，每 k 个节点一组进行翻转，请你返回修改后的链表。
+
+k 是一个正整数，它的值小于或等于链表的长度。**如果节点总数不是 k 的整数倍，那么请将最后剩余的节点保持原有顺序。**
+
+你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
+
+```cpp
+    // 返回的是新的head和tail
+    pair<ListNode*, ListNode*> myReverse(ListNode* head, ListNode* tail) {
+        ListNode* prev = tail->next;
+        ListNode* cur = head;
+        while (prev != tail) {
+            ListNode* next = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+        return {tail, head};
+    }
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode* pre = dummy;
+        while (head) { // while head
+            ListNode* tail = pre;
+            for (int i = 0; i < k; ++i) {
+                tail = tail->next;
+                if (tail == nullptr) {
+                    // 因为题目要求的是，如果节点总数不是 k 的整数倍，
+                    // 那么请将最后剩余的节点保持原有顺序。
+                    return dummy->next; // 直接return了
+                }
+            }
+            ListNode* xx = tail->next;
+            pair<ListNode*, ListNode*> res = myReverse(head, tail);
+            head = res.first;
+            tail = res.second;
+            // 把反转后的接到原链表中
+            pre->next = head;
+            tail->next = xx;
+            // 更新pre和head
+            pre = tail;
+            head = tail->next;
+        }
+        return dummy->next;
     }
 ```
 
@@ -1568,6 +1721,81 @@ vector<int> inorderTraversal(TreeNode* root) {
         元素加入子集
         回溯(子集, 全集)
         元素退出子集
+```
+
+### N皇后
+
+n 皇后问题 研究的是如何将 n 个皇后放置在 n × n 的棋盘上，并且使皇后彼此之间不能相互攻击。
+
+给你一个整数 n ，返回 n 皇后问题 不同的解决方案的数量。
+
+每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
+
+**解法**
+
+回溯法
+
+每个皇后必须位于不同行和不同列，因此将 N 个皇后放置在 $$N \times N$$ 的棋盘上，一定是**每一行有且仅有一个皇后**，**每一列有且仅有一个皇后**，且**任何两个皇后都不能在同一条斜线上**。
+
+使用一个数组记录**每行**放置的皇后的**列下标**，依次在每一行放置一个皇后。每次新放置的皇后都不能和已经放置的皇后之间有攻击：即新放置的皇后**不能**和任何一个已经放置的皇后在**同一列**以及**同一条斜线**上，并更新数组中的当前行的皇后列下标。
+
+N 个皇后都放置完毕，则找到一个可能的解
+
+为了判断一个位置所在的列和两条斜线上是否已经有皇后，使用三个集合 $$\textit{columns}$$、$$\textit{diagonals}_1$$和 $$\textit{diagonals}_2$$分别记录**每一列以及两个方向的每条斜线上是否有皇后**。
+
+
+```cpp
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string> > solutions = vector<vector<string> >();
+        vector<int> queens = vector<int>(n, -1); //初始化都是-1
+        unordered_set<int> columns;
+        unordered_set<int> diagonals1;
+        unordered_set<int> diagonals2;
+        backtrack(solutions, queens, n, 0, columns, diagonals1, diagonals2);
+        return solutions;
+    }
+
+    vector<string> generate_board(vector<int>& queens, int n) {
+        vector<string> board;
+        for (int i = 0; i < n; ++i) {
+            string row = string(n, '.'); // 初始化为n个.
+            row[queens[i]] = 'Q';
+            board.push_back(row);
+        }
+        return board;
+    }
+    void backtrack(vector<vector<string> > &solutions, vector<int>& queens, 
+        int n, int row, unordered_set<int>& columns, 
+        unordered_set<int>& diagonals1, unordered_set<int> diagonals2) {
+        if (row == n) {
+            vector<string> board = generate_board(queens, n); 
+            solutions.push_back(board);
+        } else {
+            for (int i = 0; i < n; ++i) {
+                if (columns.count(i)) {
+                    continue;
+                }
+                int diagonal1 = row - i;
+                if (diagonals1.count(diagonal1)) {
+                    continue;
+                }
+                int diagonal2 = row + i;
+                if (diagonals2.count(diagonal2)) {
+                    continue;
+                }
+                queens[row] = i; // 放进来试试
+                columns.insert(i); // 这一列不能继续放
+                diagonals1.insert(diagonal1); // 左上角不能继续放
+                diagonals2.insert(diagonal2); // 右上角不能继续放
+                backtrack(solutions, queens, n, row + 1, columns, diagonals1, diagonals2);
+                // 还原
+                queens[row] = -1;
+                columns.erase(i); 
+                diagonals1.erase(diagonal1);
+                diagonals2.erase(diagonal2);
+            }
+        }
+    }
 ```
 
 ### 电话号码的字母组合
@@ -1850,7 +2078,7 @@ public:
 
 #### 归并
 
-变种：数组中的逆序对(offerNo51)
+变种：数组中的逆序对(offerNo51)：[https://daiwk.gitbook.io/int-collections/int#shu-zu-zhong-de-ni-xu-dui-offerno51](https://daiwk.gitbook.io/int-collections/int#shu-zu-zhong-de-ni-xu-dui-offerno51)
 
 ```cpp
     vector<int> tmp;
@@ -3940,6 +4168,84 @@ AB -> 28
         return max((max_exec - 1) * (n + 1) + max_cnt, static_cast<int>(tasks.size()));
     }
 ```
+
+## 字典树
+
+### 字典序的第K小数字
+
+给定整数 n 和 k，返回  [1, n] 中字典序第 k 小的数字。
+
+```
+示例 1:
+输入: n = 13, k = 2
+输出: 10
+解释: 字典序的排列是 [1, 10, 11, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9]，所以第二小的数字是 10。
+
+示例 2:
+输入: n = 1, k = 1
+输出: 1
+```
+
+字典序就是**根据数字的前缀进行排序**，比如 10 < 9，因为 10 的前缀是 1，比 9 小。
+
+![](assets/trie-tree.png)
+
+**前序遍历**字典树即可得到字典序从小到大的数字序列，遍历到第k个节点就是第k小的数
+
+但其实不用建树
+
+节点i的子节点为$$(i\times 10, i\times 10+1,...,i\times 10 + 9)$$，
+
+设**当前的字典树的第 i 小的节点为 $$n_i$$**，则只需按照先序遍历再继续往后找 k - i个节点即为目标节点。
+
+假设**以$$n_i$$为根的子树的节点数是** $$step(n_i)$$，那么
+
++ 如果$$step(n_i)<=k-i$$，那么第k小的节点在$$n_i$$的右兄弟的子树中，可以直接从兄弟$$n_{i+1}$$开始往后找$$k-i-step(n_i)$$个节点
++ 如果$$step(n_i)>k-i$$，那么第k小的节点肯定在$$n_i$$的子树中，从左侧第一个孩子中找k-i-1个节点
+
+计算$$step(n_i)$$：
+
+层次遍历，第i层的最左侧的孩子节点是$$first_i$$，最右侧节点是$$last_i$$，第i层总共有$$last_i - first_i + 1$$个节点，
+
+其中，$$first_i = 10\times first_{i-1}$$
+
+$$last_i = 10\times last_{i-1} + 9$$
+
+因为总节点数最多为n，所以第i层最右节点是min(n, last_i)
+
+不断迭代直到$$first_i>n$$就不再向下搜索
+
+```cpp
+    int get_steps(int cur, long n) {
+        int steps = 0;
+        long first = cur; //long?
+        long last = cur;
+        // 层次遍历
+        while (first <= n) {
+            steps += min(last, n) - first + 1;
+            first = first * 10;
+            last = last * 10 + 9;
+        }
+        return steps;
+    }
+
+    int findKthNumber(int n, int k) {
+        int cur = 1;
+        k--;
+        while (k > 0) {
+            int steps = get_steps(cur, n);
+            if (steps <= k) {
+                k -= steps;// 跳过当前子树，往右走
+                cur++;
+            } else {
+                cur = cur * 10;//进入左子树
+                k--;
+            }
+        }
+        return cur;
+    }
+```
+
 
 
 ## 其他2
