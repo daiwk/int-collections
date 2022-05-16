@@ -1419,6 +1419,7 @@ dp
 ```cpp
     ListNode* reverseList(ListNode* head) {
         //prev cur next三个指针
+        // prev初始化为空，很重要，因为head要指向它！！
         ListNode* prev = nullptr;
         ListNode* cur = head;
         while (cur) {
@@ -1484,6 +1485,190 @@ k 是一个正整数，它的值小于或等于链表的长度。**如果节点�
         return dummy->next;
     }
 ```
+
+### 链表的中间结点
+
+给定一个头结点为 head 的非空单链表，返回链表的中间结点。
+
+如果有两个中间结点，则返回第二个中间结点。
+
+**解法**
+
+快慢指针，快的走两步，慢的一步，快的到tail时，慢的就是要的了
+
+```cpp
+    ListNode* middleNode(ListNode* head) {
+        // 起点一样，都是head
+        ListNode* fast = head;
+        ListNode* slow = head;
+        // 注意判断条件，&&
+        while (fast != nullptr && fast->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+```
+
+### 重排链表
+
+给定一个单链表 L 的头节点 head ，单链表 L 表示为：
+
+```
+L0 → L1 → … → Ln - 1 → Ln
+请将其重新排列后变为：
+L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
+```
+不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+
+**寻找链表中点 + 链表逆序 + 合并链表**
+
+可以发现，其实就是先把右半边的链表反转，然后和左半边的链表一个个归并
+
+```cpp
+    void reorderList(ListNode* head) {
+        ListNode* mid = middle_node(head);
+        ListNode* l1 = head;
+        // 搞出一个mid来
+        ListNode* l2 = mid->next;
+        l2 = reverse_list(l2);
+        // 把l1变短
+        mid->next = nullptr;
+        merge_list(l1, l2);
+    }
+
+    ListNode* middle_node(ListNode* head) {
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast != nullptr && fast->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+    ListNode* reverse_list(ListNode* head) {
+        ListNode* prev = nullptr;
+        ListNode* cur = head;
+        while (cur) {
+            ListNode* next = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+        return prev;
+    }
+    void merge_list(ListNode* l1, ListNode* l2) {
+        ListNode* l1_p;
+        ListNode* l2_p;
+        while (l1 != nullptr && l2 != nullptr) {
+            // 先记录当前的next
+            l1_p = l1->next;
+            l2_p = l2->next;
+            l1->next = l2;
+            l2->next = l1_p;
+            l1 = l1_p;
+            l2 = l2_p;
+        }
+    }
+```
+
+### 反转链表 II
+
+给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。
+
+```cpp
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        
+        ListNode* dummy = new ListNode(-1);
+        dummy->next = head;
+        ListNode* prev = dummy; // 不能prev=nullptr了
+        ListNode* cur = head;
+        if (left == right || head->next == nullptr) {
+            return head;
+        }
+        for(int i = 1; i <= left - 1; ++i) {
+            // 如果prev初始化为nullptr，这里就崩了
+            prev = cur;
+            cur = cur->next;
+        }
+        ListNode* x_start = prev;
+        ListNode* x_start2 = cur;
+
+        for (int j = 0; j < right - left; ++j) {
+            ListNode* next = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+        // 挂回去
+        ListNode* x = cur->next;
+        x_start->next = cur;
+        x_start2->next = x;
+        cur->next = prev;
+        return dummy->next;
+    }
+```
+
+### 排序链表
+
+给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+
+**解法**
+
+找到中点，然后归并排序
+
+```cpp
+    ListNode* middle_node(ListNode* head, ListNode* tail) {
+        ListNode* fast = head;
+        ListNode* slow = head;
+        while (fast != tail && fast->next != tail) {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        return slow;
+    }
+    ListNode* sort_list(ListNode* head, ListNode* tail) {
+        if (head == nullptr) {
+            return head;
+        }
+        //必须要有这段。。
+        if (head->next == tail) {
+            head->next = nullptr;
+            return head;
+        }
+        ListNode* mid = middle_node(head, tail);
+        ListNode* l1 = sort_list(head, mid);
+        ListNode* l2 = sort_list(mid, tail);
+        return merge(l1, l2);
+    }
+    ListNode* merge(ListNode* l1, ListNode* l2) {
+        // 链表版的归并，加个dummy简单点。。
+        ListNode* dummy = new ListNode(0);
+        ListNode* cur = dummy;
+        ListNode* tmp1 = l1;
+        ListNode* tmp2 = l2;
+        while (tmp1 != nullptr && tmp2 != nullptr) {
+            if (tmp1->val <= tmp2->val) {
+                cur->next = tmp1;
+                tmp1 = tmp1->next;
+            } else {
+                cur->next = tmp2;
+                tmp2 = tmp2->next;
+            }
+            cur = cur->next;//别漏了这个。。
+        }
+        if (tmp1 != nullptr) {
+            cur->next = tmp1;
+        } else if (tmp2 != nullptr) {
+            cur->next = tmp2;
+        }
+        return dummy->next;
+    }
+    ListNode* sortList(ListNode* head) {
+        return sort_list(head, nullptr);
+    }
+```
+
 
 ## 树
 
@@ -1600,7 +1785,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 给定一个二叉搜索树的根节点 root ，和一个整数 k ，请你设计一个算法查找其中第 k 个最小元素（从 1 开始计数）。
 
-
+**解法**
 
 左边比根小，右边比根大，那就中序遍历，遍历完成左，然后根，然后右，然后k--，减到0就是了 中序就是栈
 
@@ -1624,6 +1809,88 @@ vector<int> inorderTraversal(TreeNode* root) {
         return root->val;
     }
 ```
+
+### 二叉树的右视图
+
+给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+
+**解法1：dfs**
+
+按照根->右->左的方法，每层先访问到的是右节点
+
+```cpp
+    // dfs版本
+    vector<int> rightSideView(TreeNode* root) {
+        unordered_map<int, int> right_map;
+        int max_depth = -1;
+        stack<TreeNode*> node_stk;
+        stack<int> depth_stk;
+        node_stk.push(root);
+        depth_stk.push(0);
+        while (!node_stk.empty()) {
+            TreeNode* node = node_stk.top();
+            node_stk.pop();
+            int depth = depth_stk.top();
+            depth_stk.pop();
+            if (node != nullptr) {
+                max_depth = max(max_depth, depth);
+                // 只搞一次
+                if (right_map.find(depth) == right_map.end()) {
+                    right_map[depth] = node->val;
+                }
+                // stk是后进先出，所以先left再right
+                node_stk.push(node->left);
+                node_stk.push(node->right);
+                depth_stk.push(depth + 1);
+                depth_stk.push(depth + 1);
+            }
+        }
+        vector<int> res;
+        for (int depth = 0; depth <= max_depth; ++depth) {
+            res.push_back(right_map[depth]);
+        }
+        return res;
+    }
+```
+
+**解法2：bfs**
+
+bfs层序遍历（queue），记录每层的最后一个元素
+
+```cpp
+    // bfs版本
+    vector<int> rightSideView(TreeNode* root) {
+        unordered_map<int, int> right_map;
+        int max_depth = -1;
+        queue<TreeNode*> node_q;
+        queue<int> depth_q;
+        node_q.push(root);
+        depth_q.push(0);
+        while (!node_q.empty()) {
+            TreeNode* node = node_q.front();
+            node_q.pop();
+            int depth = depth_q.front();
+            depth_q.pop();
+            if (node != nullptr) {
+                // 记录最大深度
+                max_depth = max(max_depth, depth);
+                // 不断更新，最后一个就是最右边的了
+                right_map[depth] = node->val;
+                // left right都要扔进去，且都要扔depth+1进去
+                node_q.push(node->left);
+                depth_q.push(depth + 1);
+                node_q.push(node->right);
+                depth_q.push(depth + 1);
+            }
+        }
+        vector<int> res;
+        for (int depth = 0; depth <= max_depth; ++depth) {
+            res.push_back(right_map[depth]);
+        }
+        return res;
+    }
+```
+
 
 ## 图
 
@@ -1901,6 +2168,55 @@ N 个皇后都放置完毕，则找到一个可能的解
             backtrace(res, output, first + 1, len);
             swap(output[i], output[first]); // 换回去
         }
+    }
+```
+
+### 下一个排列
+
+整数数组的一个 排列  就是将其所有成员以序列或线性顺序排列。
+
+例如，arr = [1,2,3] ，以下这些都可以视作 arr 的排列：[1,2,3]、[1,3,2]、[3,1,2]、[2,3,1] 。
+
+整数数组的 下一个排列 是指其整数的**下一个字典序更大的排列**。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 下一个排列 就是在这个有序容器中排在它后面的那个排列。**如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列**（即，其元素按升序排列）。
+
+例如，arr = [1,2,3] 的下一个排列是 [1,3,2] 。
+
+类似地，arr = [2,3,1] 的下一个排列是 [3,1,2] 。
+
+而 arr = [3,2,1] 的下一个排列是 [1,2,3] ，因为 [3,2,1] 不存在一个字典序更大的排列。
+
+给你一个整数数组 nums ，找出 nums 的下一个排列。
+
+必须 原地 修改，只允许使用额外常数空间。
+
+**解法**
+
+找到一个大于当前序列的新序列，且变大的幅度尽可能小。
+
++ 将一个**左边的较小数与右边的较大数进行交换**，这样当前排列可以变大
++ 让较小数尽可能靠右，较大数尽可能小。
+  + 那就从右往左遍历，找到第一个**a[i] < a[i+1]**的，这样它的右边才会有比它小的，所以这是较大数
+  + 再从右往左遍历一遍，找到第一个**a[j] > a[i]**的，所以这是较小数
++ 交换完成后，较大数右边的数按升序重新排列。
+  + 其实上面这么找，就表示了i+1的右边在交换后是降序的，因为a[j-1] > a[j] > a[j+1]，而a[j]是第一个比a[i]大的，所以a[j+1] < a[j]，所以a[j-1]>a[j]>a[j+1]
+
+```cpp
+    void nextPermutation(vector<int>& nums) {
+        int i = nums.size() - 2;// 因为要和i+1比较
+        //找到第一个a[i]<a[i+1]
+        while (i >= 0 && nums[i] >= nums[i + 1]) {
+            --i;
+        }
+        if (i >= 0) {
+            int j = nums.size() - 1;
+            // 找到第一个j，使得a[i]>a[j]
+            while (j >= 0 && nums[i] >= nums[j]) {
+                j--;
+            }
+            swap(nums[i], nums[j]);
+        }
+        // 就算i<0，那就是i=-1，仍然成立
+        reverse(nums.begin() + i + 1, nums.end());
     }
 ```
 
@@ -3422,6 +3738,67 @@ dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最�
     }
 ```
 
+### 分发糖果
+
+n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的评分。
+
+你需要按照以下要求，给这些孩子分发糖果：
+
+```
+每个孩子至少分配到 1 个糖果。
+相邻两个孩子评分更高的孩子会获得更多的糖果。
+请你给每个孩子分发糖果，计算并返回需要准备的 最少糖果数目 。
+```
+
+```
+示例 1：
+
+输入：ratings = [1,0,2]
+输出：5
+解释：你可以分别给第一个、第二个、第三个孩子分发 2、1、2 颗糖果。
+示例 2：
+
+输入：ratings = [1,2,2]
+输出：4
+解释：你可以分别给第一个、第二个、第三个孩子分发 1、2、1 颗糖果。
+     第三个孩子只得到 1 颗糖果，这满足题面中的两个条件。
+
+```
+
+**解法**
+
+糖果总是尽量少给，且从 1 开始累计，每次要么比相邻的同学多给一个，要么重新置为 1。
+
++ 如果当前同学比左边同学rating高，那说明他在最近的递增序列中，给他pre+1
++ 如果两个人相等，直接给他1个就行，如示例2
++ 否则属于一个递减序列，
+  + 直接先给他1个，然后假设下一个还是递减的，那就再+2，下下个还是那就再+3，其实就是dec+=1, x+=dec;下一个继续dec+=1, x+=dec
+  + 如果当前的递减序列长度和上一个递增序列等长时，需要把最近的递增序列的最后一个同学也并进递减序列中。也就是用两个变量，分别记录最近一个上升的长度inc与最近一个下降的长度dec，如果相等，dec++。注意，这个时候要把pre搞成1，因为下次要上升的时候，是递减的最后一个位置，这个人只给他一个糖果
+
+```cpp
+    int candy(vector<int>& ratings) {
+        int n = ratings.size();
+        int ret = 1;
+        int inc = 1, dec = 0, pre = 1;
+        for (int i = 1; i < n; ++i) {
+            if (ratings[i] >=  ratings[i - 1]) {
+                dec = 0;
+                pre = ratings[i] == ratings[i - 1]? 1: pre + 1;
+                ret += pre;
+                inc = pre;// 肯定是从1开始加上来的，所以inc=pre
+            } else {
+                dec++;
+                if (dec == inc) {
+                    dec++;
+                }
+                ret += dec;
+                pre = 1;
+            }
+        }
+        return ret;
+    }
+```
+
 
 ## 设计
 
@@ -4245,8 +4622,6 @@ $$last_i = 10\times last_{i-1} + 9$$
         return cur;
     }
 ```
-
-
 
 ## 其他2
 
