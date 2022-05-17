@@ -1156,7 +1156,7 @@ P     I
 
 
 ```cpp
-xx
+
 ```
 
 
@@ -1172,7 +1172,7 @@ Output: ​
 [-1, 0, 1, 2]
 ​
 
-自己的解法
+自己的解法，能过68/71，超时。。其实两个while可以去掉一个，这样也只能过69/71
 
 ```cpp
 #include <iostream>
@@ -1185,7 +1185,7 @@ pair<vector<int>, int> get_max_len(const vector<int>& vec) {
     for (auto& i: vec) {
         xset.emplace(i);
     }
-    int max_len = -1;
+    int max_len = 0;
     vector<int> res_vec;
     for (auto& item: xset) {
         vector<int> tmp_vec;

@@ -52,5 +52,9 @@ gcf里是只用了id和切词,simnet本身q和t都是文本，erniesage的节点
 
 代码：拓扑排序。。不会 跳过；手写auc
 
+二面。。
 
+大致在一面gcf相关基础上又问了gcf样本的周期（比如图文 视频的有效期是多久，一次（即一个delta）分别用多久的语料来训），query怎么加进去的，gcn参数，模型怎么增量训的，啥叫feasign 你们居然是记录feasign的show clk？ 怎么checkpoint、base、delta问了很久（感觉没搞过ctr预估？这也要问？）
+
+题目问了最长连续序列，需要返回这个子序列，不止是最大长度，没写出最优解。。gg
 
