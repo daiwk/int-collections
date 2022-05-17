@@ -1364,7 +1364,7 @@ int main() {
     }
 ```
 
-### 滑动窗口最大值
+### 【top100】滑动窗口最大值
 
 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
 
@@ -1386,7 +1386,43 @@ int main() {
  1  3  -1  -3  5 [3  6  7]      7
 ```
 
+**优先队列**
+
+这题要的是**每个**滑动窗口对应的最大值
+
+搞一个大小为k的大顶堆，堆顶就是max，这个时候，堆里需要存```<nums[i], i>```这样的pair
+
+何时pop堆顶元素？当再来一个元素的时候，堆顶不在滑动窗口中时！
+
+也就是说，假设这个时候遍历到了第i个元素，那么堆顶的下标m距离i超过k了，那就是```i - m + 1 > k```，即```i-m >=k```
+
 ```cpp
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        vector<int> res;
+        struct MyCmp {
+            bool operator() (const pair<int, int>& a, const pair<int, int>& b) {
+                return a.first < b.first;
+            }
+        };
+        priority_queue<pair<int, int>, vector<pair<int, int> >, MyCmp> q;
+        for (int i = 0; i < k; ++i) {
+            q.push({nums[i], i});
+        }
+        // 先push_back进去！！！要不然后面可能给pop掉了。。
+        res.push_back(q.top().first);
+        for (int i = k; i < nums.size(); ++i) {
+            // 先塞进堆里
+            q.push({nums[i], i});
+            // 这是个while，要一次性把窗口外的都删了，
+            // 可能删不全，但下个i的时候会继续删
+            while (i - q.top().second >= k) {
+                q.pop();
+            }
+            // 堆顶就是当前这个窗口的max
+            res.push_back(q.top().first);
+        }
+        return res;
+    }
 ```
 
 ## 链表
@@ -4106,6 +4142,7 @@ dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最�
 
 子数组 是数组的连续子序列。
 
+**解法**
 
 ![](assets/maxmul.jpg)
 
@@ -4190,6 +4227,14 @@ n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的
         return ret;
     }
 ```
+
+### 【top100】打家劫舍
+
+你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。
+
+给定一个代表每个房屋存放金额的非负整数数组，计算你 不触动警报装置的情况下 ，一夜之内能够偷窃到的最高金额。
+
+
 
 
 ## 设计
