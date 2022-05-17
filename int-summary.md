@@ -1327,6 +1327,67 @@ int main() {
 
 可以是dp也可以是栈
 
+栈的解法就是栈里放的是int，而不是左右括号
+
+始终保持**栈底**元素为当前已经遍历过的元素中**最后一个没有被匹配的右括号的下标**
+
++ 遇到左括号，把**下标扔进栈里**
++ 遇到右括号
+    + **弹出栈顶**，表示有左括号和它匹配上了，**弹出之后**：
+        + 如果栈为空，说明当前右括号没人和他匹配，就把它的下标扔进去，这就满足了**最后一个没有被匹配的右括号的下标**
+        + 如果栈不空，**当前右括号下标减掉栈顶**就是**以这个右括号结尾的最长有效括号长度**。。
+
+如果一开始栈为空，第一个字符为左括号的时候我们会将其放入栈中，这样就不满足提及的「最后一个没有被匹配的右括号的下标」，为了保持统一，我们在**一开始的时候往栈中放入一个值为 -1 的元素**。
+
+![](./assets/max-valid-kuohao.png)
+
+如上图，先-1入栈，然后遇到(，就扔一个0进去，然后i=1的时候，栈顶的0其实和它是匹配的，就扔掉，这个时候1-(-1)就是2了，其实就是扔掉的那对括号的长度
+
+```cpp
+    int longestValidParentheses(string s) {
+        int max_res = 0;
+        stack<int> stk;
+        stk.push(-1);// 如上所述，为了保证栈底一直是xxx的右括号
+        for (int i = 0; i < s.length(); ++i) {
+            if (s[i] == '(') {
+                stk.push(i);
+            } else if (s[i] == ')') {
+                stk.pop();
+                if (stk.empty()) {
+                    stk.push(i);
+                } else {
+                    max_res = max(max_res, i - stk.top());
+                }
+            }
+        }
+        return max_res;
+    }
+```
+
+### 滑动窗口最大值
+
+给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
+
+返回 滑动窗口中的最大值 。
+
+```
+示例 1：
+
+输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
+输出：[3,3,5,5,6,7]
+解释：
+滑动窗口的位置                最大值
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+```
+
+```cpp
+```
 
 ## 链表
 
@@ -2111,6 +2172,105 @@ bfs层序遍历（queue），记录每层的最后一个元素
         depth(root);
         return depth_max;
     }
+```
+
+## 【top100】二叉树的最大深度(offerNo55)
+
+给定一个二叉树，找出其最大深度。
+
+二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+
+说明: 叶子节点是指没有子节点的节点。
+
+示例：
+给定二叉树 [3,9,20,null,null,15,7]，
+
+```
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回它的最大深度 3 。
+
+**解答：**
+
+方法一：递归
+
+每往下一层就加1，体现在走完左右子树的时候，return的时候加1，只有这样，最终的深度才会体现出来。。只有一个节点的时候，深度是1。
+
+时间复杂度O(N), N为节点总数，因为需要遍历所有节点
+
+空间复杂度：在最糟糕的情况下，树是完全不平衡的，例如每个结点只剩下左子结点，递归将会被调用 N 次，因此保持调用栈的存储将是O(N)。但在最好的情况下（树是完全平衡的），树的高度将是 log(N)。因此，在这种情况下的空间复杂度将是O(log(N))。
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    
+    int maxDepth(TreeNode* root) {
+        if (root == NULL) {
+            return 0;
+        } else {
+            int left_height = maxDepth(root->left);
+            int right_height = maxDepth(root->right);
+            return std::max(left_height, right_height) + 1; // 每往下一层就要加1
+        }
+    }
+};
+```
+
+方法2：**迭代（栈）**
+
+使用 **DFS** 策略访问每个结点，同时在**每次访问时更新最大深度。**
+
+从包含根结点且相应深度为 1 的栈开始。然后我们继续迭代：将当前结点弹出栈并推入子结点。每一步都会更新深度。
+
+注意，push的时候是cur_depth + 1，而非depth+1
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    
+    int maxDepth(TreeNode* root) {
+        stack<std::pair<TreeNode*, int> > st;
+        if (root != NULL) {
+            st.push(std::make_pair(root, 1));
+        }
+        int depth = 0;
+        while (!st.empty()) {
+            std::pair<TreeNode*, int> a = st.top();
+            TreeNode* cur_root = a.first;
+            int cur_depth = a.second;
+            st.pop();
+            if (cur_root != NULL) {
+                depth = std::max(depth, cur_depth);
+                st.push(std::make_pair(cur_root->left, cur_depth + 1));
+                st.push(std::make_pair(cur_root->right, cur_depth + 1));
+            }
+        }
+        return depth;
+    }
+};
 ```
 
 ## 图
