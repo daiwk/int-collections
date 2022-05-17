@@ -1154,9 +1154,35 @@ P     I
 
 请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
 
+**其实只需要每次在哈希表中检查是否存在x−1即可。如果x-1存在，说明当前数x不是连续序列的起始数字，我们跳过这个数。**
 
 ```cpp
-
+    int longestConsecutive(vector<int>& vec) {
+        unordered_set<int> xset;
+        for (auto& i: vec) {
+            xset.emplace(i);
+        }
+        int max_len = 0;
+        vector<int> res_vec;
+        for (auto& item: xset) {
+            vector<int> tmp_vec;
+            int tmp_len = 0;
+            int i = 0;
+            if (!xset.count(item - 1)) {
+                while (xset.count(item + i)) {
+                    // cout << "aa2 " << i << " " << item-i << endl;
+                    tmp_vec.emplace_back(item + i);
+                    i++;
+                }
+            }
+            tmp_len += i;
+            if (tmp_len > max_len) {
+                res_vec.swap(tmp_vec);
+            }
+            max_len = max(max_len, tmp_len);
+        }
+        return max_len;
+    }
 ```
 
 
@@ -1191,6 +1217,7 @@ pair<vector<int>, int> get_max_len(const vector<int>& vec) {
         vector<int> tmp_vec;
         int tmp_len = 0;
         int i = 0;
+        // 可以只留一个while
         while (xset.count(item - i)) {
             // cout << "aa1 " << i << " " << item-i << endl;
             tmp_vec.emplace_back(item - i);
@@ -1205,6 +1232,64 @@ pair<vector<int>, int> get_max_len(const vector<int>& vec) {
             i++;
         }
         tmp_len += i -1;
+        if (tmp_len > max_len) {
+            res_vec.swap(tmp_vec);
+        }
+        max_len = max(max_len, tmp_len);
+    }
+    return {res_vec, max_len};
+}
+
+int main() {
+    vector<int> vec {0, 78, 1,2,-1,5,6,7,7};
+    auto res = get_max_len(vec);
+    cout << res.second << endl;
+    cout << "=====" << endl;
+    for (const auto&i: res.first) {
+        cout << i << endl;
+    }
+
+    return 0;
+}
+```
+
+优化后的解法：
+
+```cpp
+#include <iostream>
+#include <unordered_set>
+#include <vector>
+using namespace std;
+
+pair<vector<int>, int> get_max_len(const vector<int>& vec) {
+    unordered_set<int> xset;
+    for (auto& i: vec) {
+        xset.emplace(i);
+    }
+    int max_len = 0;
+    vector<int> res_vec;
+    for (auto& item: xset) {
+        vector<int> tmp_vec;
+        int tmp_len = 0;
+        int i = 0;
+//        // 可以只留一个while
+//        while (xset.count(item - i)) {
+//            // cout << "aa1 " << i << " " << item-i << endl;
+//            tmp_vec.emplace_back(item - i);
+//            i++;
+//        }
+//        tmp_len += i;
+
+//        i = 1;
+        if (!xset.count(item - 1)) {
+            while (xset.count(item + i)) {
+                // cout << "aa2 " << i << " " << item-i << endl;
+                tmp_vec.emplace_back(item + i);
+                i++;
+            }
+        }
+//        tmp_len += i -1;
+        tmp_len += i;
         if (tmp_len > max_len) {
             res_vec.swap(tmp_vec);
         }
