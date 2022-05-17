@@ -750,6 +750,9 @@ public:
 
 ```cpp
     int maxArea(vector<int>& height) {
+        // 对于i，j两个点，能接的水量是min(num[i],num[j]) * (j - i)
+        // 这个时候应该移动的是num[i]和num[j]中较小的那个，因为j-i肯定会变小，
+        // 而想要变大，只能min(num[i],num[j])变大，所以要把小的移一下试试，如果小的在左边那就右移，否则同理
         int max_res = 0;
         int i = 0, j = height.size() - 1;
         while (i < j) {
@@ -991,6 +994,11 @@ P     I
 
 ```cpp
     vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        // 首先设定上下左右边界
+        // 其次向右移动到最右，此时第一行因为已经使用过了，可以将其从图中删去，体现在代码中就是重新定义上边界
+        // 判断若重新定义后，上下边界交错，表明螺旋矩阵遍历结束，跳出循环，返回答案
+        // 若上下边界不交错，则遍历还未结束，接着向下向左向上移动，操作过程与第一，二步同理
+        // 不断循环以上步骤，直到某两条边界交错，跳出循环，返回答案
         vector<int> res;
         if (matrix.empty()) {
             return res;
@@ -1138,6 +1146,84 @@ P     I
         }
         return res;
     }
+```
+
+### 最长连续序列
+
+给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+
+请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
+
+
+```cpp
+xx
+```
+
+
+#### 类似的byte面试题
+
+返回一个序列中最长的连续数组
+
+题目描述
+Input: ​
+[0,  78, 1, 2, -1, 5, 6, 7, 7]​
+
+Output: ​
+[-1, 0, 1, 2]
+​
+
+自己的解法
+
+```cpp
+#include <iostream>
+#include <unordered_set>
+#include <vector>
+using namespace std;
+
+pair<vector<int>, int> get_max_len(const vector<int>& vec) {
+    unordered_set<int> xset;
+    for (auto& i: vec) {
+        xset.emplace(i);
+    }
+    int max_len = -1;
+    vector<int> res_vec;
+    for (auto& item: xset) {
+        vector<int> tmp_vec;
+        int tmp_len = 0;
+        int i = 0;
+        while (xset.count(item - i)) {
+            // cout << "aa1 " << i << " " << item-i << endl;
+            tmp_vec.emplace_back(item - i);
+            i++;
+        }
+        tmp_len += i;
+        
+        i = 1;
+        while (xset.count(item + i)) {
+            // cout << "aa2 " << i << " " << item-i << endl;
+            tmp_vec.emplace_back(item + i);
+            i++;
+        }
+        tmp_len += i -1;
+        if (tmp_len > max_len) {
+            res_vec.swap(tmp_vec);
+        }
+        max_len = max(max_len, tmp_len);
+    }
+    return {res_vec, max_len};
+}
+
+int main() {
+    vector<int> vec {0, 78, 1,2,-1,5,6,7,7};
+    auto res = get_max_len(vec);
+    cout << res.second << endl;
+    cout << "=====" << endl;
+    for (const auto&i: res.first) {
+        cout << i << endl;
+    }
+
+    return 0;
+}
 ```
 
 
@@ -1820,6 +1906,7 @@ vector<int> inorderTraversal(TreeNode* root) {
 
 ```cpp
     // dfs版本
+    // 按照根->右->左的方法，每层先访问到的是右节点
     vector<int> rightSideView(TreeNode* root) {
         unordered_map<int, int> right_map;
         int max_depth = -1;
@@ -1859,6 +1946,7 @@ bfs层序遍历（queue），记录每层的最后一个元素
 
 ```cpp
     // bfs版本
+    // bfs层序遍历（queue），记录每层的最后一个元素
     vector<int> rightSideView(TreeNode* root) {
         unordered_map<int, int> right_map;
         int max_depth = -1;
@@ -3367,6 +3455,9 @@ f(i) = max(f(i-1) + nums[i], nums[i])
 
 ```cpp
     int maxSubArray(vector<int>& nums) {
+        // f(i)表示以第i个数结尾的连续子数组最大和，那么求的就是i=0,...,n-1的max f(i)
+        // f(i) = max(f(i-1) + nums[i], nums[i])
+        // 如果加上这个数能变得更大，那就加上；如果不行，那这个数就是新的起点
         int pre = 0;
         int max_res = INT_MIN; // 初始化极小值，或者nums[0]
         for (int i = 0; i < nums.size(); ++i) {
@@ -3408,6 +3499,9 @@ f(i) = max(f(i-1) + nums[i], nums[i])
 
 ```cpp
     int maxProfit(vector<int>& prices) {
+        // 找到最小的谷之后的最大的峰。 我们可以维持两个变量
+        // minprice ：迄今为止所得到的最小的谷值。初始化为int_max，如果当前价格比它小，那就更新它为当前价格
+        // maxprofit，迄今为止所得到的最大的利润（卖出价格与最低价格之间的最大差值）。如果当前价格与minprice的差比它大，那就更新它
         int minprice = INT_MAX;
         int max_profit = 0;
         for (int i = 0; i < prices.size(); ++i) {
@@ -3777,6 +3871,11 @@ n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的
 
 ```cpp
     int candy(vector<int>& ratings) {
+        // 如果当前同学比左边同学rating高，那说明他在最近的递增序列中，给他pre+1
+        // 如果两个人相等，直接给他1个就行，如示例2
+        // 否则属于一个递减序列，
+        //    直接先给他1个，然后假设下一个还是递减的，那就再+2，下下个还是那就再+3，其实就是dec+=1, x+=dec;下一个继续dec+=1, x+=dec
+        //    如果当前的递减序列长度和上一个递增序列等长时，需要把最近的递增序列的最后一个同学也并进递减序列中。也就是用两个变量，分别记录最近一个上升的长度inc与最近一个下降的长度dec，如果相等，dec++。注意，这个时候要把pre搞成1，因为下次要上升的时候，是递减的最后一个位置，这个人只给他一个糖果
         int n = ratings.size();
         int ret = 1;
         int inc = 1, dec = 0, pre = 1;

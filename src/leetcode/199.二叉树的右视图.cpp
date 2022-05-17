@@ -19,6 +19,7 @@
 class Solution {
 public:
     // // bfs版本
+    // // bfs层序遍历（queue），记录每层的最后一个元素
     // vector<int> rightSideView(TreeNode* root) {
     //     unordered_map<int, int> right_map;
     //     int max_depth = -1;
@@ -50,6 +51,7 @@ public:
     //     return res;
     // }
     // dfs版本
+    // 按照根->右->左的方法，每层先访问到的是右节点
     vector<int> rightSideView(TreeNode* root) {
         unordered_map<int, int> right_map;
         int max_depth = -1;
