@@ -2064,6 +2064,38 @@ bfs层序遍历（queue），记录每层的最后一个元素
     }
 ```
 
+### 二叉树的直径
+
+给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
+
+**解法**
+
+![](./assets/tree-diameter.jpeg)
+
+经过节点的最长路径就是**左孩子深度+右孩子深度**，
+
+因此，求出所有节点的最长路径，取个max就是了
+
+而求深度可以用递归的dfs，**depth返回的是max(左深度,右深度)+1**
+
+```cpp
+    int depth_max = 0;
+    int depth(TreeNode* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+        int left_depth = depth(root->left);
+        int right_depth = depth(root->right);
+        int cur_depth = left_depth + right_depth;
+        depth_max = max(depth_max, cur_depth);
+        return max(left_depth, right_depth) + 1;
+    }
+
+    int diameterOfBinaryTree(TreeNode* root) {
+        depth(root);
+        return depth_max;
+    }
+```
 
 ## 图
 
