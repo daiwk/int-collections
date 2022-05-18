@@ -23,12 +23,13 @@ public:
         if (root == nullptr) {
             return res;
         }
+        // 用队列
         queue<TreeNode*> q;
         q.push(root);
         while (!q.empty()) {
             int size = q.size();
             res.push_back(vector<int>());// 先塞个空的进去
-            for (int i = 0; i < size; ++i) {
+            for (int i = 0; i < size; ++i) {//这里是固定的size，不是q.size，因为q一直在变
                 TreeNode * node = q.front();
                 q.pop();
                 res.back().push_back(node->val);//！！！！！！往最后一个vec里扔东西

@@ -1425,6 +1425,53 @@ int main() {
     }
 ```
 
+### 【top100】和为 K 的子数组
+
+给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的子数组的个数 。
+
+```
+示例 1：
+输入：nums = [1,1,1], k = 2
+输出：2
+
+示例 2：
+输入：nums = [1,2,3], k = 3
+输出：2
+```
+
+子数组指的就是连续的
+
+pre[i]：[0,i]这段(闭区间)结尾的子数组的和
+
+所以```pre[i] = pre[i-1]+nums[i]```
+
+那[i,j]的和就是```pre[i] - pre[j-1]```，看看这个和是不是k
+
+看看有多少个j，能够```pre[i]-pre[j-1]==k```，所以```pre[j-1] = pre[i] - k```
+
+那就可以用一个map来存，key是```pre[j]```，value是出现次数
+
+对于i来讲，首先```map[pre[i]]++```，如果```pre[i] - k```已经有了，那就```count+=map[pre[i] - k]```
+
+另外，```pre[i]=pre[i-1] + nums[i]```，其实用一个数一直更新就行，不用数组
+
+```cpp
+    int subarraySum(vector<int>& nums, int k) {
+        unordered_map<int, int> xmap;
+        int count = 0;
+        int pre = 0;
+        xmap[pre] = 1; // 这里要加上，要不0会漏掉。。
+        for (int i = 0; i < nums.size(); ++i) {
+            pre += nums[i];
+            if (xmap.find(pre - k) != xmap.end()) {
+                count += xmap[pre - k];
+            }
+            xmap[pre]++;
+        }
+        return count;
+    }
+```
+
 ## 链表
 
 ### 【top100】两数相加
@@ -1953,6 +2000,40 @@ L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
     }
 ```
 
+### 【top100】删除链表的倒数第 N 个结点
+
+给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+
+双指针，让一个先走n步，然后两个一起出发，快的到end的时候，慢的next删了
+
+```cpp
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        // 搞个dummy解决边界问题。。
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode* fast = head;
+        for (int i = 0; i < n && fast != nullptr; ++i) {
+            fast = fast->next;
+        }
+        // slow从dummy开始！！
+        ListNode* slow = dummy;
+        while (fast != nullptr) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        slow->next = slow->next->next;
+        return dummy->next;
+    }
+```
+
+当然，也可以省一点空间：
+
+```cpp
+        ListNode* ans = dummy->next;
+        delete dummy;
+        return ans;
+```
+
 
 ## 树
 
@@ -1978,9 +2059,41 @@ vector<int> inorderTraversal(TreeNode* root) {
     }
 ```
 
-### 层序遍历
+### 【top100】二叉树的层序遍历
+
+给你二叉树的根节点 root ，返回其节点值的 层序遍历 。 （即逐层地，从左到右访问所有节点）。
 
 队列（bfs）queue
+
+```cpp
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int> > res;
+        if (root == nullptr) {
+            return res;
+        }
+        // 用队列
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int size = q.size();
+            res.push_back(vector<int>());// 先塞个空的进去
+            for (int i = 0; i < size; ++i) {//这里是固定的size，不是q.size，因为q一直在变
+                TreeNode * node = q.front();
+                q.pop();
+                res.back().push_back(node->val);//！！！！！！往最后一个vec里扔东西
+                if (node->left) {
+                    q.push(node->left);
+                }
+
+                if (node->right) {
+                    q.push(node->right);
+                }
+            }
+        } 
+        return res;
+    }
+```
+
 
 ### 二叉树的锯齿形层序遍历
 给你二叉树的根节点 root ，返回其节点值的 锯齿形层序遍历 。（即先从左往右，再从右往左进行下一层遍历，以此类推，层与层之间交替进行）。
@@ -2210,7 +2323,7 @@ bfs层序遍历（queue），记录每层的最后一个元素
     }
 ```
 
-## 【top100】二叉树的最大深度(offerNo55)
+### 【top100】二叉树的最大深度(offerNo55)
 
 给定一个二叉树，找出其最大深度。
 
@@ -2307,6 +2420,42 @@ public:
         return depth;
     }
 };
+```
+
+### 【top100】不同的二叉搜索树
+
+给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
+
+**解法**
+
++ ```G(n)```：长度为n的序列能构成的不同二叉搜索树个数
++ ```F(i,n)```：**以i为根**，长度为n的不同二叉搜索树个数
+
+$$G(n)=\sum_{i=1}^{n} F(i, n)$$
+
+以i为根节点，可以把1,...,i-1作为左子树，i+1,...,n作为右子树，递归，这样做因为根不一样，所以每棵树都是不一样的。
+
+左子树的数量其实就是G(i-1)，右子树的数量是G(n-i)，而F(i,n)其实就是**左右子树的暴力笛卡尔积**$$F(i,n)=G(i-1)G(n-i)$$
+
+因此，
+
+$$G(n)=\sum_{i=1}^{n} G(i-1) \cdot G(n-i)$$
+
+所以，sum(G(x)G(y))，其中x从0到n-1，y从n-1到0，两两组合，其实就是暴力的笛卡尔积。。所以可以两层for，且为了不重复计算，所以外面是i in [1,n]，里面是j in [1,i]
+
+```cpp
+    int numTrees(int n) {
+        vector<int> G(n + 1, 0);
+        G[0] = 1;// 空树，只有一个解
+        G[1] = 1;// 只有根，只有一个解
+        for (int i = 2; i <= n; i++) { // 从2开始，因为前面算了0和1
+            for (int j = 1; j <= i; j++) { 
+                // 从1开始，因为要j-1>=0;
+                // <=i，因为要i-j>=0
+                G[i] += G[j - 1] * G[i - j]; 
+            }
+       }
+       return G[n];
 ```
 
 ## 图
@@ -4234,6 +4383,54 @@ n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的
 
 给定一个代表每个房屋存放金额的非负整数数组，计算你 不触动警报装置的情况下 ，一夜之内能够偷窃到的最高金额。
 
+**解法**
+
+dp，要求不能相邻，也就是说
+
++ 要么选nums[i]，那就是之前选的是i-2，所以是dp[i-2]+nums[i]
++ 要么不选nums[i]，那就用dp[i-1]
+
+所以dp[i]是二者的max
+
+```cpp
+    int rob(vector<int>& nums) {
+        vector<int> dp;
+        dp.reserve(nums.size());
+        if (nums.empty()) {
+            return 0;
+        }
+        dp[0] = nums[0];
+        if (nums.size() == 1) {
+            return dp[0];
+        }
+        dp[1] = max(nums[0], nums[1]);
+        if (nums.size() == 2) {
+            return dp[1];
+        }
+        for (int i = 2; i < nums.size(); ++i) {
+            dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);
+        }
+        return dp[nums.size() - 1];
+    }
+```
+
+### 【top100】分割等和子集
+
+给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+
+```
+示例 1：
+输入：nums = [1,5,11,5]
+输出：true
+解释：数组可以分割成 [1, 5, 5] 和 [11] 。
+
+示例 2：
+输入：nums = [1,2,3,5]
+输出：false
+解释：数组不能分割成两个元素和相等的子集。
+```
+
+**解法**
 
 
 
