@@ -1472,6 +1472,108 @@ pre[i]：[0,i]这段(闭区间)结尾的子数组的和
     }
 ```
 
+### 【top100】字符串解码
+
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
+
+```
+示例 1：
+输入：s = "3[a]2[bc]"
+输出："aaabcbc"
+
+示例 2：
+输入：s = "3[a2[c]]"
+输出："accaccacc"
+
+示例 3：
+输入：s = "2[abc]3[cd]ef"
+输出："abcabccdcdcdef"
+
+示例 4：
+输入：s = "abc3[cd]xyz"
+输出："abccdcdcdxyz"
+```
+
+栈
+
+可能出现括号嵌套的情况，如```2[a2[bc]]```，可以搞成```2[abcbc]```，也就是从最内层的括号开始展开
+
+遍历数组：
+
++ 如果是数字，解析出完整的数字（可能多位），进栈
++ 如果是字母或者左括号，进栈
++ 如果是右括号，一直出栈，直到出了左括号，搞成一个字符串，然后reverse，剩下的就是一个数字，然后把这个字符串重复这么多次就是了，**然后把这个扔回栈里去**
+
+最终栈里剩下的是几段string，全pop出来，再reverse一下就是要的了
+
+```cpp
+    string get_string(const vector<string>& vec) {
+        string tmp_str = "";
+        for (int j = 0; j < vec.size(); ++j) {
+            tmp_str += vec[j];
+        }
+        return tmp_str;
+    }
+
+    string decodeString(string s) {
+        stack<string> stk;
+        size_t ptr = 0;
+        string res = "";
+        while (ptr < s.size()) {
+            if (isdigit(s[ptr])) {
+                string tmp_str = "";
+                while (isdigit(s[ptr])) {;
+                    tmp_str += string(1, s[ptr++]);
+                }
+                stk.push(tmp_str);
+            } else if (isalpha(s[ptr]) || s[ptr] == '[') {
+                stk.push(string(1, s[ptr++]));
+            } else if (s[ptr] == ']') {
+                vector<string> tmp_vec;
+                vector<string> tmp_str_vec;
+                while(stk.top() != "[") {
+                    string tmp = stk.top();
+                    tmp_str_vec.push_back(tmp);
+                    stk.pop();
+                }
+                reverse(tmp_str_vec.begin(), tmp_str_vec.end());
+                string tmp_str = get_string(tmp_str_vec);
+                cout << tmp_str << endl;
+                stk.pop(); // pop掉[
+                int digit = atoi(stk.top().c_str()); // atoi转成int
+                stk.pop();
+                string x_str = "";
+                while (digit) {
+                    tmp_vec.push_back(tmp_str);
+                    digit--;
+                }
+                string xtmp_str = get_string(tmp_vec);
+                stk.push(xtmp_str);// 要塞回栈里去！！！
+                cout << xtmp_str << "qqq" << endl;
+                ptr++;
+            }
+        }
+        vector<string> res_vec;
+        // 全部搞出来，因为可能会有多段结果
+        while(!stk.empty()) {
+            res_vec.push_back(stk.top());
+            stk.pop();
+        }
+        reverse(res_vec.begin(), res_vec.end());
+        res = get_string(res_vec);
+        return res;
+    }
+```
+
+
+
+
 ## 链表
 
 ### 【top100】两数相加
@@ -4416,7 +4518,7 @@ dp，要求不能相邻，也就是说
 
 ### 【top100】分割等和子集
 
-给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+给你一个 只包含**正整数** 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
 
 ```
 示例 1：
@@ -4432,6 +4534,66 @@ dp，要求不能相邻，也就是说
 
 **解法**
 
+其实类似0-1背包问题，2个背包，每个背包里**恰好等于sum(nums)/2**
+
+先做两个特判：
+
++ nums.size()<2，直接false
++ sum(nums)是奇数，直接false
++ 因为都是正数，所以如果maxnum>sum/2，那剩下的肯定凑不出，也直接false
+
+**二维dp，n行，target+1列**
+
+**dp[i][j]：从下标0到i中选取若干个整数（可以是0个），他们的和是否=j**
+
+初始化：
+
++ j=0,要和为0，那不管i是多少，都不选，也就是```dp[i][0]=true; 0<=i<n```
++ i=0，只能选nums[0]，所以```dp[0][nums[0]] = true;``
+
+i>0 j >0时
+
++ 如果```j>=nums[i]```，当前这个```nums[i]```可选可不选：
+    + 如果不选，那么```dp[i][j]=dp[i-1][j]```
+    + 如果选，那么```dp[i][j]=dp[i-1][j-nums[i]]```
++ 如果```j<nums[i]```，那么不能选，所以```dp[i][j]=dp[i-1][j]```
+
+答案是```dp[n-1][target]```
+
+```cpp
+    bool canPartition(vector<int>& nums) {
+        int n = nums.size();
+        if (n < 2) {
+            return false;
+        }
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        int max_num = *max_element(nums.begin(), nums.end());
+        if (sum % 2 == 1) {
+            return false;
+        }
+        int target = sum / 2;
+        if (max_num > target) {
+            return false;
+        }
+        vector<vector<int> > dp(n, vector<int>(target + 1, 0));
+        for(int i = 0; i < n; ++i) {
+            dp[i][0] = true;
+        }
+        dp[0][nums[0]] = true;
+        for (int i = 1; i < n; ++i) {
+            int num = nums[i];
+            for (int j = 1; j <= target; ++j) {
+                if (num > j) {
+                    dp[i][j] = dp[i - 1][j];
+                } else { // num <= j
+                    dp[i][j] = dp[i - 1][j - num] | dp[i - 1][j];
+                }
+            }
+        }
+        return dp[n - 1][target];
+
+    }
+```
 
 
 ## 设计
