@@ -8,7 +8,7 @@
 class Solution {
 public:
     string minWindow(string s, string t) {
-
+        
     }
 };
 // @lc code=end
