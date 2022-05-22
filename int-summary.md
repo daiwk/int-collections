@@ -1571,7 +1571,7 @@ pre[i]：[0,i]这段(闭区间)结尾的子数组的和
     }
 ```
 
-### 
+### 【top100】最小覆盖子串
 
 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
 
@@ -1597,7 +1597,68 @@ pre[i]：[0,i]这段(闭区间)结尾的子数组的和
 因此没有符合条件的子字符串，返回空字符串。
 ```
 
+**解法**
 
+滑动窗口，双指针，**在任意时刻，只有一个指针运动。**
+
+right和left都从头走，当包括了所有元素后，再缩小窗口
+
+当窗口**包含 t 全部所需的字符后**，**如果能收缩，我们就收缩窗口直到得到最小窗口。**
+
+用map记录窗口t中字符及其出现次数(因为不要求连续)
+
+```cpp
+class Solution {
+public:
+    bool check(unordered_map<char, int>& t_cnt, 
+        unordered_map<char, int>& cur_cnt) {
+        for (const auto& i: t_cnt) {
+            if (cur_cnt[i.first] < i.second) {
+                return false;
+            }
+            // 等价于如下代码。。。所以这两个map不能是const
+            // auto it = cur_cnt.find(i.first);
+            // if(it != cur_cnt.end()) {
+            //     if (i.second > it->second) {
+            //         cout << i.first << " " << i.second << " " << it->second << endl;
+            //         return false;
+            //     }
+            // } else {
+            //     cur_cnt[i.first] = 0;
+            //     return false;
+            // }
+        }
+        return true;
+    }
+
+    string minWindow(string s, string t) {
+        unordered_map<char, int> t_cnt, cur_cnt;
+        for (const auto& i: t) {
+            ++t_cnt[i];
+        }
+        int left = 0, right = -1;// right初始化为-1
+        int len = INT_MAX, res_left = -1;
+        cout << "qqq" << endl;
+        while (right < int(s.size())) { // 要int，不然-1> t.size()..
+            
+            if (t_cnt.find(s[++right]) != t_cnt.end()) {
+                ++cur_cnt[s[right]];
+                cout << "in:" << s[right] << endl;
+            }
+            while (check(t_cnt, cur_cnt) && left <= right) {
+                if (len > right - left + 1) {
+                    len = right - left + 1;
+                    res_left = left;
+                }
+                if (t_cnt.find(s[left]) != t_cnt.end()) {
+                    --cur_cnt[s[left]]; 
+                }
+                ++left;// 只缩小左边界
+            }
+        }
+        return res_left == -1? "": s.substr(res_left, len);
+    }
+```
 
 
 
