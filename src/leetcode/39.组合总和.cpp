@@ -16,14 +16,13 @@ public:
             res.emplace_back(cur_combine);
             return;
         }
-        // 这里强制idx+1。。
+        // 这个实现的是不选当前数，所以直接强制idx+1
         dfs(candidates, target, res, cur_combine, idx + 1);
         // 尝试选择当前数
         if (target - candidates[idx] >= 0) { 
             //因为题目限制了candidates[i] >=1，所以只要有缺口，那就还要继续找
             cur_combine.push_back(candidates[idx]);
-            // 这边不要idx+1...，而是传target-candidates[idx]进去
-            // 因为每个数可以重复选。。。。
+            // 继续尝试选当前数。。所以不要idx+1...，但target要变化了
             dfs(candidates, target - candidates[idx], res, cur_combine, idx);
             cur_combine.pop_back();
         }
