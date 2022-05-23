@@ -37,10 +37,14 @@ public:
             TreeNode* t2 = q.front();
             q.pop();
             if (t1 == NULL && t2 == NULL) continue;
+            // 一个空 一个不空，不可能镜像
             if (t1 == NULL || t2 == NULL) return false;
+            // 两个不等，不可能镜像
             if (t1->val != t2->val) return false;
+            // t1左t2右
             q.push(t1->left);
             q.push(t2->right);
+            // t1右t2左
             q.push(t1->right);
             q.push(t2->left);
         }

@@ -1660,6 +1660,99 @@ public:
     }
 ```
 
+### 【top100】移动零
+
+给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+
+
+双指针，i一路往后走，```idx_0```记录0的位置，
+
+如果```nums[i]!=0```，那就把```nums[i]```复制给```nums[idx_0]```，然后```idx_0++```
+
+剩下的```idx_0```->结尾的，置0
+
+```cpp
+    void moveZeroes(vector<int>& nums) {
+        int idx_0 = 0;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (nums[i] != 0) {
+                nums[idx_0] = nums[i];
+                ++idx_0;
+            }
+        }
+        for (int j = idx_0; j < nums.size(); ++j) {
+            nums[j] = 0;
+        }
+    }
+```
+
+### 最小栈
+
+设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+
+实现 MinStack 类:
+
+```
+MinStack() 初始化堆栈对象。
+void push(int val) 将元素val推入堆栈。
+void pop() 删除堆栈顶部的元素。
+int top() 获取堆栈顶部的元素。
+int getMin() 获取堆栈中的最小元素。
+```
+
+限制：pop、top 和 getMin 操作总是在 非空栈 上调用
+
+**解法**
+
+引入一个辅助栈，
+
++ push：当前数push进主栈，**min(辅助栈top，当前数)** push进辅助栈
++ pop：主栈和辅助栈都pop
++ get_min：辅助栈的top
+
+```cpp
+class MinStack {
+public:
+    stack<int> real_stk;
+    stack<int> min_stk;
+    MinStack() {
+        // 保证主栈push第一个数时，辅助栈也能正常work
+        // 这里是INT_MAX，不是INT_MIN..
+        min_stk.push(INT_MAX);
+    }
+    
+    void push(int val) {
+        // 是和min的top比较
+        min_stk.push(min(min_stk.top(), val));
+        real_stk.push(val);
+    }
+    
+    void pop() {
+        min_stk.pop();
+        real_stk.pop();
+    }
+    
+    int top() {
+        return real_stk.top();
+    }
+    
+    int getMin() {
+        return min_stk.top();
+    }
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+```
+
 
 
 ## 链表
@@ -2648,6 +2741,166 @@ $$G(n)=\sum_{i=1}^{n} G(i-1) \cdot G(n-i)$$
        return G[n];
 ```
 
+### 【top100】对称二叉树
+
+给定一个二叉树，检查它是否是镜像对称的。
+
+例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+
+```
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+```
+
+但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+
+```
+    1
+   / \
+  2   2
+   \   \
+   3    3
+```
+
+**解答**：
+
+方法一：递归
+
+如果同时满足下面的条件，两个树互为镜像：
+
+* 它们的两个根结点具有相同的值。
+* 每个树的右子树都与另一个树的左子树镜像对称。
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool isMirror(TreeNode* t1, TreeNode* t2) {
+        if (t1 == NULL && t2 == NULL) return true;
+        // 如果两个不都是NULL，这个时候，如果一个是NULL,另一个不是，那么肯定不镜像！！
+        // 如果两个都不是NULL,那还有可能，可以等下一次递归
+        if (t1 == NULL || t2 == NULL) return false;
+        return (t1->val == t2->val &&
+               isMirror(t1->left, t2->right) &&
+               isMirror(t1->right, t2->left));
+    }
+    bool isSymmetric(TreeNode* root) {
+        return isMirror(root, root);
+    }
+};
+```
+
+方法二：迭代
+
+利用**队列**进行迭代
+
+队列中每两个连续的结点应该是相等的，而且它们的子树互为镜像。最初，队列中包含的是 root 以及 root。该算法的工作原理类似于 BFS，但存在一些关键差异。每次提取两个结点并比较它们的值。然后，将两个结点的左右子结点按**相反的顺序**插入队列中(即t1->left, t2->right, t1->right, t2->left)。
+
+当队列为空时，或者我们检测到树不对称（即从队列中取出**两个不相等的连续结点**）时，该算法结束。
+
+注意，cpp的queue的front不会pop，要手动pop
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) {
+        queue<TreeNode*> q;
+        q.push(root);
+        q.push(root);
+        while (!q.empty()) {
+            TreeNode* t1 = q.front();
+            q.pop();
+            TreeNode* t2 = q.front();
+            q.pop();
+            if (t1 == NULL && t2 == NULL) continue;
+            // 一个空 一个不空，不可能镜像
+            if (t1 == NULL || t2 == NULL) return false;
+            // 两个不等，不可能镜像
+            if (t1->val != t2->val) return false;
+            // t1左t2右
+            q.push(t1->left);
+            q.push(t2->right);
+            // t1右t2左
+            q.push(t1->right);
+            q.push(t2->left);
+        }
+        return true;
+    }
+};
+```
+
+### 验证二叉搜索树
+
+给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
+
+有效 二叉搜索树定义如下：
+
+```
+节点的左子树只包含 小于 当前节点的数。
+节点的右子树只包含 大于 当前节点的数。
+所有左子树和右子树自身必须也是二叉搜索树。
+```
+
+**解法**
+
+可以递归，非递归就是**中序遍历**
+
+**二叉搜索树的中序遍历结果一定是升序的**
+
+用**栈**
+
+可以在遍历的时候，看当前节点是不是大于前一个中序的结果
+
+存一个值就行，不用存整个中序的串。。
+
+另外，题目限制了val是int32，所以需要用long long，避免越界
+
+
+```cpp
+    bool isValidBST(TreeNode* root) {
+        stack<TreeNode*> stk;
+        // 用long long，背下来。。
+        long long inorder_last = (long long)INT_MIN - 1;
+        // 两个条件
+        while (!stk.empty() || root != nullptr) {
+            while (root != nullptr) {
+                stk.push(root);
+                // 先把左子树全塞进去
+                root = root->left;
+            }
+            root = stk.top();
+            stk.pop();
+            if (root->val <= inorder_last) {
+                return false;
+            }
+            inorder_last = root->val; // 中序的last
+            root = root->right;
+        }
+        return true;
+    }
+```
+
+
 ## 图
 
 ### 【top100】岛屿数量
@@ -2700,6 +2953,55 @@ $$G(n)=\sum_{i=1}^{n} G(i-1) \cdot G(n-i)$$
         if (c + 1 < cols && grid[r][c + 1] == '1') {
             dfs(grid, r, c+1); // 右
         }
+    }
+```
+
+###  【top100】二叉树的最近公共祖先
+
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+
+**解法**
+
+可以递归，非递归法如下：
+
+用map存每个节点的父节点(dfs)，
+
+先让p通过map不断找他的父节点，记录下每一个父节点，扔到set里
+
+再让q通过map不断找他的父节点，如果找到了，就是最近的公共祖先
+
+```cpp
+    unordered_map<int, TreeNode*> father_map;
+    unordered_set<int> path;
+
+    void dfs(TreeNode* root) {
+        if (root->left != nullptr) {
+            father_map[root->left->val] = root;
+            dfs(root->left);
+        }
+        if (root->right != nullptr) {
+            father_map[root->right->val] = root;
+            dfs(root->right);
+        }
+    }
+
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        // 根节点没有father
+        father_map[root->val] = nullptr;
+        dfs(root);
+        while (p != nullptr) {
+            path.emplace(p->val);
+            p = father_map[p->val];
+        }
+        while (q != nullptr) {
+            if (path.find(q->val) != path.end()) {
+                return q;
+            }
+            q = father_map[q->val];
+        }
+        return q;
     }
 ```
 
@@ -3060,6 +3362,65 @@ N 个皇后都放置完毕，则找到一个可能的解
         return false;
     }
 ```
+
+### 【top100】组合总和
+
+给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+
+candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。 
+
+对于给定的输入，保证和为 target 的不同组合数少于 150 个。
+
+```
+示例 1：
+输入：candidates = [2,3,6,7], target = 7
+输出：[[2,2,3],[7]]
+解释：
+2 和 3 可以形成一组候选，2 + 2 + 3 = 7 。注意 2 可以使用多次。
+7 也是一个候选， 7 = 7 。
+仅有这两种组合。
+
+示例 2：
+输入: candidates = [2,3,5], target = 8
+输出: [[2,2,2,2],[2,3,3],[3,5]]
+```
+
+**解法**
+
+典型回溯法，选这个数，搞一下，再回退，不过还是有一些特殊的地方。。见注释
+
+```cpp
+    void dfs(vector<int>& candidates, int target, 
+        vector<vector<int> > & res, vector<int>& cur_combine, int idx) {
+        if (idx == candidates.size()) {
+            return;
+        }
+        if (target == 0) { // 刚好这个数是需要的
+            res.emplace_back(cur_combine);
+            return;
+        }
+        // 这里强制idx+1。。
+        dfs(candidates, target, res, cur_combine, idx + 1);
+        // 尝试选择当前数
+        if (target - candidates[idx] >= 0) { 
+            //因为题目限制了candidates[i] >=1，所以只要有缺口，那就还要继续找
+            cur_combine.push_back(candidates[idx]);
+            // 这边不要idx+1...，而是传target-candidates[idx]进去
+            // 因为每个数可以重复选。。。。
+            dfs(candidates, target - candidates[idx], res, cur_combine, idx);
+            cur_combine.pop_back();
+        }
+        return;
+    }
+    
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int> > res;
+        vector<int> cur_combine;
+        dfs(candidates, target, res, cur_combine, 0);
+        return res;
+    }
+```
+
 
 ## 排序与搜索
 
@@ -4185,6 +4546,76 @@ f(i) = max(f(i-1) + nums[i], nums[i])
     }
 ```
 
+### 【top100】最佳买卖股票时机含冷冻期
+
+给定一个整数数组prices，其中第  prices[i] 表示第 i 天的股票价格 。​
+
+设计一个算法计算出最大利润。在满足以下约束条件下，你可以尽可能地完成更多的交易（多次买卖一支股票）:
+
+卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)。
+
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+
+```
+示例 1:
+输入: prices = [1,2,3,0,2]
+输出: 3 
+解释: 对应的交易状态为: [买入, 卖出, 冷冻期, 买入, 卖出]
+```
+
+**解法**
+
+很多类型题，总结一下就是可以对“买入”和“卖出”分开考虑：
+
++ 买入：负收益，希望尽可能降低
++ 卖出：正收益，希望尽可能提高
+
+所以可以dp，计算**每一天结束后能获得的累积最大收益**
+
+f[i]：第i天结束之后的累积最大收益
+
++ f[i][0]：目前有一只股票，对应的最大累积收益
++ f[i][1]：目前没股票，处于冷冻期中，对应的最大累积收益
++ f[i][2]：目前没股票，不处于冷冻期中，对应的最大累积收益
+
+处于冷冻期：指的是在第 i 天结束之后的状态。也就是说：如果第 i 天结束之后处于冷冻期，那么**第 i+1 天无法买入股票**。
+
++ f[i][0]的这只股票可以有两种情况：
+  + 第i-1天就已经有的，那就是f[i-1][0]
+  + 第i天才买的，那么第i-1天肯定是没股票且不处于冷冻期，因为第i天能买入，那就是f[i-1][2] - prices[i]
+  + 所以 f[i][0]=max(f[i-1][0], f[i-1][2]-prices[i])
++ f[i][1]处于冷冻期，说明i-1天是有股票的，然后在第i天卖了，所以就是f[i][1]=f[i-1][0]+prices[i]
++ f[i][2]没股票且不处于冷冻期，说明第i-1天没股票，且第i天啥都没干。而第i-1天没股票有两种情况，也就是说f[i][2]=max(f[i-1][1], f[i-1][2])
+
+所以，最后一天(n-1)其实就是max(f[n-1][0], f[n-1][1],f[n-1][2])
+
+如果最后还不卖掉，那肯定不是最大化，因此其实看后两项就行
+
+max(f[n-1][1],f[n-1][2])
+
+边界条件： f[0][0]=-prices[0]，因为这天有股票，肯定是当天买的。而f[0][1]=0，f[0][2] = 0
+
+```cpp
+    int maxProfit(vector<int>& prices) {
+        // 特判
+        if (prices.empty()) {
+            return 0;
+        }
+        int n = prices.size();
+        vector<vector<int> > f(n, vector<int>(3));
+        f[0][0] = -prices[0];
+        for (int i = 1; i < n; ++i) {
+            f[i][0] = max(f[i - 1][0], f[i - 1][2] - prices[i]);
+            f[i][1] = f[i - 1][0] + prices[i];
+            f[i][2] = max(f[i - 1][1], f[i - 1][2]);
+        }
+        return max(f[n - 1][1], f[n - 1][2]);
+    }
+```
+
+
+
+
 ### 【top100】正则表达式匹配
 
 ```
@@ -4683,7 +5114,7 @@ i>0 j >0时
     }
 ```
 
-### 完全平方数
+### 【top100】完全平方数
 
 给你一个整数 n ，返回 和为 n 的完全平方数的最少数量 。
 
@@ -4707,14 +5138,114 @@ f[i]：**最少需要多少个数**的平方来表示**整数i**
 
 这些数肯定落在区间[1, sqrt(n)]中，所以状态转移就是
 
-$$
-f[i]=1+min_{j=1}^{\sqrt {i}}f[i-j^2]
-$$
+![](assets/dp-full-square.png)
 
-
+边界，f[0]= 0
 
 ```cpp
-test
+    int numSquares(int n) {
+        vector<int> f(n + 1);
+        // 边界，f[0]= 0
+        for (int i = 1; i <= n; ++i) {
+            int res = INT_MAX;
+            for (int j = 1; j * j <= i; ++j) {
+                res = min(res, f[i - j * j]);
+            }
+            f[i] = res + 1;
+        }
+        return f[n];
+    }
+```
+
+### 【top100】单词拆分
+
+给你一个字符串 s 和一个字符串列表 wordDict 作为字典。请你判断是否可以利用字典中出现的单词拼接出 s 。
+
+注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。
+
+```
+示例 1：
+输入: s = "applepenapple", wordDict = ["apple", "pen"]
+输出: true
+解释: 返回 true 因为 "applepenapple" 可以由 "apple" "pen" "apple" 拼接成。
+     注意，你可以重复使用字典中的单词。
+
+示例 2：
+输入: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+输出: false
+```
+
+**解法**
+
+```dp[i]：```字符串s的前i个字符（0到i-1）组成的字符串```s[0,...,i-1]```能否拆分成若干个词典中出现的单词
+
+转移：去掉最后一个单词，看剩下的
+
+第j到i-1构成的词s[j-i,...,i -1]在词典中，那就dp[i] = dp[j]
+
+而这个j可以用一个for从0到i-1遍历，判断是否在词典中可以用set
+
+但直接这么写是不对的！！应该是：
+
+dp[i] = dp[j] && xset.find(xxstr)
+
+如果dp[j]=false，其实并不能得出dp[i] = dp[j]的结论！！这个时候是不知道dp[i]应该是多少的
+
+```cpp
+    bool wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> xset;
+        for (const auto& i: wordDict) {
+            xset.emplace(i);
+        }
+        vector<bool> dp(s.length() + 1, false);
+        dp[0] = true;
+        for (int i = 1; i <= s.length(); ++i) {
+            for (int j = 0; j < i; ++j) {
+                //cout << i << j << s.substr(j, i) << endl;
+                bool exists = (xset.find(s.substr(j, i - j)) != xset.end());
+                if (exists && dp[j]) {
+                    dp[i] = true;
+                    //cout << "qqq" << i << j << s.substr(j, i - j) << dp[j] << endl;
+                    // 不break也可以，但会有一坨重复计算
+                    break;
+                }
+            }
+        }
+        return dp[s.length()];
+    }
+```
+
+### 【top100】柱状图中最大的矩形
+
+给定 n 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+
+求在该柱状图中，能够勾勒出来的矩形的最大面积。
+
+![](assets/max-juxing-hist.jpeg)
+
+单调栈，先mark下。。
+
+```cpp
+    int largestRectangleArea(vector<int>& heights) {
+        int n = heights.size();
+        vector<int> left(n), right(n, n);
+        
+        stack<int> mono_stack;
+        for (int i = 0; i < n; ++i) {
+            while (!mono_stack.empty() && heights[mono_stack.top()] >= heights[i]) {
+                right[mono_stack.top()] = i;
+                mono_stack.pop();
+            }
+            left[i] = (mono_stack.empty() ? -1 : mono_stack.top());
+            mono_stack.push(i);
+        }
+        
+        int ans = 0;
+        for (int i = 0; i < n; ++i) {
+            ans = max(ans, (right[i] - left[i] - 1) * heights[i]);
+        }
+        return ans;
+    }
 ```
 
 
@@ -5461,6 +5992,62 @@ AB -> 28
         // 这个时候就不需要再这么按顺序了，因为任意两个任务间肯定大于n，所以总时间就是|tasks|
         // xx.size()需要强转成int，因为原来是size_t
         return max((max_exec - 1) * (n + 1) + max_cnt, static_cast<int>(tasks.size()));
+    }
+```
+
+### 【top100】旋转图像
+
+给定一个 n × n 的二维矩阵 matrix 表示一个图像。请你将图像顺时针旋转 90 度。
+
+你必须在 原地 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要 使用另一个矩阵来旋转图像。
+
+![](./assets/rotate-img.jpeg)
+
+```
+输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+输出：[[7,4,1],[8,5,2],[9,6,3]]
+```
+
+**解法**
+
+对于矩阵中的第i行第j个元素，旋转后变到第j行倒数第i列的位置，即```matrix[j][n - 1 - i]```，如果可以用辅助矩阵，那可以先把结果填到这个矩阵里，再复制回去
+
+原地的方法：先水平旋转，再主对角线旋转，就是要的。。
+
+水平旋转【**可以按照中间的行为轴，上下互换**】：
+
+```
+matrix[i][j]==>matrix[n-1-i][j]
+```
+
+主对角线旋转【**可以按照对角线为轴，上下互换**】：
+
+```
+matrix[i][j]==>matrix[j][i]
+```
+
+```cpp
+    void rotate(vector<vector<int>>& matrix) {
+        int rows = matrix.size();
+        if (rows == 0) {
+            return;
+        }
+        int cols = matrix[0].size();
+        // 水平翻转
+        for (int i = 0; i < rows / 2; ++i) { 
+            // 注意是rows/2!!
+            for (int j = 0; j < cols; ++j) {
+                swap(matrix[i][j], matrix[rows - 1 - i][j]);
+            }
+        }
+        // 对角线翻转
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < i; ++j) { 
+                // 注意是j < i!!
+                swap(matrix[j][i], matrix[i][j]);
+            }
+        }
+        return;
     }
 ```
 
