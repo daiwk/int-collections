@@ -38,6 +38,7 @@ public:
             // 放入答案中
             result.push_back(u);
             for (int v: edges[u]) {
+                // 删掉u-v这条边
                 --indeg[v];
                 // 如果相邻节点 v 的入度为 0，就可以选 v 对应的课程了
                 if (indeg[v] == 0) {
