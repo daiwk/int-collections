@@ -19,27 +19,23 @@
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
-        vector<int> ret;
-        std::stack<TreeNode*> st;
-        //ret.push_back(root->val);
-        st.push(root);
-        while (!st.empty()) {
-            TreeNode* tmp = st.top();
-            st.pop();
-            if (tmp) {
-                ret.push_back(tmp->val);
+        vector<int> res;
+        std::stack<TreeNode*> stk;
+        while (!stk.empty() || root != nullptr) {
+            //先把左都塞进去
+            while (root != nullptr) {
+                stk.push(root);
+                // 改成left的时候就塞了！！
+                res.push_back(root->val);
+                root = root->left;
             }
-            else {
-                break;
-            }
-            if (tmp->right) {
-                st.push(tmp->right);
-            }
-            if (tmp->left) {
-                st.push(tmp->left);
-            }
+            // 取出根
+            root = stk.top();
+            stk.pop();
+            // 再搞右
+            root = root->right;
         }
-        return ret;
+        return res;
     }
 };
 // @lc code=end

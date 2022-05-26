@@ -1788,8 +1788,6 @@ public:
     }
 ```
 
-
-
 方法2：**Manacher算法**
 
 Manacher算法：**线性时间**内求解最长回文子串的算法
@@ -1842,6 +1840,191 @@ Manacher算法：**线性时间**内求解最长回文子串的算法
 
 ```
 
+### 【top100】除自身以外数组的乘积
+
+给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积 。
+
+题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
+
+请**不要使用除法**，且在 O(n) 时间复杂度内完成此题。
+
+**解法**
+
+可以存两个数组，分别表示这个位置的左边乘积和右边乘积，
+
+```cpp
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int len = nums.size();
+        vector<int> l_product(len, 0), r_product(len, 0);
+        vector<int> res(len);
+        l_product[0] = 1;
+        for (int i = 1; i < len; ++i) {
+            l_product[i] = nums[i - 1] * l_product[i - 1];
+        }
+        r_product[len - 1] = 1;
+        for (int i = len - 2; i >= 0; --i) {
+            r_product[i] = nums[i + 1] * r_product[i + 1];
+        }
+        for (int i = 0; i < len; ++i) {
+            //cout << i << " " << l_product[i] << " " << r_product[i] << endl;
+            res[i] = l_product[i] * r_product[i];
+        }
+        return res;
+    }
+```
+
+优化：不需要存两个额外数据，给l_product赋值时，其实可以直接给res赋值
+
+而且，r_product可以不用存一个数组，用一个数就行
+
+```cpp
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int len = nums.size();
+        vector<int> r_product(len, 0);
+        vector<int> res(len);
+        res[0] = 1;
+        for (int i = 1; i < len; ++i) {
+            res[i] = nums[i - 1] * res[i - 1];
+        }
+        int r = 1;
+        for (int i = len - 1; i >= 0; --i) {
+            res[i] = res[i] * r;
+            r *= nums[i];
+        }
+        return res;
+    }
+```
+
+### 【top100】根据身高重建队列
+
+假设有打乱顺序的一群人站成一个队列，数组 people 表示队列中一些人的属性（不一定按顺序）。每个 people[i] = [hi, ki] 表示第 i 个人的身高为 hi ，前面 正好 有 ki 个身高大于或等于 hi 的人。
+
+请你重新构造并返回输入数组 people 所表示的队列。返回的队列应该格式化为数组 queue ，其中 queue[j] = [hj, kj] 是队列中第 j 个人的属性（queue[0] 是排在队列前面的人）。
+
+```
+输入：people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
+输出：[[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+解释：
+编号为 0 的人身高为 5 ，没有身高更高或者相同的人排在他前面。
+编号为 1 的人身高为 7 ，没有身高更高或者相同的人排在他前面。
+编号为 2 的人身高为 5 ，有 2 个身高更高或者相同的人排在他前面，即编号为 0 和 1 的人。
+编号为 3 的人身高为 6 ，有 1 个身高更高或者相同的人排在他前面，即编号为 1 的人。
+编号为 4 的人身高为 4 ，有 4 个身高更高或者相同的人排在他前面，即编号为 0、1、2、3 的人。
+编号为 5 的人身高为 7 ，有 1 个身高更高或者相同的人排在他前面，即编号为 1 的人。
+因此 [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]] 是重新构造后的队列。
+```
+
+**解法**
+
+题目的意思就是，要让第二列是对的，即前面正好有k个人身高大于等于他
+
+**先按身高从大到小排序，身高相等时，按ki从低到高排**
+
+然后依次根据每个人的第二列来决定这个人应该怎么扔到答案里去
+
+扔第i个的时候，保证他前面有ki个，那就是在begin()+ki的位置插入，插完后这个元素就位于第begin()+ki位（从0开始算，那他前面就正好有ki个）
+
+例如，现在是abcd，我在begin+3的位置插入一个e，那就是在d之前插入，得到abced，这样e前面刚好有3个
+
+insert：在xx位置**前**插入一个元素
+
+另外就是注意2级排序的sort的写法，且相等的时候要return false..不然会core
+
+```cpp
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
+        vector<vector<int> > res;
+        sort(people.begin(), people.end(), [](const vector<int>& a, const vector<int>&b) {
+            if (a[0] > b[0]) {
+                return true;
+            } else if (a[0] == b[0] ){
+                if (a[1] < b[1]) {
+                    return true;
+                }
+                else { //相等
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        });
+        for (auto& person: people) {
+           res.insert(res.begin() + person[1], person);
+        }
+        return res;
+    }
+```
+
+### 【top100】找到字符串中所有字母异位词
+
+给定两个字符串 s 和 p，找到 s 中所有 p 的 异位词 的子串，返回这些子串的起始索引。不考虑答案输出的顺序。
+
+异位词 指由相同字母重排列形成的字符串（包括相同的字符串）。
+
+```
+示例 1:
+
+输入: s = "cbaebabacd", p = "abc"
+输出: [0,6]
+解释:
+起始索引等于 0 的子串是 "cba", 它是 "abc" 的异位词。
+起始索引等于 6 的子串是 "bac", 它是 "abc" 的异位词。
+```
+
+**解法**
+
+**滑动窗口**
+
+搞一个和p一样长的窗口，并记录窗口内每个词的count，看看和p里的count是否一样
+
+套用经典滑动窗口的框架
+
+```cpp
+    vector<int> findAnagrams(string s, string p) {
+        unordered_map<char, int> need, window;
+        // 目标map
+        for (char c: p) {
+            need[c]++;
+        }
+        int left = 0, right = 0;
+        int valid = 0;
+        vector<int> res;
+        while (right < s.size()) {   
+            char c = s[right];
+            right++;
+            if (need.count(c)) {
+                // 只有这个字母是需要的，才会放到window这个count里
+                window[c]++;
+                if (window[c] == need[c]) {
+                    // 这个字母的count正确，那就valid++
+                    valid++;
+                }
+            }
+            // 判断左窗口是否要收缩
+            while (right - left >= p.size()) {
+                // right-left可能超过窗口长度，可能需要收缩
+                if (valid == need.size()) {
+                    // 所有字符均count正确
+                    res.push_back(left);
+                }
+                char d = s[left];
+                left++;
+                if (need.count(d)) {
+                    // 只有这个字母是需要的，才会放到window这个count里
+                    if (window[d] == need[d]) {
+                        valid--;
+                        // 因为这个时候原来的left已经不在窗口里了
+                        // 所以要去掉这个合法字符
+                    }
+                    // 原来的left不在窗口里了，所以窗口记数也要--
+                    window[d]--;
+                }
+            }
+        }
+        return res;
+    }
+
+```
+
 
 ## 链表
 
@@ -1852,6 +2035,7 @@ Manacher算法：**线性时间**内求解最长回文子串的算法
 请你将两个数相加，并以相同形式返回一个表示和的链表。
 
 你可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
 head->...->tail 是倒序的整数，求两个整数的和，并返回同样格式的链表
 
 ```cpp
@@ -2413,41 +2597,7 @@ L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
 
 如果链表中存在环 ，则返回 true 。 否则，返回 false 。
 
-**分析：**
-
-**方法一：哈希表**
-
-检查一个结点此前是否被访问过来判断链表。常用的方法是使用哈希表。
-
-我们遍历所有结点并在哈希表中存储每个结点的引用（或内存地址）。如果当前结点为空结点 null（即已检测到链表尾部的下一个结点），那么我们已经遍历完整个链表，并且该链表不是环形链表。如果当前结点的引用已经存在于哈希表中，那么返回 true（即该链表为环形链表）。
-
-```cpp
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-class Solution {
-public:
-    bool hasCycle(ListNode *head) {
-        set<ListNode*> set_link;
-        ListNode* p = head;
-        while (p != NULL) {
-            if (set_link.find(p) != set_link.end()) {
-                return true;
-            }
-            set_link.insert(p);
-            p = p->next;
-        }
-        return false;
-    }
-};
-```
-
-**方法二：双指针**
+**双指针**
 
 使用具有 不同速度 的快、慢两个指针遍历链表，空间复杂度可以被降低至 O(1)。慢指针每次移动一步，而快指针每次移动两步。
 
@@ -2456,33 +2606,19 @@ public:
 时间复杂度的分析见[https://leetcode-cn.com/problems/linked-list-cycle/solution/](https://leetcode-cn.com/problems/linked-list-cycle/solution/)
 
 ```cpp
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-class Solution {
-public:
     bool hasCycle(ListNode *head) {
-        if (head == NULL || head->next == NULL) {
-            return false;
-        }
-        ListNode* fast = head->next;// fast初始化为next，起点就比slow快了
+        // 都指向head 
+        ListNode* fast = head;
         ListNode* slow = head;
-        while(fast != slow) {
-            if (fast == NULL || fast->next == NULL) {
-                // 如果fast到终点了，或者fast的下一个节点是终点，说明slow肯定追不上来了
-                return false;
-            }
+        while (fast != nullptr && fast->next != nullptr) {
             slow = slow->next;
             fast = fast->next->next;
+            if (fast == slow) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
-};
 ```
 
 ### 【top100】回文链表
@@ -2507,26 +2643,227 @@ public:
     }
 ```
 
+### 【top100】环形链表 II
+
+给定一个链表的头节点  head ，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+
+如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。 为了表示给定链表中的环，评测系统内部使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。如果 pos 是 -1，则在该链表中没有环。注意：pos 不作为参数进行传递，仅仅是为了标识链表的实际情况。
+
+不允许修改 链表。
+
+**解法**
+
+快慢指针，相遇后，另外搞一个指针从头开始，和slow一起走，相遇处就是环入口
+
+```cpp
+    ListNode *detectCycle(ListNode *head) {
+        ListNode* fast = head;
+        ListNode* slow = head;
+        while (fast != nullptr && fast->next != nullptr) {      
+            fast = fast->next->next;
+            slow = slow->next;
+            // 就这里和判断是否有环有点diff
+            if (slow == fast) {
+                ListNode* third = head;
+                while (third != slow) {
+                    third = third->next;
+                    slow = slow->next;
+                }
+                return third;
+            }
+        } 
+        return nullptr;
+    }
+```
 
 ## 树
 
-### 【top100】二叉树的中序遍历
+### 二叉树的各种遍历
 
-栈 一直塞左子树，取出栈顶，扔到res里去，pop出来，开始遍历原栈顶的右子树
+[https://leetcode.cn/problems/binary-tree-inorder-traversal/solution/python3-er-cha-shu-suo-you-bian-li-mo-ban-ji-zhi-s/](https://leetcode.cn/problems/binary-tree-inorder-traversal/solution/python3-er-cha-shu-suo-you-bian-li-mo-ban-ji-zhi-s/)
+
+#### 前中后序递归法
+
+xorder(left, res);res.push(root->val);xorder(right, res)，root放在不同位置
 
 ```cpp
-vector<int> inorderTraversal(TreeNode* root) {
+void xorder(node* root, vec& res) {
+    if (root == nullptr) {
+        return;
+    }
+    // 这几句换下位置就是了
+    xorder(root->left, res);
+    res.push_back(root->val);
+    xorder(root->right, res);
+}
+```
+
+#### 前中后序的迭代法：栈
+
+```cpp
+// 中：
+while (!stk.empty() || root != nullptr) {
+    //先把左都塞进去
+    while (root != nullptr) {
+        stk.push(root);
+        root = root->left;
+    }
+    // 取出根，给res
+    root = stk.top();
+    stk.pop();
+    res.push_back(root->val);
+    // 再搞右
+    root = root->right;
+}
+
+// 前：在中序的基础上改下push_back的位置，在中的基础上访问右特殊处理
+while (!stk.empty() || root != nullptr) {
+    //先把左都塞进去
+    while (root != nullptr) {
+        stk.push(root);
+        // 改成left的时候就塞了！！
+        res.push_back(root->val);
+        root = root->left;
+    }
+    // 取出根
+    root = stk.top();
+    stk.pop();
+    // 再搞右
+    root = root->right;
+}
+
+// 后：需要额外有一个prev指针！！
+TreeNode* prev = nullptr;
+while (!stk.empty() || root != nullptr) {
+    //先把左都塞进去
+    while (root != nullptr) {
+        stk.push(root);
+        root = root->left;
+    }
+    // 取出根
+    root = stk.top();
+    stk.pop();
+    // 再搞右
+    if (root->right == nullptr || prev == root->right) {
+        // 当前节点已经没有右子树了，且上一个节点就是它的右子树
+        // 这个时候主是我们要的结果了
+        res.push_back(root->val);
+        // 更新prev为当前节点，并重置root为null
+        prev = root;
+        root = nullptr;
+    } else {
+        //root扔进去，访问右子树
+        stk.push(root);
+        root = root->right;
+    }
+}
+```
+
+#### 层序：队列
+
+先进先出
+
+```cpp
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int size = q.size();
+            res.push_back(vector<int>());// 先塞个空的进去
+            for (int i = 0; i < size; ++i) {//这里是固定的size，不是q.size，因为q一直在变
+                TreeNode * node = q.front();
+                q.pop();
+                res.back().push_back(node->val);//！！！！！！往最后一个vec里扔东西
+                if (node->left) {
+                    q.push(node->left);
+                }
+
+                if (node->right) {
+                    q.push(node->right);
+                }
+            }
+        } 
+```
+
+#### N叉树的前序
+
+递归：
+
+```cpp
+    void preorder(Node* root, vector<int>& res) {
+       if (root == nullptr) {
+           return;
+       }
+       res.push_back(root->val);
+       for (auto& child: root->children) {
+           preorder(child, res);
+       }
+       return;
+    }
+```
+
+非递归：
+
+```cpp
+    vector<int> preorder(Node* root) {
+        vector<int> res;
+        stack<Node*> stk;
+        if (root == nullptr) {
+            return res;
+        }
+        // 先塞根
+        stk.push(root);
+        while (!stk.empty()) {
+            root = stk.top();
+            stk.pop();
+            res.emplace_back(root->val);
+            // 逆序入栈
+            for (auto it = root->children.rbegin(); it != root->children.rend(); it++) {
+                stk.push(*it);
+            }
+        }
+        return res;
+    }
+```
+
+
+### 【top100】二叉树的中序遍历
+
+递归：
+
+```cpp
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        inorder(root, res);
+        return res;
+    }
+    void inorder(TreeNode* root, vector<int>& res) {
+        if (root == nullptr) {
+            return;
+        }
+        inorder(root->left, res);
+        res.push_back(root->val);
+        inorder(root->right, res);
+    }
+```
+
+**栈** 一直塞左子树，取出栈顶，扔到res里去，pop出来，开始遍历原栈顶的右子树
+
+```cpp
+   vector<int> inorderTraversal(TreeNode* root) {
         stack<TreeNode*> stk;
         vector<int> res;
-        while (root != nullptr || !stk.empty()) { // 两个条件 或！！！！
-            while (root != nullptr) { // 一直把root的左子树丢进去
+        while (!stk.empty() || root != nullptr) {
+            //先把左都塞进去
+            while (root != nullptr) {
                 stk.push(root);
                 root = root->left;
             }
+            // 取出根，给res
             root = stk.top();
-            stk.pop(); // 栈顶扔出来
-            res.emplace_back(root->val); // 值搞进去
-            root = root->right; // 开始原栈顶的右子树
+            stk.pop();
+            res.push_back(root->val);
+            // 再搞右
+            root = root->right;
         }
         return res;
     }
@@ -2650,6 +2987,86 @@ vector<int> inorderTraversal(TreeNode* root) {
         // 前序中的任意连续两个节点u,v而言，要么v是u的左儿子，
         // 要么u没有左儿子的话，那么v就是u或者u的祖先的右儿子（u向上回溯，到第一个有右儿子的就是他的右儿子）
 ```
+
+### N 叉树的前序遍历
+
+给定一个 n 叉树的根节点  root ，返回 其节点值的 前序遍历 。
+
+n 叉树 在输入中按层序遍历进行序列化表示，每组子节点由空值 null 分隔（请参见示例）。
+
+递归版本：在二叉树的递归上，把left right改成for循环
+
+```cpp
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+
+class Solution {
+public:
+    void preorder(Node* root, vector<int>& res) {
+       if (root == nullptr) {
+           return;
+       }
+       res.push_back(root->val);
+       for (auto& child: root->children) {
+           preorder(child, res);
+       }
+       return;
+    }
+
+    vector<int> preorder(Node* root) {
+        vector<int> res;
+        preorder(root, res);
+        return res;
+    }
+};
+```
+
+迭代法：比二叉树的前序迭代简单多了，不需要两层while
+
+注意两点：
+
++ 先把根扔进栈里
++ 逆序遍历children
+
+```cpp
+    vector<int> preorder(Node* root) {
+        vector<int> res;
+        stack<Node*> stk;
+        if (root == nullptr) {
+            return res;
+        }
+        // 先塞根
+        stk.push(root);
+        while (!stk.empty()) {
+            root = stk.top();
+            stk.pop();
+            res.emplace_back(root->val);
+            // 逆序入栈
+            for (auto it = root->children.rbegin(); it != root->children.rend(); it++) {
+                stk.push(*it);
+            }
+        }
+        return res;
+    }
+```
+
 
 ### 二叉搜索树中第K小的元素
 
@@ -3087,6 +3504,55 @@ public:
             root = root->right;
         }
         return true;
+    }
+```
+
+
+### 【top100】翻转二叉树
+
+给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
+
+递归交换左右孩子
+
+```cpp
+    TreeNode* invertTree(TreeNode* root) {
+        if (root == nullptr) {
+            return root;
+        }
+        TreeNode* left = invertTree(root->left);
+        TreeNode* right = invertTree(root->right);
+        root->left = right;
+        root->right = left;
+        return root;
+    }
+```
+
+### 【top100】合并二叉树
+
+给你两棵二叉树： root1 和 root2 。
+
+想象一下，当你将其中一棵覆盖到另一棵之上时，两棵树上的一些节点将会重叠（而另一些不会）。你需要将这两棵树合并成一棵新二叉树。合并的规则是：如果两个节点重叠，那么将这两个节点的值相加作为合并后节点的新值；否则，不为 null 的节点将直接作为新二叉树的节点。
+
+返回合并后的二叉树。
+
+注意: 合并过程必须从两个树的根节点开始。
+
+**解法**
+
+dfs递归
+
+```cpp
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2) {
+        if (root1 == nullptr) {
+            return root2;
+        }
+        if (root2 == nullptr) {
+            return root1;
+        }
+        TreeNode* new_node = new TreeNode(root1->val + root2->val);
+        new_node->left = mergeTrees(root1->left, root2->left);
+        new_node->right = mergeTrees(root1->right, root2->right);
+        return new_node;
     }
 ```
 
@@ -3647,6 +4113,104 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 ```
 
 当然，还可以dp，比较复杂。。算了
+
+### 【top100】删除无效的括号
+
+给你一个由若干括号和字母组成的字符串 s ，删除最小数量的无效括号，使得输入的字符串有效。
+
+返回所有可能的结果。答案可以按 任意顺序 返回。
+
+```
+示例 1：
+输入：s = "()())()"
+输出：["(())()","()()()"]
+```
+
+**解法**
+
+要所有可能结果，那就回溯
+
+判断是否合法：参考[https://leetcode.cn/problems/valid-parentheses/](https://leetcode.cn/problems/valid-parentheses/) 用栈，也可以一个变量，看到左括号++，右括号--，最后是不是0。注意，需要特殊判断)(的情况。。如下注释
+
+计算多余的左右括号：
+
+两个变量存左右括号数量
+
++ 遇到左括号：左括号数+1
++ 遇到右括号：
+  + 如果左括号数!=0，那就左括号数-1
+  + 如果左括号数=0，右括号数+1
+
+这样得到的左右括号数就是各自最少应该删掉的数量
+
+剪枝：
+
++ 每删掉一个括号，就更新l_remove或者r_remove，如果剩下的字符串长度< l_move + r_move，那就停止
++ lmove=0且rmove=0时，判断剩下的字符串是不是合法
+
+另外，还需要去重
+
+```cpp
+    vector<string> res;
+    bool is_valid(const string& str) {
+        int cnt = 0;
+        for (auto& i: str) {
+            if (i == '(') {
+                cnt++;
+            } else if (i == ')') {
+                cnt--;
+                // 这个必须要有，不然可能出来)(的情况。。还return了true
+                if (cnt < 0) {
+                    return false;
+                }
+            }
+        }
+        return cnt == 0;
+    }
+
+    void backtrace(string ss, int start, int l_remove, int r_remove) {
+        if (l_remove == 0 && r_remove == 0) {
+            if (is_valid(ss)) {
+                res.push_back(ss);
+                return;
+            }
+        }
+        // i从start开始
+        for (int i = start; i < ss.size(); ++i) {
+            // 需要加这个，要不然出来的结果会有重复
+            if (i != start && ss[i] == ss[i - 1]) {
+                continue;
+            }
+            if (l_remove + r_remove > ss.size() - i) {
+                // 肯定凑不成
+                return;
+            }
+            if (l_remove > 0 && ss[i] == '(') {
+                backtrace(ss.substr(0, i) + ss.substr(i + 1), i, l_remove - 1, r_remove);
+            }
+            if (r_remove > 0 && ss[i] == ')') {
+                backtrace(ss.substr(0, i) + ss.substr(i + 1), i, l_remove, r_remove - 1);
+            }
+        }
+
+    }
+    vector<string> removeInvalidParentheses(string s) {
+        int l_remove = 0, r_remove = 0;
+        for (auto& i: s) {
+            if (i == '(') {
+                l_remove++;
+            } else if (i == ')') {
+                if (l_remove == 0) {
+                    r_remove++;//多出了一个右括号
+                } else {
+                    l_remove--;// 能找到匹配的
+                }
+            }
+        }
+        backtrace(s, 0, l_remove, r_remove);
+        return res;
+    }
+```
 
 
 
@@ -5537,6 +6101,61 @@ dp[0][0]=grid[0][0]。。别漏了。。
             }
         }
         return dp[rows - 1][cols - 1];
+    }
+```
+
+### 【top100】戳气球
+
+有 n 个气球，编号为0 到 n - 1，每个气球上都标有一个数字，这些数字存在数组 nums 中。
+
+现在要求你戳破所有的气球。戳破第 i 个气球，你可以获得 nums[i - 1] * nums[i] * nums[i + 1] 枚硬币。 这里的 i - 1 和 i + 1 代表和 i 相邻的两个气球的序号。如果 i - 1或 i + 1 超出了数组的边界，那么就当它是一个数字为 1 的气球。
+
+求所能获得硬币的最大数量。
+
+**解法**
+
++ 特殊处理：左右各填上一个元素，扔到vals数组中（n+2个元素），方便处理两边越界的情况
++ 戳气球会导致不相邻的变成相邻，比较麻烦，那就**倒着来，看成往区间内塞气球。。**
+
+
+dp[i][j]：**在开区间(i,j)能获得的最大硬币数**
+
+**之所以是开区间，就是说i和j不要戳，中间的随便戳！！**
+
+参考这个[https://leetcode.cn/problems/burst-balloons/solution/zhe-ge-cai-pu-zi-ji-zai-jia-ye-neng-zuo-guan-jian-/](https://leetcode.cn/problems/burst-balloons/solution/zhe-ge-cai-pu-zi-ji-zai-jia-ye-neng-zuo-guan-jian-/)
+
++ i >= j-1时，dp[i][j] = 0
++ i < j -1时，**i和j中间至少有一个元素**，从i+1到j-1遍历k，这里的k指的是**最后一个！！！**戳爆的气球，所以他的旁边就只剩i和j了，就可以得到vals[i]*vals[k]*vals[j]，然后**既然k是最后一个，那么k的左右之前就被戳爆了**，所以要加上dp[i][k]和dp[k][j]，而这里有一坨k，能得到最大收益的那个k才是你想要的，所以要取个max
+
+![](./assets/chuo-qiqiu.png)
+
+那么最后要的就是dp[0][n+1]
+
+因为最终要的是0,n+1，所以i要倒着来，j正着来：
+
+![](./assets/chuo-qiqiu-dptable.png)
+
+
+```cpp
+    int maxCoins(vector<int>& nums) {
+        int n = nums.size();
+        vector<vector<int> > dp(n + 2, vector<int>(n + 2));
+        vector<int> vals(n + 2);
+        // =1是因为v[i]*v[k]*v[j]，为了保证边界得到的还是v[k]
+        vals[0] = vals[n + 1] = 1; 
+        for (int i = 1; i < n + 1; ++i) {
+            vals[i] =  nums[i - 1];
+        }
+        // 如上所述，从下往上，i可以从n也可以n-1开始，从n开始比较好理解
+        for (int i = n; i >= 0; --i) {
+            // 从左往右，且保证i < j - 1，即j>i+1
+            for (int j = i + 2; j <= n + 1; ++j) {
+                for (int k = i + 1; k < j; ++k) {
+                    dp[i][j] = max(vals[i] * vals[k] * vals[j] + dp[i][k] + dp[k][j], dp[i][j]);
+                }
+            }
+        }
+        return dp[0][n + 1];
     }
 ```
 

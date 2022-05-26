@@ -1,7 +1,7 @@
 /*
- * @lc app=leetcode.cn id=94 lang=cpp
+ * @lc app=leetcode.cn id=145 lang=cpp
  *
- * [94] 二叉树的中序遍历
+ * [145] 二叉树的后序遍历
  */
 
 // @lc code=start
@@ -18,35 +18,32 @@
  */
 class Solution {
 public:
-    // 递归
-    // vector<int> inorderTraversal(TreeNode* root) {
-    //     vector<int> res;
-    //     inorder(root, res);
-    //     return res;
-    // }
-    // void inorder(TreeNode* root, vector<int>& res) {
-    //     if (root == nullptr) {
-    //         return;
-    //     }
-    //     inorder(root->left, res);
-    //     res.push_back(root->val);
-    //     inorder(root->right, res);
-    // }
-    vector<int> inorderTraversal(TreeNode* root) {
-        stack<TreeNode*> stk;
+    vector<int> postorderTraversal(TreeNode* root) {
         vector<int> res;
+        stack<TreeNode*> stk;
+        TreeNode* prev = nullptr;
         while (!stk.empty() || root != nullptr) {
             //先把左都塞进去
             while (root != nullptr) {
                 stk.push(root);
                 root = root->left;
             }
-            // 取出根，给res
+            // 取出根
             root = stk.top();
             stk.pop();
-            res.push_back(root->val);
             // 再搞右
-            root = root->right;
+            if (root->right == nullptr || prev == root->right) {
+                // 当前节点已经没有右子树了，且上一个节点就是它的右子树
+                // 这个时候主是我们要的结果了
+                res.push_back(root->val);
+                // 更新prev为当前节点，并重置root为null
+                prev = root;
+                root = nullptr;
+            } else {
+                //root扔进去，访问右子树
+                stk.push(root);
+                root = root->right;
+            }
         }
         return res;
     }
