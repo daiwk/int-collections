@@ -2061,6 +2061,34 @@ insert：在xx位置**前**插入一个元素
     }
 ```
 
+### 【top100】比特位计数
+
+给你一个整数 n ，对于 0 <= i <= n 中的每个 i ，计算其二进制表示中 1 的个数 ，返回一个长度为 n + 1 的数组 ans 作为答案。
+
+**解法**
+
+Brian Kernighan 算法
+
+x=x&(x-1)，这样可以把x的二进制表示的**最后一个1变成0**，那么一个while不断搞，当x=0时，操作的次数就是原来x中1的个数
+
+```cpp
+    vector<int> countBits(int n) {
+        vector<int> res;
+        for(int i = 0; i <= n; ++i) {
+            res.push_back(k_b_count(i));
+        }
+        return res;
+    }
+    int k_b_count(int n) {
+        int cnt = 0;
+        while (n != 0) {
+            n = n & (n - 1);
+            cnt++;
+        }
+        return cnt;
+    }
+```
+
 ## 链表
 
 ### 【top100】两数相加
