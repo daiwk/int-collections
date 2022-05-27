@@ -2025,6 +2025,41 @@ insert：在xx位置**前**插入一个元素
 
 ```
 
+### 【top100】找到所有数组中消失的数字
+
+给你一个含 n 个整数的数组 nums ，其中 nums[i] 在区间 [1, n] 内。请你找出所有在 [1, n] 范围内但没有出现在 nums 中的数字，并以数组的形式返回结果。
+
+```
+示例 1：
+输入：nums = [4,3,2,7,8,2,3,1]
+输出：[5,6]
+```
+
+**解法**
+
+遍历数组，遇到nums[i]，就给nums[nums[i] - 1] + n，这里可能越界，所以nums[i] - 1要模一下n
+
+再遍历一遍，所有小于等于n的下标就是没出现过的
+
+```cpp
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> res;
+        for (int i = 0; i < n; ++i) {
+            // 为了保证不越界，需要将nums[i] -1对n取模，
+            // 得到原来的数!!
+            int x = (nums[i] - 1) % n;
+            nums[x] += n;
+        }
+
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] <= n) {
+                res.push_back(i + 1);
+            }
+        }
+        return res;
+    }
+```
 
 ## 链表
 
