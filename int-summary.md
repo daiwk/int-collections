@@ -3619,6 +3619,68 @@ dfs递归
     }
 ```
 
+###  【top100】二叉树的最近公共祖先
+
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+
+**解法**
+
+可以递归，非递归法如下：
+
+用map存每个节点的父节点(dfs)，
+
+先让p通过map不断找他的父节点，记录下每一个父节点，扔到set里
+
+再让q通过map不断找他的父节点，如果找到了，就是最近的公共祖先
+
+```cpp
+    unordered_map<int, TreeNode*> father_map;
+    unordered_set<int> path;
+
+    void dfs(TreeNode* root) {
+        if (root->left != nullptr) {
+            father_map[root->left->val] = root;
+            dfs(root->left);
+        }
+        if (root->right != nullptr) {
+            father_map[root->right->val] = root;
+            dfs(root->right);
+        }
+    }
+
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        // 根节点没有father
+        father_map[root->val] = nullptr;
+        dfs(root);
+        while (p != nullptr) {
+            path.emplace(p->val);
+            p = father_map[p->val];
+        }
+        while (q != nullptr) {
+            if (path.find(q->val) != path.end()) {
+                return q;
+            }
+            q = father_map[q->val];
+        }
+        return q;
+    }
+```
+
+### 【top100】二叉树展开为链表
+
+给你二叉树的根结点 root ，请你将它展开为一个单链表：
+
+展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
+
+展开后的单链表应该与二叉树 先序遍历 顺序相同。
+
+**解法**
+
+前序访问的是根 左 右，如果左是空的，那么左孩子不会被展开
+
+
 
 ## 图
 
@@ -3675,54 +3737,6 @@ dfs递归
     }
 ```
 
-###  【top100】二叉树的最近公共祖先
-
-给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
-
-百度百科中最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
-
-**解法**
-
-可以递归，非递归法如下：
-
-用map存每个节点的父节点(dfs)，
-
-先让p通过map不断找他的父节点，记录下每一个父节点，扔到set里
-
-再让q通过map不断找他的父节点，如果找到了，就是最近的公共祖先
-
-```cpp
-    unordered_map<int, TreeNode*> father_map;
-    unordered_set<int> path;
-
-    void dfs(TreeNode* root) {
-        if (root->left != nullptr) {
-            father_map[root->left->val] = root;
-            dfs(root->left);
-        }
-        if (root->right != nullptr) {
-            father_map[root->right->val] = root;
-            dfs(root->right);
-        }
-    }
-
-    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-        // 根节点没有father
-        father_map[root->val] = nullptr;
-        dfs(root);
-        while (p != nullptr) {
-            path.emplace(p->val);
-            p = father_map[p->val];
-        }
-        while (q != nullptr) {
-            if (path.find(q->val) != path.end()) {
-                return q;
-            }
-            q = father_map[q->val];
-        }
-        return q;
-    }
-```
 
 ## 回溯法
 

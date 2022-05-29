@@ -40,7 +40,17 @@ gcn是基于pgl的，因为频道样本相对少，天级别增量训，且可�
 
 + mn建库时怎么衡量ii距离
 
-ui用内积，建库用的是angular，也就是欧式，为什么不太清楚。。
+ui用内积，建库用的是angular，也就是欧式，为什么不太清楚。。其实可以参考下[https://www.zhihu.com/question/505942505?utm_source=wechat_session&utm_medium=social&s_r=0](https://www.zhihu.com/question/505942505?utm_source=wechat_session&utm_medium=social&s_r=0)
+
+[https://zhuanlan.zhihu.com/p/158199835](https://zhuanlan.zhihu.com/p/158199835)
+
+也就是 
+
+$$d(u,v)=\sqrt {\sum _{i=1}^{n}{(u_i-v_i})^2}$$
+
+$$cos(u,v)=\frac{uv}{|u||v|}=\frac{\sum_{i=1}^{n}{u_iv_i}}{\sqrt {\sum _{i=1}^{n}{u_i^2}}\sqrt{\sum_{i=1}^{n}{v_i^2}}}$$
+
+$$d(u,v) = \sqrt {2(1-cos(u,v))}$$
 
 + query你们怎么用的，看着没用文本信息
 
@@ -145,3 +155,4 @@ query效果咋样？冷用户比较好，他们不怎么用feed，一用feed发�
 有试过别的gnn么？因为换了个框架，pgl，当时问pgl的同学，说ligtgcn对低活用户多的场景效果比较好，别的因为有nn，如果id missing了，会学出很奇怪的emb，所以就试了lightgcn
 
 多场景一起建模，样本分布差别很大怎么办？如果真的是特别稀疏的场景，要么基于主任务的emb单独建模，这样能训得更充分点。如果样本分布差距不是很大，其实可以联训，要么调下样本权重，要么通过网络结构上的改动比如加对某些特征一些gate，相当于建模不同场景的不同weight之类的
+
