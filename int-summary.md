@@ -3683,6 +3683,42 @@ dfs递归
 + 如果左是空的，那么左孩子不会被展开
 + 如果左非空，那么在**左子树的最后一个节点**被访问后，就是右孩子了。也就是说**右孩子的前驱节点**就是**左子树的最后一个节点**
 
+那么，当前cur，如果左非空，先用**next记录左孩子**，拿另一个指针**pre从next开始**，一直找他的**右孩子**，最后一个就是我们要的**前驱节点**。
+
+接下来：
+
++ pre->right=cur->right
++ pre->left = nullptr
++ cur->right = next
+
+再接下来，因为左子树都干掉了，那就是cur = cur->right
+
+<html>
+<img style="height:100" src="assets/tree1.png"/>
+<img style="height:100" src="assets/tree2.png"/>
+<img style="height:100" src="assets/tree3.png"/>
+<img style="height:100" src="assets/tree4.png"/>
+</html>
+
+```cpp
+    void flatten(TreeNode* root) {
+        TreeNode* cur = root;
+        while (cur != nullptr) {
+            if (cur->left != nullptr) {
+                TreeNode* next = cur->left;
+                TreeNode* pre = next;
+                while (pre->right != nullptr) {
+                    // 注意，这里是pre->right !=nullptr，不是pre！！
+                    pre = pre->right;
+                }
+                pre->right = cur->right;
+                cur->left = nullptr;
+                cur->right = next;
+            }
+            cur = cur->right;
+        }
+    }
+```
 
 
 ## 图

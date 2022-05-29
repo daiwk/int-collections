@@ -46,7 +46,9 @@ ui用内积，建库用的是angular，也就是欧式，为什么不太清楚�
 
 也就是 
 
-![](./assets/cos-dotproduct.png)
+<html>
+<img style="height:100" src="assets/cos-dotproduct.png"/>
+</html>
 
 + query你们怎么用的，看着没用文本信息
 

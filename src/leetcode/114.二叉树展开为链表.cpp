@@ -19,7 +19,21 @@
 class Solution {
 public:
     void flatten(TreeNode* root) {
-
+        TreeNode* cur = root;
+        while (cur != nullptr) {
+            if (cur->left != nullptr) {
+                TreeNode* next = cur->left;
+                TreeNode* pre = next;
+                while (pre->right != nullptr) {
+                    // 注意，这里是pre->right !=nullptr，不是pre！！
+                    pre = pre->right;
+                }
+                pre->right = cur->right;
+                cur->left = nullptr;
+                cur->right = next;
+            }
+            cur = cur->right;
+        }
     }
 };
 // @lc code=end
