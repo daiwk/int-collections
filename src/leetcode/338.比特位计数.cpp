@@ -10,11 +10,11 @@ public:
     vector<int> countBits(int n) {
         vector<int> res;
         for(int i = 0; i <= n; ++i) {
-            res.push_back(k_b_count(i));
+            res.push_back(b_k_count(i));
         }
         return res;
     }
-    int k_b_count(int n) {
+    int b_k_count(int n) {
         int cnt = 0;
         while (n != 0) {
             n = n & (n - 1);

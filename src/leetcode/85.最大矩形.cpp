@@ -7,55 +7,60 @@
 // @lc code=start
 class Solution {
 public:
-
-    int maxArea(vector<int>& heights, int start, int end) {
-        if (start > end) {
-            return 0;
-        } 
-        int min_idx = start;
-        int min_hight = heights[start];
-        for (int i = start; i <= end; ++i) {
-            if (min_hight > heights[i]) {
-                min_idx = i;
-                min_hight = heights[i];
+    int max_hist(vector<int> &heights)
+    {
+        int n = heights.size();
+        vector<int> left(n), right(n, n);
+        stack<int> mono_stk;
+        for (int i = 0; i < n; ++i)
+        {
+            while (!mono_stk.empty() && heights[mono_stk.top()] >= heights[i])
+            {
+                right[mono_stk.top()] = i;
+                mono_stk.pop();
             }
+            left[i] = mono_stk.empty() ? -1 : mono_stk.top();
+            mono_stk.push(i);
         }
-        return std::max(std::max(min_hight * (end - start + 1), maxArea(heights, start, min_idx - 1)), maxArea(heights, min_idx + 1, end));
+        int ans = 0;
+        for (int i = 0; i < n; ++i)
+        {
+            ans = max(ans, (right[i] - left[i] - 1) * heights[i]);
+        }
+        return ans;
+    }
 
-    }
-    int largestRectangleArea(vector<int>& heights) {
-        if (heights.size() == 0) {
-            return 0;
-        }
-        return maxArea(heights, 0, heights.size() - 1);
-    }
-    int maximalRectangle(vector<vector<char>>& matrix) {
+    int maximalRectangle(vector<vector<char> > &matrix)
+    {
         int rows = matrix.size();
-        int cols = 0;
-        if (rows > 0) {
-            cols = matrix[0].size();
-        }
-        if (rows == 0 || cols == 0) {
+        if (rows == 0)
+        {
             return 0;
         }
-        int maxmax = 0;
-        for (int i = 0; i < rows; ++i) {
-            vector<int> heights;
-            for (int j = 0; j < cols; ++j) {
-                int cur_height = 0;
-                if (matrix[i][j] == '1') {
-                    for (int k = i; k >= 0; --k) {
-                        if (matrix[k][j] == '0') {
-                            break;
-                        } 
-                        ++cur_height;
+        int cols = matrix[0].size();
+        int res = 0;
+        for (int i = 0; i < rows; ++i)
+        {
+            vector<int> heights(cols);
+            for (int j = 0; j < cols; ++j)
+            {
+                int k = i;
+                while (matrix[k][j] == '1')
+                {
+                    heights[j]++;
+                    // cout << j << " " << k << endl;
+                    if (k == 0)
+                    {
+                        // 注意这个的位置，得在heights[j]++之后
+                        // 否则如果这个矩阵里就一个元素1的时候，就gg了
+                        break;
                     }
+                    k--;
                 }
-                heights.emplace_back(cur_height);
+                res = max(res, max_hist(heights));
             }
-            maxmax = std::max(maxmax, largestRectangleArea(heights));
         }
-        return maxmax;
+        return res;
     }
 };
 // @lc code=end
