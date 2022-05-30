@@ -2,6 +2,8 @@
 urlcolor: blue
 ---
 
+下载地址：[https://github.com/daiwk/int-collections/blob/master/int-ml.pdf](https://github.com/daiwk/int-collections/blob/master/int-ml.pdf)
+
 本文参考自李航的《统计学习方法》、周志华的《机器学习》、Hulu的《百面机器学习》等。
 
 # 概述
