@@ -1,7 +1,8 @@
 {
     "plugins": [
         "prism",
-        "-highlight"
+        "-highlight",
+        "mathjax"
     ],
     "pluginsConfig": {
         "prism": {
