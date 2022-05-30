@@ -12,7 +12,7 @@ git add commit.sh
 git add book.json
 git add gen_pdf.sh
 git add change_for_pdf.py
-git rm *-pdf.md
+git rm ./*-pdf.md
 
 git config --global user.name daiwk
 
