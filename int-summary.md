@@ -7526,18 +7526,18 @@ public:
 
 但其实不用建树
 
-节点i的子节点为 $(i\times 10, i\times 10+1,...,i\times 10 + 9)$，
+节点i的子节点为 $$(i\times 10, i\times 10+1,...,i\times 10 + 9)$$，
 
-设**当前的字典树的第 i 小的节点为 $n_i$**，则只需按照先序遍历再继续往后找 k - i个节点即为目标节点。
+设**当前的字典树的第 i 小的节点为 $$n_i$$**，则只需按照先序遍历再继续往后找 k - i个节点即为目标节点。
 
-假设**以$n_i$为根的子树的节点数是** $step(n_i)$，那么
+假设**以$$n_i$$为根的子树的节点数是** $$step(n_i)$$，那么
 
-+ 如果$step(n_i)<=k-i$，那么第k小的节点在$n_i$的右兄弟的子树中，可以直接从兄弟 $n_{i+1}$开始往后找$k-i-step(n_i)$个节点
-+ 如果$step(n_i)>k-i$，那么第k小的节点肯定在$n_i$的子树中，从左侧第一个孩子中找k-i-1个节点
++ 如果$$step(n_i)<=k-i$$，那么第k小的节点在$$n_i$$的右兄弟的子树中，可以直接从兄弟 $$n_{i+1}$$开始往后找$$k-i-step(n_i)$$个节点
++ 如果$$step(n_i)>k-i$$，那么第k小的节点肯定在$$n_i$$的子树中，从左侧第一个孩子中找k-i-1个节点
 
-计算 $step(n_i)$：
+计算 $$step(n_i)$$：
 
-层次遍历，第i层的最左侧的孩子节点是$first_i$，最右侧节点是$last_i$，第i层总共有$last_i - first_i + 1$个节点，
+层次遍历，第i层的最左侧的孩子节点是$$first_i$$，最右侧节点是$$last_i$$，第i层总共有$$last_i - first_i + 1$$个节点，
 
 其中，
 
@@ -7545,9 +7545,9 @@ $$first_i = 10\times first_{i-1}$$
 
 $$last_i = 10\times last_{i-1} + 9$$
 
-因为总节点数最多为n，所以第i层最右节点是min(n, last_i)
+因为总节点数最多为n，所以第i层最右节点是$$min(n, last_i)$$
 
-不断迭代直到$first_i>n$就不再向下搜索
+不断迭代直到$$first_i>n$$就不再向下搜索
 
 ```cpp
     int get_steps(int cur, long n) {
@@ -7632,7 +7632,7 @@ b/a，那么b/a=b/(2b)=1/2
 
 
 <html>
-<img style="height:100" src="assets/union-find-2.png"/>
+<img style="height:200" src="assets/union-find-2.png"/>
 </html>
 
 
