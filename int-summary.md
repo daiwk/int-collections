@@ -7558,7 +7558,131 @@ $$last_i = 10\times last_{i-1} + 9$$
 
 **解法**
 
+a/b=2，说明a=2b
+b/c=3，说明b=3c
+
+求a/c，可以a/c=2b/c=2*3c/c=6
+
+b/a，那么b/a=b/(2b)=1/2
+
+可见，a和b**有倍数关系，可以在一个集合中**，b和c同理，那么这个集合中的**任意两个元素其实都可以通过某种方式计算比值**。
+
+如果给的两个变量不在同一集合里，或者给的一个变量没出现在equations里，那就返回-1
+
+其实可以搞个有向图，a->b，边权重2，同理，b->c，边权重3
+
+对于一条路径来讲，可以进行路径压缩：
+
+![](./assets/union-find-1.png)
+
+具体压缩方法如下，**一层一层地压缩**
+
+![](./assets/union-find-2.png)
+
+然后，**要算b/a，那就用b->d的权重除以a->d的权重就行了**
+
+还有如下的情况，已知a/d，d/c，a/b，可以在b->c连一条边，而**两条路径上的有向边的权重的乘积是相同的**，所以就能计算b->c的权重
+
+![](./assets/union-find-3.png)
+
+而这个东西在代码里就是：
+
+weight[root_x] = weight[y] * value/weight[x]
+
+![](./assets/union-find-4.png)
+
+parent[i]=i就是根节点
+
+实际跑的时候，并查集底层用数组实现比较好，所以先用个hashmap把变量映射到id，再基于这个id去搞并查集
+
+在遍历输入数据的时候，调用并查集的union函数，把当前数据扔到树里去
+
+查询的时候，调用is_connnected函数，返回二者的比值
+
+
 ```cpp
+class UnionFind {
+private:
+    vector<int> parent;
+    vector<double> weight;
+public:
+    UnionFind(int n) {
+        for (int i = 0; i < n; ++i) {
+            parent.push_back(i);
+            weight.push_back(1.0);
+        }
+    }
+
+    int find(int x) {
+        if (x != parent[x]) {
+            int origin = parent[x];
+            // 递归！
+            parent[x] = find(parent[x]);
+            // weight乘上去
+            weight[x] *= weight[origin];
+        }
+        return parent[x];
+    }
+
+    void x_union(int x, int y, double value) {
+        int root_x = find(x);
+        int root_y = find(y);
+        // 已经是同一个根，这个时候直接return..!!
+        if (root_x == root_y) {
+            return;
+        }
+        // 这里搞的是图里的红色边
+        parent[root_x] = root_y;
+        weight[root_x] = weight[y] * value / weight[x];
+    }
+    
+    double is_connected(int x, int y) {
+        int root_x = find(x);
+        int root_y = find(y);
+        // 同根，那就是在同一个集合中
+        if (root_x == root_y) {
+            return weight[x] / weight[y];
+        } else {
+            return -1.0;
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries) {
+        int size = equations.size();
+        UnionFind uf(2 * size);
+        int id = 0;
+        map<string, int> xmap;
+        for (int i = 0; i < size; ++i) {
+            string x = equations[i][0];
+            string y = equations[i][1];
+            if (!xmap.count(x)) {
+                xmap[x] = id;
+                id++;
+            }
+
+            if (!xmap.count(y)) {
+                xmap[y] = id;
+                id++;
+            }
+            uf.x_union(xmap[x], xmap[y], values[i]);
+        }
+        int q_size = queries.size();
+        vector<double> res(q_size, -1.0);
+        for (int i = 0; i < q_size; ++i) {
+            string x = queries[i][0];
+            string y = queries[i][1];
+            if (xmap.count(x) && xmap.count(y)) {
+                int id1 = xmap[x];
+                int id2 = xmap[y];
+                res[i] = uf.is_connected(id1, id2);
+            }
+        }
+        return res;
+    }
+};
 ```
 
 
