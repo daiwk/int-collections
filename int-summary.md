@@ -3843,8 +3843,17 @@ dfs递归
 
 <html>
 <img style="height:100" src="assets/tree1.png"/>
+</html>
+
+<html>
 <img style="height:100" src="assets/tree2.png"/>
+</html>
+
+<html>
 <img style="height:100" src="assets/tree3.png"/>
+</html>
+<html>
+
 <img style="height:100" src="assets/tree4.png"/>
 </html>
 
