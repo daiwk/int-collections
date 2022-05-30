@@ -12,7 +12,7 @@ for line in sys.stdin:
             style_key = style.split("=")[0]
             style_val = style.split("=")[1]
             new_style = style_key + '="' + style_val + '"'
-            #print('![](%s){:%s}' % ("./" + src, new_style))
-            print('![](%s)' % ("./" + src))
+            print('![](%s){ %s }' % ("./" + src, new_style))
+            #print('![](%s)' % ("./" + src) + "\n")
         else:
             print(a)

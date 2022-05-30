@@ -488,7 +488,8 @@ $$
 g_j(x)\le 0\\ 
 \mu_j\ge 0\\ 
 \mu_jg_j(x)=0
-\end{matrix}\right.$$
+\end{matrix}\right.
+$$
 
 
 

@@ -2,9 +2,14 @@
 
 ## 概述
 
+本文下载地址：[https://github.com/daiwk/int-collections/blob/master/int-summary.pdf](https://github.com/daiwk/int-collections/blob/master/int-summary.pdf)
+
 主要是leetcode相关的题
 
-参考1：[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/)
+参考1：[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/
+top-interview-questions-medium/)
+
+参考2：[https://leetcode.cn/problem-list/2cktkvj/](https://leetcode.cn/problem-list/2cktkvj/)
 
 ## 数组和字符串
 
