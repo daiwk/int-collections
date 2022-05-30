@@ -6500,7 +6500,7 @@ dp[i][j]：**在开区间(i,j)能获得的最大硬币数**
 因为最终要的是0,n+1，所以i要倒着来，j正着来：
 
 <html>
-<img style="height:100" src="assets/huo-qiqiu-dptable.png"/>
+<img style="height:100" src="assets/chuo-qiqiu-dptable.png"/>
 </html>
 
 
@@ -7518,7 +7518,7 @@ public:
 字典序就是**根据数字的前缀进行排序**，比如 10 < 9，因为 10 的前缀是 1，比 9 小。
 
 <html>
-<img style="height:100" src="assets/trie-tree.png"/>
+<img style="height:200" src="assets/trie-tree.png"/>
 </html>
 
 

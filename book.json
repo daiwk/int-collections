@@ -1,8 +1,8 @@
 {
     "plugins": [
+        "katex",
         "prism",
-        "-highlight",
-        "mathjax"
+        "-highlight"
     ],
     "pluginsConfig": {
         "prism": {
