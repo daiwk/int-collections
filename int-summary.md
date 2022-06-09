@@ -2551,6 +2551,97 @@ public:
  */
 ```
 
+### 赎金信
+
+给你两个字符串：ransomNote 和 magazine ，判断 ransomNote 能不能由 magazine 里面的字符构成。
+
+如果可以，返回 true ；否则返回 false 。
+
+magazine 中的每个字符只能在 ransomNote 中使用一次。
+
+**解法**
+
+只需要满足字符串 magazine 中的每个英文字母(’a’-’z’) 的统计次数都大于等于 ransomNote 中相同字母的统计次数即可。
+
+```cpp
+    bool canConstruct(string ransomNote, string magazine) {
+        vector<int> cnt(26);
+        for (char& i: magazine) {
+            cnt[i - 'a']++;
+        }
+        for (char& j: ransomNote) {
+            cnt[j - 'a']--;
+            if (cnt[j - 'a'] < 0) {
+                // 这个字母在magazine中找不到这么多个
+                return false;
+            }
+        }
+        return true;
+    }
+```
+
+### 可被三整除的最大和
+
+给你一个整数数组 nums，请你找出并返回能被三整除的元素最大和。
+
+```
+示例 1：
+输入：nums = [3,6,5,1,8]
+输出：18
+解释：选出数字 3, 6, 1 和 8，它们的和是 18（可被 3 整除的最大和）。
+```
+
+**解法**
+
+遍历一遍，把mod3=2和mod3=1的分别塞到2个数组里，**各自排个序**
+
+全部加起来，然后看看mod3的值：
+
++ =0：就是要的了
++ =1：
+    + 干掉最小的mod3=1的数
+    + **干掉最小的两个mod3=2的数，因为(2+2)mod3也是1**
++ =2：
+    + 干掉最小的mod3=2的数
+    + **干掉最小的两个mod3=1的数**
+
+```cpp
+    int maxSumDivThree(vector<int>& nums) {
+        vector<int> ones, twos;
+        int res = 0;
+        for (auto& i: nums) {
+            if (i % 3 == 1) {
+                ones.push_back(i);
+            } else if (i % 3 == 2) {
+                twos.push_back(i);
+            }
+            res += i;
+        }
+        sort(ones.begin(), ones.end());
+        sort(twos.begin(), twos.end());
+        int ans = 0;
+        if (res % 3 == 0) {
+            return res;
+        } else if (res % 3 == 1) {
+            if (ones.size() > 0) {
+                ans = max(ans, res - ones[0]);
+            }
+            if (twos.size() >= 2) {
+                ans = max(ans, res - twos[0] - twos[1]);
+            }
+        } else if (res % 3 == 2) {
+            if (twos.size() > 0) {
+                ans = max(ans, res - twos[0]);
+            }
+            if (ones.size() >= 2) {
+                ans = max(ans, res - ones[0] - ones[1]);
+            }
+        }
+        return ans;
+    }
+```
+
+
 ## 链表
 
 ### 【top100】两数相加
@@ -6970,6 +7061,53 @@ dp[i][j]：**在开区间(i,j)能获得的最大硬币数**
         }
         return dp[0][n + 1];
     }
+```
+
+### 最低票价
+
+在一个火车旅行很受欢迎的国度，你提前一年计划了一些火车旅行。在接下来的一年里，你要旅行的日子将以一个名为 days 的数组给出。每一项是一个从 1 到 365 的整数。
+
+火车票有 三种不同的销售方式 ：
+
++ 一张 为期一天 的通行证售价为 costs[0] 美元；
++ 一张 为期七天 的通行证售价为 costs[1] 美元；
++ 一张 为期三十天 的通行证售价为 costs[2] 美元。
+
+通行证允许数天无限制的旅行。 例如，如果我们在第 2 天获得一张 为期 7 天 的通行证，那么我们可以连着旅行 7 天：第 2 天、第 3 天、第 4 天、第 5 天、第 6 天、第 7 天和第 8 天。
+
+返回 你想要完成在给定的列表 days 中列出的每一天的旅行所需要的最低消费 。
+
+```
+示例 2：
+输入：days = [1,2,3,4,5,6,7,8,9,10,30,31],
+costs = [2,7,15]
+输出：17
+
+解释：
+例如，这里有一种购买通行证的方法，可以让你完成你的旅行计划： 
+在第 1 天，你花了 costs[2] = $15 买了一张为期 30 天的通行证，
+它将在第 1, 2, ..., 30 天生效。
+在第 31 天，你花了 costs[0] = $2 买了一张为期 1 天的通行证，
+它将在第 31 天生效。 
+你总共花了 $17，并完成了你计划的每一天旅行。
+```
+
+**解法**
+
+dp[i]:到第 i 天结束，我们需要花的钱
+
+从后往前，dp[1]就是要的
+
+对于第i天：
+
++ 如果不是必须出行的日期，
+    + 那么今天不出行，所以也可以不用买票，所以dp[i] = dp[i - 1]
++ 如果是必须出行的日期，
+    + 可以买j=1/7/30天的票，那么往前的j-1天（因为今天要走）都不用买票，所以只看dp[i-j]就行
+    + dp[i]=min(dp[i-j]+cost[j]), j = 1,7,30
+
+```cpp
+
 ```
 
 
