@@ -1344,9 +1344,7 @@ int main() {
 
 如果一开始栈为空，第一个字符为左括号的时候我们会将其放入栈中，这样就不满足提及的「最后一个没有被匹配的右括号的下标」，为了保持统一，我们在**一开始的时候往栈中放入一个值为 -1 的元素**。
 
-<html>
-<img style="height:100" src="assets/max-valid-kuohao.png"/>
-</html>
+![](./assets/max-valid-kuohao.png){ height="100" }
 
 
 如上图，先-1入栈，然后遇到(，就扔一个0进去，然后i=1的时候，栈顶的0其实和它是匹配的，就扔掉，这个时候1-(-1)就是2了，其实就是扔掉的那对括号的长度
@@ -1777,9 +1775,7 @@ public:
 
 如果回文子串长度是奇数，那中心是一个字符，如果是偶数，那中心是两个字符。
 
-<html>
-<img style="height:100" src="assets/huiwen-centers.png"/>
-</html>
+![](./assets/huiwen-centers.png){ height="100" }
 
 
 
@@ -2313,9 +2309,7 @@ split+reverse+join可以简单搞定。。
 
 **解法**
 
-<html>
-<img style="height:300" src="assets/atoi.png"/>
-</html>
+![](./assets/atoi.png){ height="300" }
 
 通过一个map存开始状态和结束状态，然后通过函数来判断遇到哪个输入时，走到哪个状态。
 
@@ -2873,7 +2867,7 @@ dp
 
 **解法**
 
-维护当前**每个链表没有被合并的元素的最前面一个**，k个链表就最多有 k 个满足这样条件的元素，每次在这些元素里面**选取 $$\textit{val}$$ 属性最小的元素**合并到答案中。在选取最小元素的时候，我们可以用优先队列来优化这个过程。(**即小顶堆，比较函数是a>b**)
+维护当前**每个链表没有被合并的元素的最前面一个**，k个链表就最多有 k 个满足这样条件的元素，每次在这些元素里面**选取 $\textit{val}$ 属性最小的元素**合并到答案中。在选取最小元素的时候，我们可以用优先队列来优化这个过程。(**即小顶堆，比较函数是a>b**)
 
 ```cpp
     ListNode* mergeKLists(vector<ListNode*>& lists) {
@@ -3875,9 +3869,7 @@ bfs层序遍历（queue），记录每层的最后一个元素
 
 **解法**
 
-<html>
-<img style="height:100" src="assets/tree-diameter.jpeg"/>
-</html>
+![](./assets/tree-diameter.jpeg){ height="100" }
 
 经过节点的最长路径就是**左孩子深度+右孩子深度**，
 
@@ -4012,15 +4004,15 @@ public:
 + ```G(n)```：长度为n的序列能构成的不同二叉搜索树个数
 + ```F(i,n)```：**以i为根**，长度为n的不同二叉搜索树个数
 
-$$G(n)=\sum_{i=1}^{n} F(i, n)$$
+$G(n)=\sum_{i=1}^{n} F(i, n)$
 
 以i为根节点，可以把1,...,i-1作为左子树，i+1,...,n作为右子树，递归，这样做因为根不一样，所以每棵树都是不一样的。
 
-左子树的数量其实就是G(i-1)，右子树的数量是G(n-i)，而F(i,n)其实就是**左右子树的暴力笛卡尔积**$$F(i,n)=G(i-1)G(n-i)$$
+左子树的数量其实就是G(i-1)，右子树的数量是G(n-i)，而F(i,n)其实就是**左右子树的暴力笛卡尔积**$F(i,n)=G(i-1)G(n-i)$
 
 因此，
 
-$$G(n)=\sum_{i=1}^{n} G(i-1) \cdot G(n-i)$$
+$G(n)=\sum_{i=1}^{n} G(i-1) \cdot G(n-i)$
 
 所以，sum(G(x)G(y))，其中x从0到n-1，y从n-1到0，两两组合，其实就是暴力的笛卡尔积。。所以可以两层for，且为了不重复计算，所以外面是i in [1,n]，里面是j in [1,i]
 
@@ -4321,21 +4313,13 @@ dfs递归
 
 再接下来，因为左子树都干掉了，那就是cur = cur->right
 
-<html>
-<img style="height:100" src="assets/tree1.png"/>
-</html>
+![](./assets/tree1.png){ height="100" }
 
-<html>
-<img style="height:100" src="assets/tree2.png"/>
-</html>
+![](./assets/tree2.png){ height="100" }
 
-<html>
-<img style="height:100" src="assets/tree3.png"/>
-</html>
-<html>
+![](./assets/tree3.png){ height="100" }
 
-<img style="height:100" src="assets/tree4.png"/>
-</html>
+![](./assets/tree4.png){ height="100" }
 
 ```cpp
     void flatten(TreeNode* root) {
@@ -4549,13 +4533,13 @@ n 皇后问题 研究的是如何将 n 个皇后放置在 n × n 的棋盘上，
 
 回溯法
 
-每个皇后必须位于不同行和不同列，因此将 N 个皇后放置在 $$N \times N$$ 的棋盘上，一定是**每一行有且仅有一个皇后**，**每一列有且仅有一个皇后**，且**任何两个皇后都不能在同一条斜线上**。
+每个皇后必须位于不同行和不同列，因此将 N 个皇后放置在 $N \times N$ 的棋盘上，一定是**每一行有且仅有一个皇后**，**每一列有且仅有一个皇后**，且**任何两个皇后都不能在同一条斜线上**。
 
 使用一个数组记录**每行**放置的皇后的**列下标**，依次在每一行放置一个皇后。每次新放置的皇后都不能和已经放置的皇后之间有攻击：即新放置的皇后**不能**和任何一个已经放置的皇后在**同一列**以及**同一条斜线**上，并更新数组中的当前行的皇后列下标。
 
 N 个皇后都放置完毕，则找到一个可能的解
 
-为了判断一个位置所在的列和两条斜线上是否已经有皇后，使用三个集合 $$\textit{columns}$$、$$\textit{diagonals}_1$$和 $$\textit{diagonals}_2$$分别记录**每一列以及两个方向的每条斜线上是否有皇后**。
+为了判断一个位置所在的列和两条斜线上是否已经有皇后，使用三个集合 $\textit{columns}$、$\textit{diagonals}_1$和 $\textit{diagonals}_2$分别记录**每一列以及两个方向的每条斜线上是否有皇后**。
 
 
 ```cpp
@@ -5052,9 +5036,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 
 路径 不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
 
-<html>
-<img style="height:100" src="assets/pathsum3-1-tree.jpeg"/>
-</html>
+![](./assets/pathsum3-1-tree.jpeg){ height="100" }
 
 **解法**
 
@@ -6115,9 +6097,7 @@ dp，存left_max和right_max，然后min(left_max, right_max) - height
 
 对于数组 [2,3,1,2,4,2,3]
 
-<html>
-<img style="height:100" src="assets/jump.png"/>
-</html>
+![](./assets/jump.png){ height="100" }
 
 
 **解法：**
@@ -6516,9 +6496,7 @@ dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的**边长**�
 
 dp[i][j] = min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]) + 1
 
-<html>
-<img style="height:100" src="assets/max-square.png"/>
-</html>
+![](./assets/max-square.png){ height="100" }
 
 
 最小+1是因为既然另外两个更大，那肯定够这个最小的用
@@ -6616,9 +6594,7 @@ dp(i,j) 表示以 (i,j) 为右下角，且只包含 1 的正方形的边长最�
 
 **解法**
 
-<html>
-<img style="height:100" src="assets/maxmul.jpg"/>
-</html>
+![](./assets/maxmul.jpg){ height="100" }
 
 ```cpp
     int maxProduct(vector<int>& nums) {
@@ -6839,9 +6815,7 @@ f[i]：**最少需要多少个数**的平方来表示**整数i**
 
 这些数肯定落在区间[1, sqrt(n)]中，所以状态转移就是
 
-<html>
-<img style="height:100" src="assets/dp-full-square.png"/>
-</html>
+![](./assets/dp-full-square.png){ height="100" }
 
 
 边界，f[0]= 0
@@ -7027,17 +7001,13 @@ dp[i][j]：**在开区间(i,j)能获得的最大硬币数**
 + i >= j-1时，dp[i][j] = 0
 + i < j -1时，**i和j中间至少有一个元素**，从i+1到j-1遍历k，这里的k指的是**最后一个！！！**戳爆的气球，所以他的旁边就只剩i和j了，就可以得到vals[i]*vals[k]*vals[j]，然后**既然k是最后一个，那么k的左右之前就被戳爆了**，所以要加上dp[i][k]和dp[k][j]，而这里有一坨k，能得到最大收益的那个k才是你想要的，所以要取个max
 
-<html>
-<img style="height:100" src="assets/chuo-qiqiu.png"/>
-</html>
+![](./assets/chuo-qiqiu.png){ height="100" }
 
 那么最后要的就是dp[0][n+1]
 
 因为最终要的是0,n+1，所以i要倒着来，j正着来：
 
-<html>
-<img style="height:100" src="assets/chuo-qiqiu-dptable.png"/>
-</html>
+![](./assets/chuo-qiqiu-dptable.png){ height="100" }
 
 
 ```cpp
@@ -7238,9 +7208,7 @@ for(int i = 0; i < n; ++i) {
 
 求在该柱状图中，能够勾勒出来的矩形的最大面积。
 
-<html>
-<img style="height:100" src="assets/max-juxing-hist.jpeg"/>
-</html>
+![](./assets/max-juxing-hist.jpeg){ height="100" }
 
 
 **解法**
@@ -7322,9 +7290,7 @@ right：右边界（第一个小于它的柱子的位置）
 
 可以看成是一个从上向下移动的坐标系，而求的就是坐标系中最大矩形的面积
 
-<html>
-<img style="height:100" src="assets/max-juxing.png"/>
-</html>
+![](./assets/max-juxing.png){ height="100" }
 
 
 其实就是求出每一个坐标系的heights，然后传给上一题的函数就是了
@@ -7733,9 +7699,7 @@ public:
 给定一个整数 n ，返回 n! 结果中尾随零的数量。
 
 
-<html>
-<img style="height:100" src="assets/trailing-zeros.png"/>
-</html>
+![](./assets/trailing-zeros.png){ height="100" }
 
 
 其实这个就是n一直除以5，然后加起来
@@ -7957,15 +7921,11 @@ AB -> 28
 
 有限小数：
 
-<html>
-<img style="height:100" src="assets/fraction-to-decimal-2.png"/>
-</html>
+![](./assets/fraction-to-decimal-2.png){ height="100" }
 
 无限循环小数：
 
-<html>
-<img style="height:100" src="assets/fraction-to-decimal.png"/>
-</html>
+![](./assets/fraction-to-decimal.png){ height="100" }
 
 
 ```cpp
@@ -8151,37 +8111,35 @@ public:
 
 字典序就是**根据数字的前缀进行排序**，比如 10 < 9，因为 10 的前缀是 1，比 9 小。
 
-<html>
-<img style="height:200" src="assets/trie-tree.png"/>
-</html>
+![](./assets/trie-tree.png){ height="200" }
 
 
 **前序遍历**字典树即可得到字典序从小到大的数字序列，遍历到第k个节点就是第k小的数
 
 但其实不用建树
 
-节点i的子节点为 $$(i\times 10, i\times 10+1,...,i\times 10 + 9)$$，
+节点i的子节点为 $(i\times 10, i\times 10+1,...,i\times 10 + 9)$，
 
-设**当前的字典树的第 i 小的节点为 $$n_i$$**，则只需按照先序遍历再继续往后找 k - i个节点即为目标节点。
+设**当前的字典树的第 i 小的节点为 $n_i$**，则只需按照先序遍历再继续往后找 k - i个节点即为目标节点。
 
-假设**以$$n_i$$为根的子树的节点数是** $$step(n_i)$$，那么
+假设**以$n_i$为根的子树的节点数是** $step(n_i)$，那么
 
-+ 如果$$step(n_i)<=k-i$$，那么第k小的节点在$$n_i$$的右兄弟的子树中，可以直接从兄弟 $$n_{i+1}$$开始往后找$$k-i-step(n_i)$$个节点
-+ 如果$$step(n_i)>k-i$$，那么第k小的节点肯定在$$n_i$$的子树中，从左侧第一个孩子中找k-i-1个节点
++ 如果$step(n_i)<=k-i$，那么第k小的节点在$n_i$的右兄弟的子树中，可以直接从兄弟 $n_{i+1}$开始往后找$k-i-step(n_i)$个节点
++ 如果$step(n_i)>k-i$，那么第k小的节点肯定在$n_i$的子树中，从左侧第一个孩子中找k-i-1个节点
 
-计算 $$step(n_i)$$：
+计算 $step(n_i)$：
 
-层次遍历，第i层的最左侧的孩子节点是$$first_i$$，最右侧节点是$$last_i$$，第i层总共有$$last_i - first_i + 1$$个节点，
+层次遍历，第i层的最左侧的孩子节点是$first_i$，最右侧节点是$last_i$，第i层总共有$last_i - first_i + 1$个节点，
 
 其中，
 
-$$first_i = 10\times first_{i-1}$$
+$first_i = 10\times first_{i-1}$
 
-$$last_i = 10\times last_{i-1} + 9$$
+$last_i = 10\times last_{i-1} + 9$
 
-因为总节点数最多为n，所以第i层最右节点是$$min(n, last_i)$$
+因为总节点数最多为n，所以第i层最右节点是$min(n, last_i)$
 
-不断迭代直到$$first_i>n$$就不再向下搜索
+不断迭代直到$first_i>n$就不再向下搜索
 
 ```cpp
     int get_steps(int cur, long n) {
@@ -8277,33 +8235,25 @@ b/a，那么b/a=b/(2b)=1/2
 
 对于一条路径来讲，可以进行路径压缩：
 
-<html>
-<img style="height:100" src="assets/union-find-1.png"/>
-</html>
+![](./assets/union-find-1.png){ height="100" }
 
 
 具体压缩方法如下，**一层一层地压缩**
 
 
-<html>
-<img style="height:200" src="assets/union-find-2.png"/>
-</html>
+![](./assets/union-find-2.png){ height="200" }
 
 
 然后，**要算b/a，那就用b->d的权重除以a->d的权重就行了**
 
 还有如下的情况，已知a/d，d/c，a/b，可以在b->c连一条边，而**两条路径上的有向边的权重的乘积是相同的**，所以就能计算b->c的权重
 
-<html>
-<img style="height:100" src="assets/union-find-3.png"/>
-</html>
+![](./assets/union-find-3.png){ height="100" }
 而这个东西在代码里就是：
 
 weight[root_x] = weight[y] * value/weight[x]
 
-<html>
-<img style="height:100" src="assets/union-find-4.png"/>
-</html>
+![](./assets/union-find-4.png){ height="100" }
 
 parent[i]=i就是根节点
 
@@ -8513,9 +8463,7 @@ public:
 你需要计算完成所有任务所需要的 最短时间 。
 
 
-<html>
-<img style="height:100" src="assets/task-distribute.png"/>
-</html>
+![](./assets/task-distribute.png){ height="100" }
 
 ```cpp
     int leastInterval(vector<char>& tasks, int n) {
@@ -8563,9 +8511,7 @@ public:
 
 你必须在 原地 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要 使用另一个矩阵来旋转图像。
 
-<html>
-<img style="height:100" src="assets/rotate-img.jpeg"/>
-</html>
+![](./assets/rotate-img.jpeg){ height="100" }
 
 
 ```
