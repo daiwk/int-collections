@@ -6,10 +6,12 @@
 
 主要是leetcode相关的题
 
-参考1：[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/
+参考1：【medium常见题】[https://leetcode-cn.com/leetbook/detail/top-interview-questions-medium/](https://leetcode-cn.com/leetbook/detail/
 top-interview-questions-medium/)
 
-参考2：[https://leetcode.cn/problem-list/2cktkvj/](https://leetcode.cn/problem-list/2cktkvj/)
+参考2：【top100】[https://leetcode.cn/problem-list/2cktkvj/](https://leetcode.cn/problem-list/2cktkvj/)
+
+参考3：【topint】[https://leetcode.cn/problem-list/2ckc81c/](https://leetcode.cn/problem-list/2ckc81c/)
 
 ## 数组和字符串
 
@@ -2638,6 +2640,45 @@ magazine 中的每个字符只能在 ransomNote 中使用一次。
             }
         }
         return ans;
+    }
+```
+
+### 【topint】缺失的第一个正数
+
+给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
+
+请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
+
+**解法**
+
+和剑指offer的第三题([数组中重复的数字](https://daiwk.gitbook.io/int-collections/int#shu-zu-zhong-zhong-fu-de-shu-zi-offerno3))类似，用交换的思想
+
+正确的数组应该是1 2 3 4... n，也就是第x-1个元素是x
+
+例如-1,3,4,1恢复后是1,-1,3,4，而-1!=2，所以缺失的是2
+
+例如-1,3,4,1,2恢复后是1,2,3,4,-1，而-1!=5，所以缺失的是5
+
+遍历数组，x=nums[i]，如果x在[1,N]内，那就把x扔到下标为x-1的位置，也就是**交换**nums[i]和nums[x-1]（即nums[nums[i] - 1]）。
+
+交换完成后，新的x=nums[i]可能还在[1,N]之间，且nums[nums[i] - 1]!=nums[i]时，要一直交换，直到x不在[1,N]之间为止。
+
+```cpp
+    int firstMissingPositive(vector<int>& nums) {
+        int len = nums.size();
+        for (int i = 0; i < len; ++i) {
+            while (nums[i] > 0 && nums[i] <= len && \
+                nums[i] != nums[nums[i] - 1]) {
+                swap(nums[i], nums[nums[i] - 1]);
+            }
+        }
+        for (int i = 0; i < len; ++i) {
+            if (nums[i] != i + 1) {
+                return i + 1;
+            }
+        }
+        // 当输入是[1]的时候，应该返回2
+        return len + 1; // 这里注意！！！
     }
 ```
 
