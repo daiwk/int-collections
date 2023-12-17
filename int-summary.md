@@ -8827,21 +8827,30 @@ def calc_auc_and_pnr(labels, probs):
                 r_number += 0.5
             else:
                 r_number += 1.
+    print(number, r_number)
     pnr = number / r_number
+    ## 这两种方法都行，结果一样
     auc = number / (N * P)
-    return auc, pnr
+    auc2 = pnr/(pnr+1.)
+    return auc, auc2, pnr
 
 
 if __name__ == '__main__':
-    for user, lines in groupby(sys.stdin, key=lambda x:x.split('\t')[0]):
-        lines = list(lines)
-        #print lines
-        trues = [float(x.strip().split('\t')[1]) for x in lines]
-        preds = [float(x.strip().split('\t')[2]) for x in lines]
-        auc, pnr = calc_auc_and_pnr(trues, preds)
-        ## auc = 1/(1+1/pnr) ==> pnr = 1/ (1/a - 1)
-        pnr_check = 1. / (1. / auc - 1 + 1e-9)
-        print auc, pnr, pnr_check
+    labels = [0,1,0, 1]
+    scores = [0.3, 0.3, 0.2, 0.8]
+    print(calc_auc_and_pnr(labels, scores))
+    exit(0)
+
+
+#    for user, lines in groupby(sys.stdin, key=lambda x:x.split('\t')[0]):
+#        lines = list(lines)
+#        #print lines
+#        trues = [float(x.strip().split('\t')[1]) for x in lines]
+#        preds = [float(x.strip().split('\t')[2]) for x in lines]
+#        auc, pnr = calc_auc_and_pnr(trues, preds)
+#        ## auc = 1/(1+1/pnr) ==> pnr = 1/ (1/a - 1)
+#        pnr_check = 1. / (1. / auc - 1 + 1e-9)
+#        print(auc, pnr, pnr_check)
 ```
 
 O(nlogn)如下：
